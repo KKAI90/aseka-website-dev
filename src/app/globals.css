@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #0B1F3A;
+  --navy-mid: #1a3357;
+  --navy-light: #E6F1FB;
+  --accent: #C8002A;
+  --accent-light: #FCEBEB;
+  --gold: #A0680A;
+  --gold-light: #FAEEDA;
+  --muted: #6B6B6B;
+  --border: rgba(11, 31, 58, 0.1);
+  --surface: #F6F7F9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Noto Sans JP', 'Yu Gothic UI', 'Hiragino Sans', sans-serif;
+  color: var(--navy);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn-navy {
+  @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-150;
+  background: var(--navy);
+}
+.btn-navy:hover { background: var(--navy-mid); }
+
+.btn-ghost {
+  @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  background: transparent;
+}
+.btn-ghost:hover { background: var(--navy-light); }
+
+.btn-accent {
+  @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-150;
+  background: var(--accent);
+}
+.btn-accent:hover { opacity: 0.9; }
+
+.card {
+  @apply rounded-xl p-5;
+  border: 0.5px solid var(--border);
+  background: #fff;
+}
+
+.section-eyebrow {
+  @apply text-xs font-semibold tracking-widest uppercase mb-2;
+  color: var(--accent);
+}
+
+.section-title {
+  @apply text-2xl font-bold leading-snug mb-1;
+  color: var(--navy);
+}
+
+.section-ja {
+  @apply text-sm mb-8;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.tag-green {
+  @apply text-xs font-semibold px-2 py-0.5 rounded;
+  background: #EAF3DE;
+  color: #27500A;
+}
+
+.tag-gold {
+  @apply text-xs font-semibold px-2 py-0.5 rounded;
+  background: var(--gold-light);
+  color: var(--gold);
+}
