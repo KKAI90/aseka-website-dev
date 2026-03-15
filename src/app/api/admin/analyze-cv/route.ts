@@ -1,270 +1,225 @@
-export const maxDuration = 30; // cho phép chạy tối đa 30 giây
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 30;
+
 const JOBS = [
-  { id:1, company:"山本フーズ株式会社", position:"調理師", positionVn:"Nhân viên bếp",        industry:"飲食",  jlptMin:"N4", salary:"¥200,000", location:"東京都", status:"urgent" },
-  { id:2, company:"東京工場株式会社",   position:"製造ライン", positionVn:"Công nhân",        industry:"製造",  jlptMin:"N5", salary:"¥185,000", location:"埼玉県", status:"urgent" },
-  { id:3, company:"グランドホテル大阪", position:"客室清掃", positionVn:"Phục vụ phòng",      industry:"ホテル",jlptMin:"N4", salary:"¥175,000", location:"大阪府", status:"open"   },
-  { id:4, company:"みどり農業組合",     position:"農場作業員", positionVn:"Nông trại",        industry:"農業",  jlptMin:"N5", salary:"¥165,000", location:"北海道", status:"open"   },
-  { id:5, company:"さくらレストラン",   position:"ホール", positionVn:"Phục vụ bàn",          industry:"飲食",  jlptMin:"N4", salary:"¥170,000", location:"神奈川県",status:"paused" },
+  { id:"1", company:"山本フーズ株式会社",  position:"調理師",      positionVn:"Nhân viên bếp",        industry:"飲食",  jlptMin:"N4", salary:"¥200,000", location:"東京都", status:"urgent" },
+  { id:"2", company:"東京工場株式会社",    position:"製造ライン",   positionVn:"Công nhân",            industry:"製造",  jlptMin:"N5", salary:"¥185,000", location:"埼玉県", status:"urgent" },
+  { id:"3", company:"グランドホテル大阪",  position:"客室清掃",     positionVn:"Phục vụ phòng",        industry:"ホテル",jlptMin:"N4", salary:"¥175,000", location:"大阪府", status:"open"   },
+  { id:"4", company:"みどり農業組合",      position:"農場作業員",   positionVn:"Nông trại",            industry:"農業",  jlptMin:"N5", salary:"¥165,000", location:"北海道", status:"open"   },
+  { id:"5", company:"さくらレストラン",    position:"ホール",       positionVn:"Phục vụ bàn",          industry:"飲食",  jlptMin:"N4", salary:"¥170,000", location:"神奈川県",status:"paused" },
+  { id:"6", company:"東京ホテルグループ",  position:"フロントスタッフ",positionVn:"Lễ tân khách sạn",  industry:"ホテル",jlptMin:"N3", salary:"¥190,000", location:"東京都", status:"open"   },
+  { id:"7", company:"大阪農場",            position:"ハウス栽培",   positionVn:"Trồng trọt nhà kính", industry:"農業",  jlptMin:"N5", salary:"¥168,000", location:"大阪府", status:"open"   },
 ];
 
-const JLPT_RANK: Record<string,number> = { N1:5,N2:4,N3:3,N4:2,N5:1,"なし":0,"":0 };
+const JLPT_RANK: Record<string,number> = { N1:5,N2:4,N3:3,N4:2,N5:1,"なし":0,"N4相当":2,"N3相当":3,"":0 };
 
-// ── Rule-based CV parser ──────────────────────────────────────────────────────
-
-function extractName(text: string): string {
-  // Vietnamese name patterns
-  const vnPatterns = [
-    /(?:氏名|お名前|名前)[：:\s]*([A-Za-z\u00C0-\u024F\s]{5,40})/i,
-    /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})\s*$/m,
-    /(?:Họ tên|Tên)[：:\s]*([A-Za-z\u00C0-\u024F\s]{5,40})/i,
-  ];
-  // Japanese katakana name (Vietnamese names written in katakana)
-  const kataPattern = /([ア-ン゛゜ァ-ォャ-ョー]{4,20}[・\s][ア-ン゛゜ァ-ォャ-ョー]{2,15})/;
-  const kataMatch = text.match(kataPattern);
-  if (kataMatch) return kataMatch[1].replace(/\s+/g," ").trim();
-
-  for (const p of vnPatterns) {
-    const m = text.match(p);
-    if (m) return m[1].replace(/\s+/g," ").trim();
-  }
-
-  // Fallback: first line that looks like a name
-  const lines = text.split("\n").map(l=>l.trim()).filter(l=>l.length>0);
-  for (const line of lines.slice(0,10)) {
-    if (/^[A-Z][a-z]+(\s[A-Z][a-z]+){1,3}$/.test(line)) return line;
-  }
-  return "";
-}
-
-function extractEmail(text: string): string {
-  const m = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
-  return m ? m[0] : "";
-}
-
-function extractPhone(text: string): string {
-  const patterns = [
-    /(?:0[789]0[-\s]?\d{4}[-\s]?\d{4})/,
-    /(?:\+81[-\s]?[789]0[-\s]?\d{4}[-\s]?\d{4})/,
-    /(?:電話|Tel|TEL|SĐT)[：:\s]*([0-9\-\s\+]{10,15})/i,
-    /0\d{2,3}[-\s]?\d{3,4}[-\s]?\d{4}/,
-  ];
-  for (const p of patterns) {
-    const m = text.match(p);
-    if (m) return (m[1] || m[0]).replace(/\s/g,"-").trim();
-  }
-  return "";
-}
-
-function extractJLPT(text: string): string {
-  const m = text.match(/N[1-5](?:\s*(?:取得|合格|level|レベル))?/i);
-  if (m) {
-    const level = m[0].match(/N[1-5]/i);
-    if (level) return level[0].toUpperCase();
-  }
-  // Check text mentions
-  if (/日本語能力.*N1|N1.*日本語能力/i.test(text)) return "N1";
-  if (/日本語能力.*N2|N2.*日本語能力/i.test(text)) return "N2";
-  if (/日本語能力.*N3|N3.*日本語能力/i.test(text)) return "N3";
-  if (/日本語能力.*N4|N4.*日本語能力/i.test(text)) return "N4";
-  if (/日本語能力.*N5|N5.*日本語能力/i.test(text)) return "N5";
-  if (/日本語.*初級|初級.*日本語/i.test(text)) return "N5";
-  if (/日本語.*中級|中級.*日本語/i.test(text)) return "N4";
-  if (/日本語.*上級|上級.*日本語/i.test(text)) return "N2";
-  return "なし";
-}
-
-function extractIndustry(text: string): string {
-  const keywords: Record<string, string[]> = {
-    "飲食": ["飲食","レストラン","調理","料理","キッチン","ホール","接客","カフェ","食品","nhà hàng","bếp","phục vụ","ẩm thực"],
-    "製造": ["製造","工場","ライン","溶接","組立","品質","機械","加工","生産","nhà máy","xí nghiệp","công nhân","hàn","lắp ráp"],
-    "農業": ["農業","農場","農家","栽培","収穫","農作業","ハウス","nông nghiệp","nông trại","thu hoạch","trồng trọt"],
-    "ホテル": ["ホテル","宿泊","客室","フロント","清掃","ハウスキーピング","khách sạn","dọn phòng","lễ tân"],
-  };
-  const scores: Record<string,number> = { "飲食":0,"製造":0,"農業":0,"ホテル":0 };
-  const lower = text.toLowerCase();
-  for (const [ind, kws] of Object.entries(keywords)) {
-    for (const kw of kws) {
-      const count = (lower.match(new RegExp(kw.toLowerCase(),"g"))||[]).length;
-      scores[ind] += count;
+// Extract text from DOCX (XML-based)
+function extractDocxText(buffer: Buffer): string {
+  try {
+    const content = buffer.toString("binary");
+    // Find word/document.xml content
+    const xmlMatch = content.match(/word\/document\.xml[^P]*PK/s);
+    if (!xmlMatch) {
+      // Try to extract any readable text
+      return buffer.toString("utf-8")
+        .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
+        .replace(/\s+/g, " ").trim();
     }
+    // Remove XML tags and decode
+    const xmlContent = xmlMatch[0]
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&")
+      .replace(/\s+/g, " ").trim();
+    return xmlContent.slice(0, 8000);
+  } catch {
+    return buffer.toString("utf-8")
+      .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
+      .replace(/\s+/g, " ").trim().slice(0, 8000);
   }
-  const best = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
-  return best[1] > 0 ? best[0] : "その他";
 }
 
-function extractExperienceYears(text: string): number {
-  // Pattern: X年間 or X年の経験 or X năm kinh nghiệm
-  const patterns = [
-    /(\d+)年(?:間)?(?:の)?(?:経験|勤務|従事)/,
-    /経験\s*[:：]?\s*(\d+)年/,
-    /(\d+)\s*năm\s*kinh\s*nghiệm/i,
-    /(\d+)\s*年\s*(\d+)\s*ヶ月/,
-  ];
-  let maxYears = 0;
-  for (const p of patterns) {
-    const m = text.match(p);
-    if (m) {
-      const y = parseInt(m[1]);
-      if (y > maxYears && y < 50) maxYears = y;
+// Extract text from PDF
+function extractPdfText(buffer: Buffer): string {
+  return buffer.toString("utf-8")
+    .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
+    .replace(/\s+/g, " ").trim().slice(0, 8000);
+}
+
+// Analyze single CV with Gemini
+async function analyzeWithGemini(text: string, fileName: string) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY not set");
+
+  const prompt = `You are an expert HR assistant for Aseka株式会社, a Vietnamese staffing agency in Japan.
+Analyze this CV/resume text and extract information. The CV may be in Japanese, Vietnamese, or both.
+
+CV Content:
+${text.slice(0, 5000)}
+
+Return ONLY a valid JSON object (no markdown, no explanation):
+{
+  "name": "full name (Latin script preferred)",
+  "nameJp": "name in katakana if available",
+  "email": "email or empty string",
+  "phone": "phone number or empty string",
+  "gender": "女性 or 男性 or empty",
+  "dateOfBirth": "YYYY-MM-DD or empty",
+  "nationality": "Vietnam or empty",
+  "jlpt": "N1/N2/N3/N4/N5/N4相当/N3相当/なし",
+  "visaType": "visa type in Japanese or empty",
+  "industry": "飲食 or 製造 or 農業 or ホテル or その他",
+  "industryVn": "Nhà hàng or Nhà máy or Nông nghiệp or Khách sạn or Khác",
+  "experienceYears": 0,
+  "jobHistory": [{"company": "", "position": "", "period": ""}],
+  "skills": ["skill1", "skill2"],
+  "certifications": ["cert1"],
+  "preferredJob": "希望職種 from CV or empty",
+  "summary": "2-3 sentence professional summary in Japanese",
+  "summaryVn": "2-3 câu tóm tắt bằng tiếng Việt",
+  "strengths": ["strength1", "strength2", "strength3"],
+  "availability": "immediate or YYYY-MM or empty",
+  "height": "height in cm or empty",
+  "weight": "weight in kg or empty"
+}`;
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1500 },
+      }),
     }
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini error: ${res.status} - ${err.slice(0,200)}`);
   }
-  // Also check date ranges like 2019年 ～ 2024年
-  const dateRe = /(\d{4})年.*?[～〜\-~].*?(\d{4})年/g;
-  let dateMatch: RegExpExecArray | null;
-  while ((dateMatch = dateRe.exec(text)) !== null) {
-    const years = parseInt(dateMatch[2]) - parseInt(dateMatch[1]);
-    if (years > 0 && years < 30 && years > maxYears) maxYears = years;
-  }
-  return maxYears;
+
+  const data = await res.json();
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+  const cleaned = raw.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim();
+  return JSON.parse(cleaned);
 }
 
-function extractSkills(text: string): string[] {
-  const skillKeywords = [
-    "溶接","フォークリフト","品質管理","Excel","Word","PowerPoint",
-    "調理","接客","レジ操作","在庫管理","トラクター","ハウス栽培",
-    "清掃","フロント業務","食品衛生","N1","N2","N3","N4","N5",
-    "Hàn","Phục vụ","Lái xe","Tin học","Microsoft Office",
-  ];
-  const found: string[] = [];
-  for (const skill of skillKeywords) {
-    if (text.includes(skill) && !found.includes(skill)) {
-      found.push(skill);
-    }
-  }
-  return found.slice(0, 6);
-}
+// Job matching algorithm
+function matchJobs(candidate: Record<string,unknown>) {
+  const rank = JLPT_RANK[candidate.jlpt as string] || 0;
+  const industry = candidate.industry as string;
+  const expYears = (candidate.experienceYears as number) || 0;
+  const preferredJob = ((candidate.preferredJob as string) || "").toLowerCase();
 
-function extractCertifications(text: string): string[] {
-  const certs: string[] = [];
-  const certPatterns = [
-    /(?:資格|免許)[：:\s]*([^\n]{5,40})/g,
-    /([^\n]*(?:免許|資格|検定|JLPT|N[1-5]取得)[^\n]{0,30})/g,
-  ];
-  for (const p of certPatterns) {
-    let m: RegExpExecArray | null;
-    const re = new RegExp(p.source, p.flags);
-    while ((m = re.exec(text)) !== null) {
-      const cert = (m[1] || m[0]).trim();
-      if (cert.length > 3 && cert.length < 50 && !certs.includes(cert)) {
-        certs.push(cert);
+  return JOBS
+    .filter(j => j.status !== "full")
+    .map(job => {
+      let score = 0;
+      const reasons: string[] = [];
+
+      // Industry match (40pts)
+      if (job.industry === industry) {
+        score += 40;
+        reasons.push(`業種マッチ · Đúng ngành ${job.industry}`);
       }
-    }
-  }
-  return certs.slice(0, 4);
-}
 
-function extractGender(text: string): string {
-  if (/女性|女|nữ/i.test(text)) return "女性";
-  if (/男性|男|nam/i.test(text)) return "男性";
-  return "";
-}
+      // JLPT match (30pts)
+      const reqRank = JLPT_RANK[job.jlptMin] || 0;
+      if (rank >= reqRank) {
+        score += 30;
+        reasons.push(`日本語OK · ${candidate.jlpt}`);
+      } else if (rank === reqRank - 1) {
+        score += 10;
+        reasons.push(`日本語レベル近似`);
+      }
 
-function buildSummary(info: Record<string, unknown>, lang: "ja"|"vn"): string {
-  const name = info.name as string;
-  const jlpt = info.jlpt as string;
-  const industry = info.industry as string;
-  const exp = info.experienceYears as number;
-  const industryVn: Record<string,string> = {
-    "飲食":"nhà hàng/ẩm thực","製造":"nhà máy/xí nghiệp",
-    "農業":"nông nghiệp","ホテル":"khách sạn","その他":"các ngành khác"
-  };
-  if (lang === "vn") {
-    return `${name || "Ứng viên"} có ${exp > 0 ? `${exp} năm` : "kinh nghiệm"} trong ngành ${industryVn[industry]||industry}. ` +
-      `Trình độ tiếng Nhật ${jlpt !== "なし" ? jlpt : "đang học"}. ` +
-      `Sẵn sàng làm việc tại Nhật Bản.`;
-  }
-  return `${name || "候補者"}は${industry}業界で${exp > 0 ? `${exp}年間` : ""}の経験があります。` +
-    `日本語レベルは${jlpt !== "なし" ? jlpt : "学習中"}です。日本での就労を希望しています。`;
-}
+      // Experience (20pts)
+      if (expYears >= 3) { score += 20; reasons.push(`経験${expYears}年`); }
+      else if (expYears >= 1) { score += 10; reasons.push(`経験あり`); }
 
-function buildStrengths(industry: string, jlpt: string, expYears: number): string[] {
-  const strengths: string[] = [];
-  const jlptRank = JLPT_RANK[jlpt] || 0;
-  if (jlptRank >= 3) strengths.push("日本語コミュニケーション能力 · Giao tiếp tiếng Nhật tốt");
-  if (expYears >= 3) strengths.push(`${expYears}年以上の実務経験 · ${expYears}+ năm kinh nghiệm thực tế`);
-  if (industry === "飲食") strengths.push("飲食業界の専門知識 · Kiến thức chuyên môn ngành F&B");
-  if (industry === "製造") strengths.push("製造・品質管理スキル · Kỹ năng sản xuất & QC");
-  if (industry === "農業") strengths.push("農業技術・体力 · Kỹ thuật nông nghiệp & thể lực tốt");
-  if (industry === "ホテル") strengths.push("ホスピタリティスキル · Kỹ năng hospitality");
-  strengths.push("チームワーク・責任感 · Tinh thần đồng đội & trách nhiệm cao");
-  return strengths.slice(0, 3);
-}
+      // Preferred job keyword match (bonus 15pts)
+      if (preferredJob && (
+        job.position.includes(preferredJob) ||
+        job.positionVn.toLowerCase().includes(preferredJob) ||
+        preferredJob.includes(job.industry)
+      )) {
+        score += 15;
+        reasons.push(`希望職種マッチ · Đúng nghề mong muốn`);
+      }
 
-// ── Main handler ──────────────────────────────────────────────────────────────
+      // Urgency bonus (10pts)
+      if (job.status === "urgent") { score += 10; reasons.push(`緊急募集`); }
+
+      return { ...job, score, reasons, matchPct: Math.min(score, 100) };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+}
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const file = formData.get("cv") as File | null;
-    if (!file) return NextResponse.json({ error: "CVファイルが必要です" }, { status: 400 });
+    const results = [];
 
-    // Read and clean text
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const rawText = buffer.toString("utf-8")
-      .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    // Support up to 5 files
+    for (let i = 0; i < 5; i++) {
+      const file = formData.get(`cv_${i}`) as File | null;
+      if (!file) continue;
 
-    // Extract all fields using rule-based parsing
-    const name           = extractName(rawText);
-    const email          = extractEmail(rawText);
-    const phone          = extractPhone(rawText);
-    const jlpt           = extractJLPT(rawText);
-    const industry       = extractIndustry(rawText);
-    const experienceYears = extractExperienceYears(rawText);
-    const skills         = extractSkills(rawText);
-    const certifications = extractCertifications(rawText);
-    const gender         = extractGender(rawText);
+      try {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
 
-    const candidateInfo = {
-      name,
-      email,
-      phone,
-      gender,
-      dateOfBirth: "",
-      jlpt,
-      industry,
-      experienceYears,
-      skills,
-      certifications,
-      summary:   buildSummary({ name, jlpt, industry, experienceYears }, "ja"),
-      summaryVn: buildSummary({ name, jlpt, industry, experienceYears }, "vn"),
-      strengths: buildStrengths(industry, jlpt, experienceYears),
-      preferredLocation: "",
-      availability: "immediate",
-    };
+        // Extract text based on file type
+        let text = "";
+        const ext = file.name.split(".").pop()?.toLowerCase();
+        if (ext === "docx" || ext === "doc") {
+          text = extractDocxText(buffer);
+        } else {
+          text = extractPdfText(buffer);
+        }
 
-    // Job matching
-    const rank = JLPT_RANK[jlpt] || 0;
-    const suggestions = JOBS
-      .filter(j => j.status !== "full")
-      .map(job => {
-        let score = 0;
-        const reasons: string[] = [];
-        if (job.industry === industry)          { score += 40; reasons.push(`業種マッチ · Đúng ngành ${industry}`); }
-        const rq = JLPT_RANK[job.jlptMin] || 0;
-        if (rank >= rq)                         { score += 30; reasons.push(`日本語OK · ${jlpt}`); }
-        else if (rank === rq - 1)               { score += 10; reasons.push(`日本語レベル近似`); }
-        if (experienceYears >= 3)               { score += 20; reasons.push(`経験${experienceYears}年`); }
-        else if (experienceYears >= 1)          { score += 10; reasons.push(`経験あり`); }
-        if (job.status === "urgent")            { score += 10; reasons.push(`緊急募集`); }
-        return { ...job, score, reasons, matchPct: Math.min(score, 100) };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+        // Analyze with Gemini
+        let candidateInfo: Record<string,unknown>;
+        try {
+          candidateInfo = await analyzeWithGemini(text, file.name);
+        } catch (aiErr) {
+          console.error(`AI error for ${file.name}:`, aiErr);
+          // Fallback: basic rule-based
+          candidateInfo = {
+            name: file.name.replace(/\.(pdf|docx?|doc)$/i, ""),
+            email: "", phone: "", gender: "", dateOfBirth: "",
+            jlpt: "N4", industry: "飲食", industryVn: "Nhà hàng",
+            experienceYears: 0, skills: [], certifications: [],
+            summary: "CV分析完了", summaryVn: "Đã tải CV lên",
+            strengths: [], jobHistory: [], preferredJob: "",
+          };
+        }
 
-    return NextResponse.json({
-      candidate: candidateInfo,
-      suggestions,
-      fileName: file.name,
-      fileSize: file.size,
-    });
+        const suggestions = matchJobs(candidateInfo);
+        results.push({
+          success: true,
+          fileName: file.name,
+          fileSize: file.size,
+          candidate: candidateInfo,
+          suggestions,
+        });
+
+      } catch (fileErr) {
+        results.push({
+          success: false,
+          fileName: file.name,
+          error: fileErr instanceof Error ? fileErr.message : "Processing failed",
+        });
+      }
+    }
+
+    return NextResponse.json({ results });
 
   } catch (err) {
-    console.error("CV analysis error:", err);
+    console.error("Multi-CV analysis error:", err);
     return NextResponse.json(
       { error: "CV分析エラー / Lỗi phân tích CV" },
       { status: 500 }

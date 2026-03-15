@@ -23,23 +23,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const rawBody = await req.json();
-
-    // Chỉ lấy những trường CÓ THỰC trong bảng Database của bạn
-    // Loại bỏ những trường thừa từ AI như 'suggestions', 'score', 'matchPct'
-    // Trong hàm POST của file api/admin/candidates/route.ts
-  const candidateData = {
-  name: rawBody.name,
-  email: rawBody.email,
-  phone: rawBody.phone,
-  jlpt: rawBody.jlpt,
-  industry: rawBody.industry,
-  // Bên trái là tên cột trong Supabase, bên phải là tên thuộc tính AI trả về
-  experience_years: rawBody.experienceYears || 0, 
-  summary: rawBody.summary,
-  status: "新規登録",
-};
+  // const token = req.cookies.get("sb-access-token")?.value;
+  // if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  ...
+}
 
     const { data, error } = await db()
       .from("candidates")
