@@ -15,32 +15,54 @@ const JLPT_RANK: Record<string,number> = { N1:5, N2:4, N3:3, N4:2, N5:1, "なし
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("cv") as File | null;
-    if (!file) return NextResponse.json({ error: "CVファイルが必要です" }, { status:400 });
+    // 1. Lấy dữ liệu từ Form
+const formData = await req.formData();
+const file = formData.get("cv") as File | null; 
 
-    // Đọc file sang Buffer (Gemini có thể đọc trực tiếp PDF/Ảnh, nhưng ở đây ta dùng text từ buffer cho ổn định)
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
-    let rawText = "";
-    try {
-      rawText = buffer.toString("utf-8");
-    } catch {
-      rawText = buffer.toString("latin1");
+if (!file) {
+  return NextResponse.json({ error: "Không tìm thấy file CV" }, { status: 400 });
+}
+
+// 2. Chuyển đổi file sang Base64 để gửi cho Gemini (Cách này cực kỳ ổn định)
+const bytes = await file.arrayBuffer();
+const base64Data = Buffer.from(bytes).toString("base64");
+
+// 3. Cấu hình Model Gemini
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-1.5-flash",
+  generationConfig: { 
+    responseMimeType: "application/json" // Ép AI luôn trả về JSON chuẩn
+  }
+});
+
+const prompt = `You are an HR assistant. Analyze this CV and extract info. 
+Respond ONLY with valid JSON:
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "jlpt": "N1/N2/N3/N4/N5 or なし",
+  "industry": "飲食 or 製造 or 農業 or ホテル or その他",
+  "experienceYears": number,
+  "summary": "Japanese summary",
+  "summaryVn": "Vietnamese summary"
+}`;
+
+// 4. Gọi API Gemini (Gửi kèm cả file gốc)
+const result = await model.generateContent([
+  {
+    inlineData: {
+      data: base64Data,
+      mimeType: file.type // Tự động nhận diện PDF hoặc Ảnh
     }
-    
-    const cleanText = rawText
-      .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 15000); // Gemini hỗ trợ context lớn hơn Claude nhiều
+  },
+  prompt
+]);
 
-    // Khởi tạo model Gemini 1.5 Flash (nhanh và miễn phí)
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: {
-            responseMimeType: "application/json", // Ép trả về JSON chuẩn
+const rawResult = result.response.text();
+const candidateInfo = JSON.parse(rawResult);
+
+// ... (Giữ nguyên đoạn code so khớp Job Matching bên dưới của bạn)
         }
     });
 
