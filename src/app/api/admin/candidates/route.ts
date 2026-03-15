@@ -23,15 +23,38 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  // Tạm comment dòng này để test
-  // const token = req.cookies.get("sb-access-token")?.value;
-  // if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const rawBody = await req.json();
 
-  const body = await req.json();
-  const { data, error } = await db()
-    .from("candidates").insert(body).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data });
+    // Chỉ lấy những trường CÓ THỰC trong bảng Database của bạn
+    // Loại bỏ những trường thừa từ AI như 'suggestions', 'score', 'matchPct'
+    const candidateData = {
+      name: rawBody.name || "Unknown",
+      email: rawBody.email || "",
+      phone: rawBody.phone || "",
+      jlpt: rawBody.jlpt || "なし",
+      industry: rawBody.industry || "その他",
+      experience_years: rawBody.experienceYears || 0, // Lưu ý: DB thường dùng snake_case
+      summary: rawBody.summary || "",
+      status: "新規登録", // Trạng thái mặc định khi mới lưu
+      created_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await db()
+      .from("candidates")
+      .insert([candidateData]) // Luôn dùng mảng [] để an toàn
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase Insert Error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function PATCH(req: NextRequest) {
