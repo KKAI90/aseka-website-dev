@@ -23,19 +23,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const token = req.cookies.get("sb-access-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Tạm comment dòng này để test
+  // const token = req.cookies.get("sb-access-token")?.value;
+  // if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  console.log("POST candidates body:", JSON.stringify(body)); // ← thêm dòng này
-
   const { data, error } = await db()
     .from("candidates").insert(body).select().single();
-
-  if (error) {
-    console.log("Supabase error:", error); // ← thêm dòng này
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ data });
 }
 
