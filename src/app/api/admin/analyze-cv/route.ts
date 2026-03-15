@@ -19,7 +19,7 @@ function extractDocxText(buffer: Buffer): string {
   try {
     const content = buffer.toString("binary");
     // Find word/document.xml content
-    const xmlMatch = content.match(/word\/document\.xml[^P]*PK/s);
+    const xmlMatch = content.match(/word\/document\.xml[\s\S]*?PK/);
     if (!xmlMatch) {
       // Try to extract any readable text
       return buffer.toString("utf-8")

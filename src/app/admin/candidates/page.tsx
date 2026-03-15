@@ -275,15 +275,15 @@ export default function CandidatesPage() {
               </div>
               {selected.cv_filename&&<div style={{display:"flex",alignItems:"center",gap:"7px",background:"#FCEBEB",borderRadius:"7px",padding:"8px 12px",marginBottom:"10px"}}><span>📄</span><div><div style={{fontSize:"11px",fontWeight:700,color:"#A32D2D"}}>CV登録済み</div><div style={{fontSize:"10px",color:"#C8002A"}}>{selected.cv_filename}</div></div></div>}
               {selected.ai_data?.summaryVn&&<div style={{background:"#F6F7F9",borderRadius:"8px",padding:"10px",marginBottom:"10px",fontSize:"11px",color:"#444",lineHeight:1.65}}>{selected.ai_data.summaryVn}</div>}
-              {selected.ai_data?.strengths?.length>0&&(
+              {(selected.ai_data?.strengths?.length??0)>0&&(
                 <div style={{display:"flex",flexWrap:"wrap",gap:"4px",marginBottom:"10px"}}>
-                  {selected.ai_data.strengths.map((s,i)=><span key={i} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>)}
+                  {selected.ai_data?.strengths.map((s,i)=><span key={i} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>)}
                 </div>
               )}
-              {selected.ai_data?.jobHistory?.length>0&&(
+              {(selected.ai_data?.jobHistory?.length??0)>0&&(
                 <div style={{marginBottom:"10px"}}>
                   <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"5px"}}>職歴 / Kinh nghiệm</div>
-                  {selected.ai_data.jobHistory.map((j,i)=>(
+                  
                     <div key={i} style={{fontSize:"11px",color:navy,padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.06)"}}>
                       <span style={{fontWeight:600}}>{j.company}</span> — {j.position} <span style={{color:"#6B6B6B",fontSize:"10px"}}>{j.period}</span>
                     </div>
