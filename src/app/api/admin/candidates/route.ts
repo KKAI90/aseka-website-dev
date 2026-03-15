@@ -23,14 +23,36 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log("INSERT body keys:", Object.keys(body));
+
+    // Only insert valid columns
+    const record = {
+      name:           body.name || "",
+      email:          body.email || null,
+      phone:          body.phone || null,
+      skill:          body.skill || null,
+      jlpt:           body.jlpt || null,
+      status:         body.status || "new",
+      match_job_id:   body.match_job_id || null,
+      match_job_name: body.match_job_name || null,
+      note:           body.note || null,
+      cv_filename:    body.cv_filename || null,
+      ai_data:        body.ai_data || null,
+    };
+
     const { data, error } = await db()
       .from("candidates")
-      .insert(body)
+      .insert(record)
       .select()
       .single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return NextResponse.json({ error: error.message, details: error }, { status: 500 });
+    }
     return NextResponse.json({ data });
   } catch (err) {
+    console.error("POST candidates error:", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
