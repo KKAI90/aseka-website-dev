@@ -1,3 +1,4 @@
+export const maxDuration = 30; // cho phép chạy tối đa 30 giây
 import { NextRequest, NextResponse } from "next/server";
 
 const JOBS = [
