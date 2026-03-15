@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const base64Data = Buffer.from(bytes).toString("base64");
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash", // Thay đổi từ 1.5-flash sang 2.0-flash
+      model: "gemini-1.5-flash", // Thay đổi từ 1.5-flash sang 2.0-flash
       generationConfig: { responseMimeType: "application/json" }
     });
 
