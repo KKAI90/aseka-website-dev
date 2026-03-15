@@ -28,17 +28,18 @@ export async function POST(req: NextRequest) {
 
     // Chỉ lấy những trường CÓ THỰC trong bảng Database của bạn
     // Loại bỏ những trường thừa từ AI như 'suggestions', 'score', 'matchPct'
-    const candidateData = {
-      name: rawBody.name || "Unknown",
-      email: rawBody.email || "",
-      phone: rawBody.phone || "",
-      jlpt: rawBody.jlpt || "なし",
-      industry: rawBody.industry || "その他",
-      experience_years: rawBody.experienceYears || 0, // Lưu ý: DB thường dùng snake_case
-      summary: rawBody.summary || "",
-      status: "新規登録", // Trạng thái mặc định khi mới lưu
-      created_at: new Date().toISOString(),
-    };
+    // Trong hàm POST của file api/admin/candidates/route.ts
+  const candidateData = {
+  name: rawBody.name,
+  email: rawBody.email,
+  phone: rawBody.phone,
+  jlpt: rawBody.jlpt,
+  industry: rawBody.industry,
+  // Bên trái là tên cột trong Supabase, bên phải là tên thuộc tính AI trả về
+  experience_years: rawBody.experienceYears || 0, 
+  summary: rawBody.summary,
+  status: "新規登録",
+};
 
     const { data, error } = await db()
       .from("candidates")
