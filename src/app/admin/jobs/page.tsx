@@ -298,7 +298,7 @@ export default function JobsPage() {
             </div>
 
             {/* Tabs */}
-            <div style={{display:"flex",gap:0,borderBottom:"0.5px solid rgba(11,31,58,0.1)",marginBottom:"12px",background:"#fff",borderRadius:"10px 10px 0 0",overflow:"hidden",...B,borderBottom:"none"}}>
+            <div style={{display:"flex",gap:0,marginBottom:"12px",background:"#fff",borderRadius:"10px 10px 0 0",overflow:"hidden",border:"0.5px solid rgba(11,31,58,0.1)",borderBottom:"none"}}>
               {[{k:"info",l:"求人概要"},{k:"match",l:`AIマッチング${matches.length>0?` (${matches.length}名)`:""}`}].map(t=>(
                 <button key={t.k} onClick={()=>setActiveTab(t.k as "info"|"match")} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===t.k?700:400,color:activeTab===t.k?navy:"#6B6B6B",border:"none",background:activeTab===t.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===t.k?navy:"transparent"}`,cursor:"pointer"}}>
                   {t.l}
