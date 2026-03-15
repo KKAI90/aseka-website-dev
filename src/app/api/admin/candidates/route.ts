@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       skill:          body.skill || null,
       jlpt:           body.jlpt || null,
       status:         body.status || "new",
-      match_job_id:   body.match_job_id || null,
+      match_job_id:   null,
       match_job_name: body.match_job_name || null,
       note:           body.note || null,
       cv_filename:    body.cv_filename || null,
