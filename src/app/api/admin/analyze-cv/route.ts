@@ -110,9 +110,10 @@ function extractExperienceYears(text: string): number {
     }
   }
   // Also check date ranges like 2019年 ～ 2024年
-  const dateRanges = text.matchAll(/(\d{4})年.*?[～〜\-~].*?(\d{4})年/g);
-  for (const match of dateRanges) {
-    const years = parseInt(match[2]) - parseInt(match[1]);
+  const dateRe = /(\d{4})年.*?[～〜\-~].*?(\d{4})年/g;
+  let dateMatch: RegExpExecArray | null;
+  while ((dateMatch = dateRe.exec(text)) !== null) {
+    const years = parseInt(dateMatch[2]) - parseInt(dateMatch[1]);
     if (years > 0 && years < 30 && years > maxYears) maxYears = years;
   }
   return maxYears;
@@ -141,9 +142,10 @@ function extractCertifications(text: string): string[] {
     /([^\n]*(?:免許|資格|検定|JLPT|N[1-5]取得)[^\n]{0,30})/g,
   ];
   for (const p of certPatterns) {
-    const matches = text.matchAll(p);
-    for (const m of matches) {
-      const cert = m[1].trim();
+    let m: RegExpExecArray | null;
+    const re = new RegExp(p.source, p.flags);
+    while ((m = re.exec(text)) !== null) {
+      const cert = (m[1] || m[0]).trim();
       if (cert.length > 3 && cert.length < 50 && !certs.includes(cert)) {
         certs.push(cert);
       }
