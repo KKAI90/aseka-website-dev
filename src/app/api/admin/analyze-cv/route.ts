@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 function db() {
   return createClient(
@@ -67,7 +67,10 @@ ${text.slice(0, 5000)}`;
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0,200)}`);
   const data = await res.json();
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-  return JSON.parse(raw.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim());
+  // Extract JSON object robustly — Gemini sometimes prefixes with text
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("Gemini returned no JSON");
+  return JSON.parse(match[0]);
 }
 
 async function matchJobs(candidate: Record<string,unknown>) {
@@ -117,6 +120,7 @@ export async function POST(req: NextRequest) {
           suggestions,
         });
       } catch (err) {
+        console.error(`analyze-cv error [${item.fileName}]:`, err);
         results.push({ success: false, fileName: item.fileName, error: String(err) });
       }
     }
