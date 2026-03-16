@@ -658,31 +658,42 @@ export default function CandidatesPage() {
             </div>
 
             {/* Extracted data preview */}
-            {(Array.isArray(c.education)&&c.education.length>0||Array.isArray(c.work_history)&&(c.work_history as unknown[]).length>0||Array.isArray(c.certifications)&&(c.certifications as unknown[]).length>0)&&(
-              <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
-                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
-                {(c.education as Edu[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>学歴 ({(c.education as Edu[]).length}件)</div>
-                  {(c.education as Edu[]).map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
-                </>}
-                {(c.work_history as Work[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>職歴 ({(c.work_history as Work[]).length}件)</div>
-                  {(c.work_history as Work[]).map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
-                </>}
-                {(c.certifications as Cert[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>資格 ({(c.certifications as Cert[]).length}件)</div>
-                  {(c.certifications as Cert[]).map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
-                </>}
-              </div>
-            )}
+            {(()=>{
+              const edu = c.education as Edu[]|null;
+              const wh  = c.work_history as Work[]|null;
+              const crt = c.certifications as Cert[]|null;
+              if (!edu?.length && !wh?.length && !crt?.length) return null;
+              return (
+                <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
+                  <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
+                  {edu && edu.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>学歴 ({edu.length}件)</div>
+                    {edu.map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
+                  </>}
+                  {wh && wh.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>職歴 ({wh.length}件)</div>
+                    {wh.map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
+                  </>}
+                  {crt && crt.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>資格 ({crt.length}件)</div>
+                    {crt.map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
+                  </>}
+                </div>
+              );
+            })()}
 
             {/* Motivation/PR */}
-            {(c.motivation||c.self_pr)&&(
-              <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
-                {c.motivation&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.motivation as string}</div></>}
-                {c.self_pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.self_pr as string}</div></>}
-              </div>
-            )}
+            {(()=>{
+              const mot = c.motivation as string|null;
+              const pr  = c.self_pr as string|null;
+              if (!mot && !pr) return null;
+              return (
+                <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
+                  {mot&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
+                  {pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Right: Job matching */}
