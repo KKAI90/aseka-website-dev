@@ -27,7 +27,7 @@ type FileItem = {
   file:File; id:string;
   status:"waiting"|"analyzing"|"done"|"error";
   progress:number;
-  result?:{ success:boolean; fileName:string; candidate?:Record<string,unknown>; suggestions?:Job[]; error?:string };
+  result?:{ success:boolean; fileName:string; candidate?:Record<string,unknown>; suggestions?:Job[]; error?:string; rateLimited?:boolean };
 };
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -134,7 +134,9 @@ export default function CandidatesPage() {
   const [saving, setSaving] = useState(false);
   const [matchResults, setMatchResults] = useState<Job[]>([]);
   const [matching, setMatching] = useState(false);
+  const [retryCountdown, setRetryCountdown] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const retryTimerRef = useRef<ReturnType<typeof setInterval>|null>(null);
 
   const load = useCallback(async (s?:string) => {
     const p = new URLSearchParams();
@@ -258,6 +260,23 @@ export default function CandidatesPage() {
           if (!r) return {...f,status:"error",progress:100};
           return {...f,status:r.success?"done":"error",progress:100,result:r};
         }));
+        // If any file hit rate limit, start countdown and auto-retry
+        const hasRateLimit = data.results.some((r: {rateLimited?:boolean}) => r.rateLimited);
+        if (hasRateLimit) {
+          if (retryTimerRef.current) clearInterval(retryTimerRef.current);
+          setRetryCountdown(60);
+          retryTimerRef.current = setInterval(() => {
+            setRetryCountdown(prev => {
+              if (prev <= 1) {
+                clearInterval(retryTimerRef.current!);
+                retryTimerRef.current = null;
+                setFileItems(p => p.map(f => f.result?.rateLimited ? {...f, status:"waiting", progress:0, result:undefined} : f));
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        }
       }
     } catch (err) {
       console.error("analyzeAll error:", err);
@@ -636,7 +655,18 @@ export default function CandidatesPage() {
           </div>
         )}
 
-        {fileItems.length>0&&!isAnalyzing&&fileItems.some(f=>f.status==="waiting")&&(
+        {retryCountdown>0&&(
+          <div style={{background:"#FAEEDA",border:"1px solid #EF9F27",borderRadius:"9px",padding:"12px 16px",marginBottom:"10px",display:"flex",alignItems:"center",gap:"10px"}}>
+            <span style={{fontSize:"20px"}}>⏱</span>
+            <div style={{flex:1}}>
+              <div style={{fontSize:"13px",fontWeight:700,color:"#633806"}}>Gemini API rate limit — tự động thử lại sau {retryCountdown}s</div>
+              <div style={{fontSize:"11px",color:"#633806",marginTop:"2px"}}>Quota vượt giới hạn phút. Đang chờ reset...</div>
+            </div>
+            <div style={{width:"44px",height:"44px",borderRadius:"50%",background:"#fff",border:"2px solid #EF9F27",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"14px",fontWeight:700,color:"#633806",flexShrink:0}}>{retryCountdown}</div>
+          </div>
+        )}
+
+        {fileItems.length>0&&!isAnalyzing&&fileItems.some(f=>f.status==="waiting")&&retryCountdown===0&&(
           <button onClick={analyzeAll} style={{width:"100%",padding:"12px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
             🤖 Gemini AIで全情報を抽出 · Phân tích toàn bộ ({fileItems.filter(f=>f.status==="waiting").length}件)
           </button>

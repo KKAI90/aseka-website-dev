@@ -1,28 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 function db() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
-}
-
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
-async function callGemini(apiKey: string, body: object, retries = 3): Promise<Response> {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
-  );
-  if (res.status === 429 && retries > 0) {
-    console.warn(`Gemini 429 rate limit — waiting 20s before retry (${retries} left)`);
-    await sleep(20000);
-    return callGemini(apiKey, body, retries - 1);
-  }
-  return res;
 }
 
 async function analyzeWithGemini(text: string) {
@@ -67,15 +52,26 @@ Return ONLY valid JSON (no markdown):
 CV TEXT:
 ${text.slice(0, 5000)}`;
 
-  const res = await callGemini(apiKey, {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.1, maxOutputTokens: 2000 },
-  });
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 2000 },
+      }),
+    }
+  );
 
+  if (res.status === 429) {
+    const body = await res.text();
+    throw new Error(`RATE_LIMITED: ${body.slice(0, 100)}`);
+  }
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 200)}`);
+
   const data = await res.json();
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-  // Extract JSON object robustly — Gemini sometimes prefixes with text
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("Gemini returned no JSON");
   return JSON.parse(match[0]);
@@ -114,12 +110,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const results = [];
-    const files: Array<{fileName: string; fileSize?: number; text?: string}> = body.files || [];
 
-    for (let i = 0; i < files.length; i++) {
-      const item = files[i];
-      // Delay 3s between files to avoid rate limiting
-      if (i > 0) await sleep(3000);
+    for (const item of (body.files || [])) {
       try {
         const candidateInfo = await analyzeWithGemini(item.text || "");
         const suggestions = await matchJobs(candidateInfo);
@@ -131,8 +123,14 @@ export async function POST(req: NextRequest) {
           suggestions,
         });
       } catch (err) {
+        const errStr = String(err);
         console.error(`analyze-cv error [${item.fileName}]:`, err);
-        results.push({ success: false, fileName: item.fileName, error: String(err) });
+        results.push({
+          success: false,
+          fileName: item.fileName,
+          error: errStr,
+          rateLimited: errStr.includes("RATE_LIMITED"),
+        });
       }
     }
 
