@@ -211,13 +211,26 @@ export default function CandidatesPage() {
         }
       } catch { /* fallback to PDF path */ }
     }
-    // PDF or fallback — extract printable characters
-    try {
-      const text = new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(ab));
-      return text
-        .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
-        .replace(/\s+/g," ").trim().slice(0, 5000);
-    } catch { return ""; }
+    // PDF — use pdfjs-dist for proper text extraction
+    if (ext === "pdf") {
+      try {
+        const pdfjsLib = await import("pdfjs-dist");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(ab) }).promise;
+        const pages: string[] = [];
+        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items
+            .map((item) => ("str" in item ? item.str : ""))
+            .join(" ");
+          pages.push(pageText);
+        }
+        return pages.join("\n").replace(/\s+/g, " ").trim().slice(0, 5000);
+      } catch { return ""; }
+    }
+    // Other fallback
+    return "";
   };
 
   const analyzeAll = async () => {
