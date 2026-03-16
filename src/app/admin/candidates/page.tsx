@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 
@@ -150,18 +151,18 @@ export default function CandidatesPage() {
   useEffect(()=>{load();},[load]);
 
   const counts: Record<string,number> = {all:cands.length};
-  Object.keys(ST).forEach(k=>{counts[k]=cands.filter(c=>c.status===k).length;});
+  Object.keys(ST).forEach((k: string) => {counts[k] = cands.filter((c: Candidate) => c.status === k).length;});
 
   const updateStatus = async (id:string, status:string) => {
     await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});
-    setCands(p=>p.map(c=>c.id===id?{...c,status}:c));
-    setSelected(p=>p?.id===id?{...p,status}:p);
+    setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === id ? {...c, status} : c));
+    setSelected((p: Candidate | null) => p?.id === id ? {...p, status} : p);
   };
 
   const deleteCandidate = async (id:string) => {
     if (!confirm("削除しますか？/ Xóa ứng viên này?")) return;
     await fetch(`/api/admin/candidates?id=${id}`,{method:"DELETE"});
-    setCands(p=>p.filter(c=>c.id!==id));
+    setCands((p: Candidate[]) => p.filter((c: Candidate) => c.id !== id));
     setSelected(null);
   };
 
@@ -185,7 +186,7 @@ export default function CandidatesPage() {
       file, id:Math.random().toString(36).slice(2),
       status:"waiting" as const, progress:0,
     }));
-    setFileItems(p=>[...p,...toAdd]);
+    setFileItems((p: FileItem[]) => [...p, ...toAdd]);
   };
 
   const extractText = async (file: File): Promise<string> => {
@@ -228,17 +229,17 @@ export default function CandidatesPage() {
   const analyzeAll = async () => {
     if (!fileItems.length) return;
     setIsAnalyzing(true);
-    setFileItems(p=>p.map(f=>({...f,status:"analyzing",progress:0})));
+    setFileItems((p: FileItem[]) => p.map((f: FileItem) => ({...f, status: "analyzing", progress: 0})));
     const timers: Record<string,ReturnType<typeof setInterval>> = {};
-    fileItems.forEach(item=>{
-      timers[item.id] = setInterval(()=>{
-        setFileItems(p=>p.map(f=>f.id===item.id&&f.status==="analyzing"?{...f,progress:Math.min(f.progress+8,85)}:f));
+    fileItems.forEach((item: FileItem) => {
+      timers[item.id] = setInterval(() => {
+        setFileItems((p: FileItem[]) => p.map((f: FileItem) => f.id === item.id && f.status === "analyzing" ? {...f, progress: Math.min(f.progress + 8, 85)} : f));
       },200);
     });
     try {
       // Extract text CLIENT-SIDE → send only text (avoid 413 error)
       const filesWithText = await Promise.all(
-        fileItems.map(async item => ({
+        fileItems.map(async (item: FileItem) => ({
           fileName: item.file.name,
           fileSize: item.file.size,
           text: await extractText(item.file),
@@ -252,7 +253,7 @@ export default function CandidatesPage() {
       const data = await res.json();
       Object.values(timers).forEach(t=>clearInterval(t));
       if (data.results) {
-        setFileItems(p=>p.map((f,i)=>{
+        setFileItems((p: FileItem[]) => p.map((f: FileItem, i: number) => {
           const r = data.results[i];
           if (!r) return {...f,status:"error",progress:100};
           return {...f,status:r.success?"done":"error",progress:100,result:r};
@@ -261,7 +262,7 @@ export default function CandidatesPage() {
     } catch (err) {
       console.error("analyzeAll error:", err);
       Object.values(timers).forEach(t=>clearInterval(t));
-      setFileItems(p=>p.map(f=>({...f,status:"error",progress:100})));
+      setFileItems((p: FileItem[]) => p.map((f: FileItem) => ({...f, status: "error", progress: 100})));
     }
     setIsAnalyzing(false);
   };
@@ -302,7 +303,7 @@ export default function CandidatesPage() {
   const saveCandidate = async () => {
     if (!editForm.name || !currentReview) return;
     setSaving(true);
-    const job = currentReview.suggestions?.find(j=>j.id===selectedJobId);
+    const job = currentReview.suggestions?.find((j: Job) => j.id === selectedJobId);
     const c = currentReview.candidate;
     const res = await fetch("/api/admin/candidates",{
       method:"POST", headers:{"Content-Type":"application/json"},
@@ -321,7 +322,7 @@ export default function CandidatesPage() {
     });
     if (res.ok) {
       setView("list");
-      setFileItems(p=>p.filter(f=>f.result?.fileName!==editForm.cv_filename));
+      setFileItems((p: FileItem[]) => p.filter((f: FileItem) => f.result?.fileName !== editForm.cv_filename));
       setCurrentReview(null);
       await load();
     } else {
@@ -341,7 +342,7 @@ export default function CandidatesPage() {
         </div>
         <div style={{display:"flex",gap:"8px"}}>
           <input type="text" placeholder="名前・メールで検索..." value={search}
-            onChange={e=>{setSearch(e.target.value);load(e.target.value);}}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setSearch(e.target.value); load(e.target.value);}}
             style={{padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",width:"180px"}}/>
           <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
