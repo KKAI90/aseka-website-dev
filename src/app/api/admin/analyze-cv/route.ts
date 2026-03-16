@@ -10,13 +10,13 @@ function db() {
   );
 }
 
-async function analyzeWithGemini(text: string) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY not set");
+async function analyzeWithGroq(text: string) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("GROQ_API_KEY not set");
 
   const prompt = `You are an expert HR data extractor for Aseka株式会社.
 Extract ALL information from this resume text (Japanese/Vietnamese/mixed).
-Return ONLY valid JSON (no markdown):
+Return ONLY valid JSON (no markdown, no explanation):
 {
   "name": "Latin name",
   "name_kana": "Katakana if present",
@@ -52,28 +52,30 @@ Return ONLY valid JSON (no markdown):
 CV TEXT:
 ${text.slice(0, 5000)}`;
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 2000 },
-      }),
-    }
-  );
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.1,
+      max_tokens: 2000,
+    }),
+  });
 
   if (res.status === 429) {
     const body = await res.text();
     throw new Error(`RATE_LIMITED: ${body.slice(0, 100)}`);
   }
-  if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text()).slice(0, 200)}`);
 
   const data = await res.json();
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+  const raw = data.choices?.[0]?.message?.content || "{}";
   const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("Gemini returned no JSON");
+  if (!match) throw new Error("Groq returned no JSON");
   return JSON.parse(match[0]);
 }
 
@@ -113,7 +115,7 @@ export async function POST(req: NextRequest) {
 
     for (const item of (body.files || [])) {
       try {
-        const candidateInfo = await analyzeWithGemini(item.text || "");
+        const candidateInfo = await analyzeWithGroq(item.text || "");
         const suggestions = await matchJobs(candidateInfo);
         results.push({
           success: true,
