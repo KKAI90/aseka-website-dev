@@ -258,7 +258,8 @@ export default function CandidatesPage() {
           return {...f,status:r.success?"done":"error",progress:100,result:r};
         }));
       }
-    } catch {
+    } catch (err) {
+      console.error("analyzeAll error:", err);
       Object.values(timers).forEach(t=>clearInterval(t));
       setFileItems(p=>p.map(f=>({...f,status:"error",progress:100})));
     }
