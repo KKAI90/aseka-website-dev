@@ -188,6 +188,43 @@ export default function CandidatesPage() {
     setFileItems(p=>[...p,...toAdd]);
   };
 
+  const extractText = async (file: File): Promise<string> => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const ab = await file.arrayBuffer();
+    if (ext === "docx" || ext === "doc") {
+      try {
+        // Extract XML text from DOCX zip structure
+        const bytes = new Uint8Array(ab);
+        let xmlText = "";
+        // Search for word/document.xml content in binary
+        const marker = "word/document.xml";
+        const markerBytes = marker.split("").map(c=>c.charCodeAt(0));
+        for (let i=0; i<bytes.length-markerBytes.length; i++) {
+          let match = true;
+          for (let j=0; j<markerBytes.length; j++) {
+            if (bytes[i+j] !== markerBytes[j]) { match=false; break; }
+          }
+          if (match) {
+            const chunk = bytes.slice(i, Math.min(i+60000, bytes.length));
+            xmlText = new TextDecoder("utf-8", {fatal:false}).decode(chunk);
+            break;
+          }
+        }
+        if (xmlText) {
+          return xmlText.replace(/<[^>]+>/g," ").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&")
+            .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
+            .replace(/\s+/g," ").trim().slice(0,5000);
+        }
+      } catch { /* fallback */ }
+    }
+    // PDF or fallback
+    try {
+      const text = new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(ab));
+      return text.replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
+        .replace(/\s+/g," ").trim().slice(0,5000);
+    } catch { return ""; }
+  };
+
   const analyzeAll = async () => {
     if (!fileItems.length) return;
     setIsAnalyzing(true);
@@ -199,16 +236,26 @@ export default function CandidatesPage() {
       },200);
     });
     try {
-      const fd = new FormData();
-      fileItems.forEach((item,i)=>fd.append(`cv_${i}`,item.file));
-      const res = await fetch("/api/admin/analyze-cv",{method:"POST",body:fd});
+      // Extract text CLIENT-SIDE → send only text (avoid 413 error)
+      const filesWithText = await Promise.all(
+        fileItems.map(async item => ({
+          fileName: item.file.name,
+          fileSize: item.file.size,
+          text: await extractText(item.file),
+        }))
+      );
+      const res = await fetch("/api/admin/analyze-cv",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({files:filesWithText}),
+      });
       const data = await res.json();
       Object.values(timers).forEach(t=>clearInterval(t));
       if (data.results) {
         setFileItems(p=>p.map((f,i)=>{
           const r = data.results[i];
           if (!r) return {...f,status:"error",progress:100};
-          return {...f,status:r.success?"done":"error",progress:100,result:r,error:r.error};
+          return {...f,status:r.success?"done":"error",progress:100,result:r};
         }));
       }
     } catch {
@@ -217,6 +264,7 @@ export default function CandidatesPage() {
     }
     setIsAnalyzing(false);
   };
+
 
   const openReview = (item: FileItem) => {
     if (!item.result?.candidate) return;
@@ -658,31 +706,42 @@ export default function CandidatesPage() {
             </div>
 
             {/* Extracted data preview */}
-            {(Array.isArray(c.education)&&c.education.length>0||Array.isArray(c.work_history)&&(c.work_history as unknown[]).length>0||Array.isArray(c.certifications)&&(c.certifications as unknown[]).length>0)&&(
-              <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
-                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
-                {(c.education as Edu[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>学歴 ({(c.education as Edu[]).length}件)</div>
-                  {(c.education as Edu[]).map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
-                </>}
-                {(c.work_history as Work[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>職歴 ({(c.work_history as Work[]).length}件)</div>
-                  {(c.work_history as Work[]).map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
-                </>}
-                {(c.certifications as Cert[])?.length>0&&<>
-                  <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>資格 ({(c.certifications as Cert[]).length}件)</div>
-                  {(c.certifications as Cert[]).map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
-                </>}
-              </div>
-            )}
+            {(()=>{
+              const edu = c.education as Edu[]|null;
+              const wh  = c.work_history as Work[]|null;
+              const crt = c.certifications as Cert[]|null;
+              if (!edu?.length && !wh?.length && !crt?.length) return null;
+              return (
+                <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
+                  <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
+                  {edu && edu.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>学歴 ({edu.length}件)</div>
+                    {edu.map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
+                  </>}
+                  {wh && wh.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>職歴 ({wh.length}件)</div>
+                    {wh.map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
+                  </>}
+                  {crt && crt.length>0&&<>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>資格 ({crt.length}件)</div>
+                    {crt.map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
+                  </>}
+                </div>
+              );
+            })()}
 
             {/* Motivation/PR */}
-            {(c.motivation||c.self_pr)&&(
-              <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
-                {c.motivation&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.motivation as string}</div></>}
-                {c.self_pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.self_pr as string}</div></>}
-              </div>
-            )}
+            {(()=>{
+              const mot = c.motivation as string|null;
+              const pr  = c.self_pr as string|null;
+              if (!mot && !pr) return null;
+              return (
+                <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
+                  {mot&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
+                  {pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Right: Job matching */}
