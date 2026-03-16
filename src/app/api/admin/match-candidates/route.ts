@@ -10,104 +10,55 @@ function db() {
   );
 }
 
+async function callGemini(prompt: string): Promise<unknown[]> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return [];
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      { method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.2,maxOutputTokens:1000} }) }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
+    return JSON.parse(raw.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim());
+  } catch { return []; }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { job } = await req.json();
+    const body = await req.json();
 
-    // Get all candidates from DB
-    const { data: candidates, error } = await db()
-      .from("candidates")
-      .select("*")
-      .not("status", "eq", "quit");
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    if (!candidates || candidates.length === 0) {
-      return NextResponse.json({ matches: [] });
+    // Match job → find best candidates
+    if (body.job) {
+      const { data: candidates } = await db().from("candidates").select("*").not("status","eq","quit");
+      if (!candidates?.length) return NextResponse.json({ matches: [] });
+      const jobInfo = `求人: ${body.job.company} / ${body.job.position_ja} / 業種:${body.job.industry} / 日本語:${body.job.jlpt_min}以上\n${body.job.job_description||""}\n${body.job.requirements||""}`;
+      const candList = candidates.map((c,i) => `候補者${i+1}: ID=${c.id} 名前=${c.name} 業種=${c.skill} 日本語=${c.jlpt} 職歴${(c.work_history as unknown[])?.length||0}件`).join("\n");
+      const prompt = `${jobInfo}\n\n候補者一覧:\n${candList}\n\nTOP3をJSONで(no markdown): [{"candidateId":"uuid","candidateName":"name","matchPct":85,"reasonJa":"理由","reasonVn":"Lý do","strengths":["s1"]}]`;
+      const arr = await callGemini(prompt) as Array<{candidateId:string;candidateName:string;matchPct:number;reasonJa:string;reasonVn:string;strengths:string[]}>;
+      const matches = arr.map(m => ({ ...m, candidate: candidates.find(c=>c.id===m.candidateId)||null })).filter(m=>m.candidate);
+      return NextResponse.json({ matches });
     }
 
-    // Build job summary for Gemini
-    const jobSummary = `
-求人情報:
-企業名: ${job.company}
-職種: ${job.position_ja} / ${job.position_vn}
-業種: ${job.industry}
-おすすめポイント: ${job.osusume_point || ""}
-職務内容: ${job.job_description || ""}
-応募要件: ${job.requirements || ""}
-資格: ${job.qualifications || ""}
-語学力: ${job.language_skill || job.jlpt_min || ""}
-学歴: ${job.education || ""}
-勤務地: ${job.work_location || job.location || ""}
-給与: ${job.annual_income || job.salary || ""}
-雇用形態: ${job.employment_type || ""}
-勤務時間: ${job.work_hours || ""}
-    `.trim();
-
-    // Build candidates summary
-    const candidatesSummary = candidates.map((c, i) => `
-候補者${i+1}:
-ID: ${c.id}
-名前: ${c.name}
-業種: ${c.skill}
-日本語: ${c.jlpt}
-ステータス: ${c.status}
-備考: ${c.note || ""}
-AI分析: ${c.ai_data ? JSON.stringify(c.ai_data).slice(0, 300) : "なし"}
-    `.trim()).join("\n---\n");
-
-    const prompt = `あなたはAseka株式会社の優秀なHRマッチングAIです。
-以下の求人情報と候補者リストを分析し、この求人に最適な候補者TOP3を選んでください。
-
-${jobSummary}
-
-===候補者リスト===
-${candidatesSummary}
-
-各候補者のマッチ度を0-100%で評価し、理由を日本語とベトナム語で説明してください。
-ONLY return valid JSON array (no markdown):
-[
-  {
-    "candidateId": "uuid",
-    "candidateName": "name",
-    "matchPct": 85,
-    "reasonJa": "理由（日本語）",
-    "reasonVn": "Lý do (tiếng Việt)",
-    "strengths": ["強み1", "強み2"]
-  }
-]`;
-
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.2, maxOutputTokens: 1500 },
-        }),
-      }
-    );
-
-    if (!geminiRes.ok) {
-      const err = await geminiRes.text();
-      throw new Error(`Gemini error: ${geminiRes.status}`);
+    // Match candidate → find best jobs
+    if (body.candidateId) {
+      const { data: cand } = await db().from("candidates").select("*").eq("id", body.candidateId).single();
+      if (!cand) return NextResponse.json({ matches: [] });
+      const { data: jobs } = await db().from("job_listings").select("*").not("status","eq","paused");
+      if (!jobs?.length) return NextResponse.json({ matches: [] });
+      const candInfo = `候補者: ${cand.name} / 業種:${cand.skill} / 日本語:${cand.jlpt} / 希望:${cand.preferred_job||""}\n職歴:${JSON.stringify(cand.work_history||[]).slice(0,200)}\n資格:${JSON.stringify(cand.certifications||[]).slice(0,100)}`;
+      const jobList = jobs.map((j,i) => `求人${i+1}: ID=${j.id} 会社=${j.company} 職種=${j.position_ja} 業種=${j.industry} 日本語${j.jlpt_min}以上${j.status==="urgent"?" 緊急":""}`).join("\n");
+      const prompt = `${candInfo}\n\n求人一覧:\n${jobList}\n\nこの候補者に最適なTOP3求人をJSONで(no markdown): [{"jobId":"uuid","company":"name","position_vn":"vn","location":"loc","salary":"sal","status":"open","matchPct":85,"reasonJa":"理由","reasonVn":"Lý do","strengths":["s1"],"reasons":["r1"]}]`;
+      const arr = await callGemini(prompt) as Array<{jobId:string;company:string;position_vn:string;location:string;salary:string;status:string;matchPct:number;reasonJa:string;reasonVn:string;strengths:string[];reasons:string[]}>;
+      const matches = arr.map(m => { const job = jobs.find(j=>j.id===m.jobId); return job ? {...job,...m,matchPct:m.matchPct,reasons:[m.reasonVn]} : null; }).filter(Boolean);
+      return NextResponse.json({ matches });
     }
 
-    const geminiData = await geminiRes.json();
-    const raw = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
-    const cleaned = raw.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim();
-    const matches = JSON.parse(cleaned);
-
-    // Enrich with full candidate data
-    const enriched = matches.map((m: {candidateId: string; candidateName: string; matchPct: number; reasonJa: string; reasonVn: string; strengths: string[]}) => {
-      const cand = candidates.find(c => c.id === m.candidateId);
-      return { ...m, candidate: cand || null };
-    }).filter((m: {candidate: unknown}) => m.candidate !== null);
-
-    return NextResponse.json({ matches: enriched });
-
+    return NextResponse.json({ matches: [] });
   } catch (err) {
-    console.error("Match error:", err);
+    console.error("match error:", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

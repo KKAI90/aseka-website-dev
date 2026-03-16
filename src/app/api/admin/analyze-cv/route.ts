@@ -1,86 +1,80 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 export const maxDuration = 30;
 
-const JOBS = [
-  { id:"1", company:"山本フーズ株式会社",  position:"調理師",      positionVn:"Nhân viên bếp",        industry:"飲食",  jlptMin:"N4", salary:"¥200,000", location:"東京都", status:"urgent" },
-  { id:"2", company:"東京工場株式会社",    position:"製造ライン",   positionVn:"Công nhân",            industry:"製造",  jlptMin:"N5", salary:"¥185,000", location:"埼玉県", status:"urgent" },
-  { id:"3", company:"グランドホテル大阪",  position:"客室清掃",     positionVn:"Phục vụ phòng",        industry:"ホテル",jlptMin:"N4", salary:"¥175,000", location:"大阪府", status:"open"   },
-  { id:"4", company:"みどり農業組合",      position:"農場作業員",   positionVn:"Nông trại",            industry:"農業",  jlptMin:"N5", salary:"¥165,000", location:"北海道", status:"open"   },
-  { id:"5", company:"さくらレストラン",    position:"ホール",       positionVn:"Phục vụ bàn",          industry:"飲食",  jlptMin:"N4", salary:"¥170,000", location:"神奈川県",status:"paused" },
-  { id:"6", company:"東京ホテルグループ",  position:"フロントスタッフ",positionVn:"Lễ tân khách sạn",  industry:"ホテル",jlptMin:"N3", salary:"¥190,000", location:"東京都", status:"open"   },
-  { id:"7", company:"大阪農場",            position:"ハウス栽培",   positionVn:"Trồng trọt nhà kính", industry:"農業",  jlptMin:"N5", salary:"¥168,000", location:"大阪府", status:"open"   },
-];
+function db() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
-const JLPT_RANK: Record<string,number> = { N1:5,N2:4,N3:3,N4:2,N5:1,"なし":0,"N4相当":2,"N3相当":3,"":0 };
-
-// Extract text from DOCX (XML-based)
 function extractDocxText(buffer: Buffer): string {
   try {
-    const content = buffer.toString("binary");
-    // Find word/document.xml content
-    const xmlMatch = content.match(/word\/document\.xml[\s\S]*?PK/);
-    if (!xmlMatch) {
-      // Try to extract any readable text
-      return buffer.toString("utf-8")
-        .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
-        .replace(/\s+/g, " ").trim();
-    }
-    // Remove XML tags and decode
-    const xmlContent = xmlMatch[0]
+    const str = buffer.toString("binary");
+    const xmlStart = str.indexOf("word/document.xml");
+    if (xmlStart === -1) throw new Error("no xml");
+    const xmlSection = str.slice(xmlStart, xmlStart + 50000);
+    return xmlSection
       .replace(/<[^>]+>/g, " ")
       .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&")
-      .replace(/\s+/g, " ").trim();
-    return xmlContent.slice(0, 8000);
+      .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
+      .replace(/\s+/g," ").trim().slice(0, 8000);
   } catch {
     return buffer.toString("utf-8")
-      .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
-      .replace(/\s+/g, " ").trim().slice(0, 8000);
+      .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
+      .replace(/\s+/g," ").trim().slice(0, 8000);
   }
 }
 
-// Extract text from PDF
-function extractPdfText(buffer: Buffer): string {
-  return buffer.toString("utf-8")
-    .replace(/[^\u0020-\u007E\u3000-\u9FFF\uFF00-\uFFEF\n\r\t]/g, " ")
-    .replace(/\s+/g, " ").trim().slice(0, 8000);
-}
-
-// Analyze single CV with Gemini
-async function analyzeWithGemini(text: string, fileName: string) {
+async function analyzeCV(text: string, fileName: string) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY not set");
 
-  const prompt = `You are an expert HR assistant for Aseka株式会社, a Vietnamese staffing agency in Japan.
-Analyze this CV/resume text and extract information. The CV may be in Japanese, Vietnamese, or both.
+  const prompt = `You are an expert HR data extractor for Aseka株式会社, a Vietnamese staffing agency in Japan.
+Extract ALL information from this resume/履歴書 (Japanese, Vietnamese, or mixed format).
 
-CV Content:
-${text.slice(0, 5000)}
+CV TEXT:
+${text.slice(0, 6000)}
 
-Return ONLY a valid JSON object (no markdown, no explanation):
+Return ONLY valid JSON (no markdown, no explanation whatsoever):
 {
-  "name": "full name (Latin script preferred)",
-  "nameJp": "name in katakana if available",
-  "email": "email or empty string",
-  "phone": "phone number or empty string",
-  "gender": "女性 or 男性 or empty",
-  "dateOfBirth": "YYYY-MM-DD or empty",
-  "nationality": "Vietnam or empty",
-  "jlpt": "N1/N2/N3/N4/N5/N4相当/N3相当/なし",
-  "visaType": "visa type in Japanese or empty",
-  "industry": "飲食 or 製造 or 農業 or ホテル or その他",
-  "industryVn": "Nhà hàng or Nhà máy or Nông nghiệp or Khách sạn or Khác",
-  "experienceYears": 0,
-  "jobHistory": [{"company": "", "position": "", "period": ""}],
-  "skills": ["skill1", "skill2"],
-  "certifications": ["cert1"],
-  "preferredJob": "希望職種 from CV or empty",
-  "summary": "2-3 sentence professional summary in Japanese",
-  "summaryVn": "2-3 câu tóm tắt bằng tiếng Việt",
-  "strengths": ["strength1", "strength2", "strength3"],
+  "name": "Latin name e.g. Nguyen Tien Thanh",
+  "name_kana": "Katakana name if present",
+  "email": "email or empty",
+  "phone": "phone or empty",
+  "gender": "男性 or 女性 or empty",
+  "date_of_birth": "YYYY-MM-DD or empty",
+  "nationality": "Vietnam",
+  "address": "address or empty",
+  "visa_type": "visa type e.g. 留学 or 技能実習 or 特定技能 or empty",
+  "visa_expiry": "YYYY-MM-DD or empty",
+  "jlpt": "highest JLPT level found: N1/N2/N3/N4/N5/なし",
+  "jlpt_actual": "JLPT as written in CV e.g. JLPT N5 or N3相当",
+  "height_cm": null or number,
+  "weight_kg": null or number,
+  "skill": "main industry: 飲食 or 製造 or 農業 or ホテル or 宿泊業 or IT or その他",
+  "preferred_job": "希望職種 from CV or empty",
+  "work_hours": "preferred hours or empty",
   "availability": "immediate or YYYY-MM or empty",
-  "height": "height in cm or empty",
-  "weight": "weight in kg or empty"
+  "marital_status": "独身 or 既婚 or empty",
+  "dependents": 0,
+  "education": [
+    {"year": "2015", "month": "04", "school": "School name", "event": "入学 or 卒業 or 在学中"}
+  ],
+  "work_history": [
+    {"year": "2020", "month": "04", "company": "Company name", "position": "Position", "event": "入社 or 退社 or 在職中"}
+  ],
+  "certifications": [
+    {"year": "2021", "month": "09", "name": "Certificate name", "result": "合格 or 取得"}
+  ],
+  "motivation": "志望動機 text or empty",
+  "self_pr": "自己PR text or empty",
+  "summary_ja": "2-3 sentence professional summary in Japanese",
+  "summary_vn": "2-3 câu tóm tắt bằng tiếng Việt",
+  "strengths": ["strength1", "strength2", "strength3"],
+  "match_industry": "best matching industry for jobs: 飲食 or 製造 or 農業 or ホテル or その他"
 }`;
 
   const res = await fetch(
@@ -90,15 +84,12 @@ Return ONLY a valid JSON object (no markdown, no explanation):
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 1500 },
+        generationConfig: { temperature: 0.1, maxOutputTokens: 2000 },
       }),
     }
   );
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini error: ${res.status} - ${err.slice(0,200)}`);
-  }
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text().then(t=>t.slice(0,200))}`);
 
   const data = await res.json();
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
@@ -106,56 +97,48 @@ Return ONLY a valid JSON object (no markdown, no explanation):
   return JSON.parse(cleaned);
 }
 
-// Job matching algorithm
-function matchJobs(candidate: Record<string,unknown>) {
-  const rank = JLPT_RANK[candidate.jlpt as string] || 0;
-  const industry = candidate.industry as string;
-  const expYears = (candidate.experienceYears as number) || 0;
-  const preferredJob = ((candidate.preferredJob as string) || "").toLowerCase();
+async function matchJobs(candidate: Record<string, unknown>) {
+  const { data: jobs } = await db()
+    .from("job_listings")
+    .select("id,company,position_ja,position_vn,industry,jlpt_min,salary,location,status,osusume_point,job_description,requirements")
+    .not("status","eq","paused");
 
-  return JOBS
-    .filter(j => j.status !== "full")
-    .map(job => {
-      let score = 0;
-      const reasons: string[] = [];
+  if (!jobs || jobs.length === 0) return [];
 
-      // Industry match (40pts)
-      if (job.industry === industry) {
-        score += 40;
-        reasons.push(`業種マッチ · Đúng ngành ${job.industry}`);
-      }
+  const JLPT: Record<string,number> = { N1:5,N2:4,N3:3,N4:2,N5:1,"N3相当":3,"N4相当":2,"なし":0,"":0 };
+  const candRank = JLPT[(candidate.jlpt as string)||""] || 0;
+  const industry = (candidate.skill as string) || (candidate.match_industry as string) || "";
 
-      // JLPT match (30pts)
-      const reqRank = JLPT_RANK[job.jlptMin] || 0;
-      if (rank >= reqRank) {
-        score += 30;
-        reasons.push(`日本語OK · ${candidate.jlpt}`);
-      } else if (rank === reqRank - 1) {
-        score += 10;
-        reasons.push(`日本語レベル近似`);
-      }
+  // Normalize hotel industry variants
+  const normalizeInd = (s: string) => s.includes("ホテル")||s.includes("宿泊") ? "ホテル" : s;
+  const candInd = normalizeInd(industry);
 
-      // Experience (20pts)
-      if (expYears >= 3) { score += 20; reasons.push(`経験${expYears}年`); }
-      else if (expYears >= 1) { score += 10; reasons.push(`経験あり`); }
+  return jobs.map((job: Record<string,string>) => {
+    let score = 0;
+    const reasons: string[] = [];
 
-      // Preferred job keyword match (bonus 15pts)
-      if (preferredJob && (
-        job.position.includes(preferredJob) ||
-        job.positionVn.toLowerCase().includes(preferredJob) ||
-        preferredJob.includes(job.industry)
-      )) {
-        score += 15;
-        reasons.push(`希望職種マッチ · Đúng nghề mong muốn`);
-      }
+    if (normalizeInd(job.industry) === candInd) {
+      score += 40; reasons.push(`業種マッチ · Đúng ngành (${job.industry})`);
+    }
+    const reqRank = JLPT[job.jlpt_min] || 0;
+    if (candRank >= reqRank) {
+      score += 30; reasons.push(`日本語OK · ${candidate.jlpt} ≥ ${job.jlpt_min}`);
+    } else if (candRank === reqRank - 1) {
+      score += 15; reasons.push(`日本語近似 · ${candidate.jlpt}`);
+    }
 
-      // Urgency bonus (10pts)
-      if (job.status === "urgent") { score += 10; reasons.push(`緊急募集`); }
+    const exp = (candidate.work_history as unknown[])?.length || 0;
+    if (exp >= 3) { score += 20; reasons.push(`経験豊富 · ${exp}社の職歴`); }
+    else if (exp >= 1) { score += 10; reasons.push(`経験あり · ${exp}社`); }
 
-      return { ...job, score, reasons, matchPct: Math.min(score, 100) };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+    const prefJob = (candidate.preferred_job as string || "").toLowerCase();
+    if (prefJob && (job.position_ja?.toLowerCase().includes(prefJob) || (job.position_vn||"").toLowerCase().includes(prefJob))) {
+      score += 15; reasons.push(`希望職種マッチ · Đúng nghề mong muốn`);
+    }
+    if (job.status === "urgent") { score += 10; reasons.push(`緊急募集 · Tuyển gấp`); }
+
+    return { ...job, score, reasons, matchPct: Math.min(score, 100) };
+  }).sort((a: {score:number}, b: {score:number}) => b.score - a.score).slice(0, 3);
 }
 
 export async function POST(req: NextRequest) {
@@ -163,7 +146,6 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const results = [];
 
-    // Support up to 5 files
     for (let i = 0; i < 5; i++) {
       const file = formData.get(`cv_${i}`) as File | null;
       if (!file) continue;
@@ -171,58 +153,22 @@ export async function POST(req: NextRequest) {
       try {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
+        const ext = file.name.split(".").pop()?.toLowerCase() || "";
+        const text = (ext === "docx" || ext === "doc") ? extractDocxText(buffer)
+          : buffer.toString("utf-8").replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ").replace(/\s+/g," ").trim().slice(0, 8000);
 
-        // Extract text based on file type
-        let text = "";
-        const ext = file.name.split(".").pop()?.toLowerCase();
-        if (ext === "docx" || ext === "doc") {
-          text = extractDocxText(buffer);
-        } else {
-          text = extractPdfText(buffer);
-        }
+        const candidateInfo = await analyzeCV(text, file.name);
+        const suggestions = await matchJobs(candidateInfo);
 
-        // Analyze with Gemini
-        let candidateInfo: Record<string,unknown>;
-        try {
-          candidateInfo = await analyzeWithGemini(text, file.name);
-        } catch (aiErr) {
-          console.error(`AI error for ${file.name}:`, aiErr);
-          // Fallback: basic rule-based
-          candidateInfo = {
-            name: file.name.replace(/\.(pdf|docx?|doc)$/i, ""),
-            email: "", phone: "", gender: "", dateOfBirth: "",
-            jlpt: "N4", industry: "飲食", industryVn: "Nhà hàng",
-            experienceYears: 0, skills: [], certifications: [],
-            summary: "CV分析完了", summaryVn: "Đã tải CV lên",
-            strengths: [], jobHistory: [], preferredJob: "",
-          };
-        }
-
-        const suggestions = matchJobs(candidateInfo);
-        results.push({
-          success: true,
-          fileName: file.name,
-          fileSize: file.size,
-          candidate: candidateInfo,
-          suggestions,
-        });
-
-      } catch (fileErr) {
-        results.push({
-          success: false,
-          fileName: file.name,
-          error: fileErr instanceof Error ? fileErr.message : "Processing failed",
-        });
+        results.push({ success: true, fileName: file.name, fileSize: file.size, candidate: candidateInfo, suggestions });
+      } catch (err) {
+        results.push({ success: false, fileName: file.name, error: String(err) });
       }
     }
 
     return NextResponse.json({ results });
-
   } catch (err) {
-    console.error("Multi-CV analysis error:", err);
-    return NextResponse.json(
-      { error: "CV分析エラー / Lỗi phân tích CV" },
-      { status: 500 }
-    );
+    console.error("analyze-cv error:", err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
