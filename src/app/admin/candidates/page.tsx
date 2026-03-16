@@ -173,7 +173,7 @@ export default function CandidatesPage() {
         body: JSON.stringify({ candidateId: cand.id }),
       });
       const d = await res.json();
-      setMatchResults(d.matches||[]);
+      setMatchResults((d.matches||[]) as Job[]);
     } catch { setMatchResults([]); }
     setMatching(false);
   };
@@ -221,7 +221,7 @@ export default function CandidatesPage() {
   const openReview = (item: FileItem) => {
     if (!item.result?.candidate) return;
     const c = item.result.candidate;
-    setCurrentReview({ candidate:c, suggestions:item.result.suggestions||[], fileName:item.result.fileName });
+    setCurrentReview({ candidate:c, suggestions:(item.result.suggestions||[]) as Job[], fileName:item.result.fileName });
     setEditForm({
       name:        String(c.name||""),
       name_kana:   String(c.name_kana||""),
@@ -658,7 +658,7 @@ export default function CandidatesPage() {
             </div>
 
             {/* Extracted data preview */}
-            {((c.education as unknown[])?.length>0||(c.work_history as unknown[])?.length>0||(c.certifications as unknown[])?.length>0)&&(
+            {(Array.isArray(c.education)&&c.education.length>0||Array.isArray(c.work_history)&&(c.work_history as unknown[]).length>0||Array.isArray(c.certifications)&&(c.certifications as unknown[]).length>0)&&(
               <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
                 <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
                 {(c.education as Edu[])?.length>0&&<>
@@ -679,8 +679,8 @@ export default function CandidatesPage() {
             {/* Motivation/PR */}
             {(c.motivation||c.self_pr)&&(
               <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
-                {c.motivation&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{String(c.motivation)}</div></>}
-                {c.self_pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{String(c.self_pr)}</div></>}
+                {c.motivation&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.motivation as string}</div></>}
+                {c.self_pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{c.self_pr as string}</div></>}
               </div>
             )}
           </div>
