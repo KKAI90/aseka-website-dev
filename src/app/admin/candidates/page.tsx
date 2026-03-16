@@ -2,6 +2,7 @@
 import React from 'react';
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import JSZip from "jszip";
 
 /* ─── Types ─────────────────────────────────────────────── */
 type Edu  = { year:string; month:string; school:string; event:string };
@@ -196,35 +197,26 @@ export default function CandidatesPage() {
     const ab = await file.arrayBuffer();
     if (ext === "docx" || ext === "doc") {
       try {
-        // Extract XML text from DOCX zip structure
-        const bytes = new Uint8Array(ab);
-        let xmlText = "";
-        // Search for word/document.xml content in binary
-        const marker = "word/document.xml";
-        const markerBytes = marker.split("").map(c=>c.charCodeAt(0));
-        for (let i=0; i<bytes.length-markerBytes.length; i++) {
-          let match = true;
-          for (let j=0; j<markerBytes.length; j++) {
-            if (bytes[i+j] !== markerBytes[j]) { match=false; break; }
-          }
-          if (match) {
-            const chunk = bytes.slice(i, Math.min(i+60000, bytes.length));
-            xmlText = new TextDecoder("utf-8", {fatal:false}).decode(chunk);
-            break;
-          }
+        // Use JSZip to properly decompress DOCX (ZIP format)
+        const zip = await JSZip.loadAsync(ab);
+        const xmlFile = zip.file("word/document.xml");
+        if (xmlFile) {
+          const xml = await xmlFile.async("string");
+          return xml
+            .replace(/<w:p[ >]/g, "\n<w:p>")  // newline before each paragraph
+            .replace(/<[^>]+>/g, "")           // strip all XML tags
+            .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ")
+            .replace(/\s+/g," ").trim()
+            .slice(0, 5000);
         }
-        if (xmlText) {
-          return xmlText.replace(/<[^>]+>/g," ").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&")
-            .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
-            .replace(/\s+/g," ").trim().slice(0,5000);
-        }
-      } catch { /* fallback */ }
+      } catch { /* fallback to PDF path */ }
     }
-    // PDF or fallback
+    // PDF or fallback — extract printable characters
     try {
       const text = new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(ab));
-      return text.replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
-        .replace(/\s+/g," ").trim().slice(0,5000);
+      return text
+        .replace(/[^\u0020-\u007E\u00C0-\u024F\u3000-\u9FFF\uFF00-\uFFEF\n]/g," ")
+        .replace(/\s+/g," ").trim().slice(0, 5000);
     } catch { return ""; }
   };
 
