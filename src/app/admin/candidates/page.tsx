@@ -616,7 +616,7 @@ export default function CandidatesPage() {
                         <div style={{fontSize:"10px",color:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#6B6B6B"}}>
                           {item.status==="analyzing"?`${item.progress}% — Gemini AI抽出中...`
                           :item.status==="done"?"✓ 分析完了 · Click「確認・保存」"
-                          :`✗ エラー`}
+                          :`✗ エラー${item.result?.error?` · ${item.result.error.slice(0,80)}`:""}`}
                         </div>
                       </div>
                     )}
