@@ -30,8 +30,9 @@ export function middleware(req: NextRequest) {
   const appType  = process.env.NEXT_PUBLIC_APP_TYPE ?? "";
 
   // ── Detect context (hostname wins over env var) ────────────────────────
-  const isAdminHost  = host.startsWith("admin.")  || appType === "admin";
-  const isMypageHost = host.startsWith("mypage.") || appType === "mypage";
+  // Supports: admin.aseka.jp (prod) OR aseka-admin-dev.vercel.app (test)
+  const isAdminHost  = host.startsWith("admin.")  || host.includes("-admin-")  || host.includes("-admin.") || appType === "admin";
+  const isMypageHost = host.startsWith("mypage.") || host.includes("-mypage-") || host.includes("-mypage.") || appType === "mypage";
 
   // ── ADMIN context ──────────────────────────────────────────────────────
   if (isAdminHost) {
