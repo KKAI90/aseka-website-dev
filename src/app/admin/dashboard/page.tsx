@@ -71,69 +71,69 @@ function DonutChart({ items }: { items: PipelineItem[] }) {
   );
 }
 
-/* ── Funnel chart (SVG trapezoid polygons) ── */
-function FunnelChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { cv:number; jobs:number; offers:number } }) {
+/* ── Bar chart (vertical grouped) ── */
+function BarChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { cv:number; jobs:number; offers:number } }) {
   const stages = [
-    { key:"新規登録", color:"#378ADD", labelVn:"Mới đăng ký" },
+    { key:"新規登録", color:"#378ADD", labelVn:"Mới ký" },
     { key:"面接中",   color:"#EF9F27", labelVn:"Phỏng vấn" },
     { key:"内定済み", color:"#5DCAA5", labelVn:"Đã offer" },
     { key:"就業中",   color:"#27500A", labelVn:"Đang làm" },
+    { key:"退職",     color:"#B4B2A9", labelVn:"Nghỉ việc" },
   ];
   const data = stages.map(s => {
     const found = pipeline.find(p => p.ja === s.key);
     return { ...s, val: found?.val || 0 };
   });
   const maxVal = Math.max(...data.map(d => d.val), 1);
-  const svgW = 260, stageH = 52, gap = 6;
-  const totalH = data.length * (stageH + gap);
+  const chartH = 140;
 
   return (
     <div>
       {/* Monthly summary badges */}
-      <div style={{ display:"flex", gap:"8px", marginBottom:"14px" }}>
+      <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
         {[
-          { label:"今月登録CV", labelVn:"CV tháng này", val:monthly.cv, color:"#378ADD", bg:"#EBF4FF" },
-          { label:"今月求人",   labelVn:"Việc tháng này", val:monthly.jobs, color:"#7C6FF7", bg:"#F0EFFE" },
-          { label:"今月内定",   labelVn:"Offer tháng này", val:monthly.offers, color:"#5DCAA5", bg:"#EAFAF5" },
+          { label:"今月登録CV", labelVn:"CV tháng này",   val:monthly.cv,     color:"#185FA5", bg:"#EBF4FF" },
+          { label:"今月求人",   labelVn:"Việc tháng này", val:monthly.jobs,   color:"#7C6FF7", bg:"#F0EFFE" },
+          { label:"今月内定",   labelVn:"Offer tháng này",val:monthly.offers, color:"#27A87A", bg:"#EAFAF5" },
         ].map(b => (
-          <div key={b.label} style={{ flex:1, background:b.bg, borderRadius:"8px", padding:"8px 10px", textAlign:"center" }}>
-            <div style={{ fontSize:"18px", fontWeight:700, color:b.color }}>{b.val}</div>
-            <div style={{ fontSize:"10px", fontWeight:600, color:navy }}>{b.label}</div>
+          <div key={b.label} style={{ flex:1, background:b.bg, borderRadius:"10px", padding:"9px 8px", textAlign:"center", border:`0.5px solid ${b.color}22` }}>
+            <div style={{ fontSize:"22px", fontWeight:800, color:b.color, lineHeight:1 }}>{b.val}</div>
+            <div style={{ fontSize:"10px", fontWeight:600, color:navy, marginTop:"3px" }}>{b.label}</div>
             <div style={{ fontSize:"9px", color:"#6B6B6B" }}>{b.labelVn}</div>
           </div>
         ))}
       </div>
 
-      {/* SVG funnel */}
-      <svg width="100%" viewBox={`0 0 ${svgW} ${totalH}`} style={{ overflow:"visible" }}>
-        {data.map((s, i) => {
-          const topFrac = s.val / maxVal;
-          const botFrac = i < data.length - 1 ? (data[i + 1].val / maxVal) : topFrac * 0.85;
-          const topW = Math.max(topFrac * svgW * 0.92, 40);
-          const botW = Math.max(botFrac * svgW * 0.92, 36);
-          const cx2 = svgW / 2;
-          const y = i * (stageH + gap);
-          const tl = cx2 - topW / 2, tr = cx2 + topW / 2;
-          const bl = cx2 - botW / 2, br = cx2 + botW / 2;
-          const convPct = i === 0 ? 100 : data[0].val > 0 ? Math.round((s.val / data[0].val) * 100) : 0;
-
+      {/* Bar chart */}
+      <div style={{ display:"flex", alignItems:"flex-end", gap:"8px", height:`${chartH + 52}px`, padding:"0 4px" }}>
+        {data.map((s) => {
+          const barH = Math.max((s.val / maxVal) * chartH, s.val > 0 ? 12 : 4);
+          const pct = maxVal > 0 ? Math.round((s.val / maxVal) * 100) : 0;
           return (
-            <g key={s.key}>
-              <polygon
-                points={`${tl},${y} ${tr},${y} ${br},${y + stageH} ${bl},${y + stageH}`}
-                fill={s.color} opacity="0.88"
-                style={{ transition:"all 0.8s ease" }}
-              />
-              {/* stage label left */}
-              <text x={tl - 6} y={y + stageH / 2 - 5} textAnchor="end" fontSize="10" fontWeight="600" fill={navy}>{s.key}</text>
-              <text x={tl - 6} y={y + stageH / 2 + 8} textAnchor="end" fontSize="8" fill="#6B6B6B">{s.labelVn}</text>
-              {/* value center */}
-              <text x={cx2} y={y + stageH / 2 - 4} textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">{s.val}</text>
-              <text x={cx2} y={y + stageH / 2 + 10} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.82)">{convPct}%</text>
-            </g>
+            <div key={s.key} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:"4px" }}>
+              {/* value label on top */}
+              <div style={{ fontSize:"13px", fontWeight:700, color:s.val > 0 ? s.color : "#ccc", minHeight:"18px", display:"flex", alignItems:"center" }}>
+                {s.val}
+              </div>
+              {/* % below value */}
+              <div style={{ fontSize:"9px", color:"#6B6B6B", minHeight:"12px" }}>{pct}%</div>
+              {/* bar */}
+              <div style={{ width:"100%", height:`${barH}px`, background:s.color, borderRadius:"6px 6px 3px 3px", opacity: s.val === 0 ? 0.2 : 1, transition:"height 0.8s ease", position:"relative", overflow:"hidden" }}>
+                {/* shine overlay */}
+                <div style={{ position:"absolute", top:0, left:0, right:0, height:"40%", background:"rgba(255,255,255,0.18)", borderRadius:"6px 6px 0 0" }} />
+              </div>
+              {/* x-axis label */}
+              <div style={{ textAlign:"center", marginTop:"4px" }}>
+                <div style={{ fontSize:"10px", fontWeight:600, color:navy, whiteSpace:"nowrap" }}>{s.key}</div>
+                <div style={{ fontSize:"8px", color:"#6B6B6B", whiteSpace:"nowrap" }}>{s.labelVn}</div>
+              </div>
+            </div>
           );
         })}
-      </svg>
+      </div>
+
+      {/* X-axis baseline */}
+      <div style={{ height:"1px", background:"rgba(11,31,58,0.1)", margin:"0 4px" }} />
     </div>
   );
 }
@@ -251,20 +251,23 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Funnel chart */}
+          {/* Bar chart */}
           <div style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
-            <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)" }}>
-              <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>採用フロー・今月実績 / Phễu tuyển dụng · Tháng này</div>
-              <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>Biểu đồ hình thang (Funnel) · 漏斗グラフ</div>
+            <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+              <div>
+                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>採用ステージ・今月実績 / Tình trạng tuyển dụng · Tháng này</div>
+                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>Biểu đồ hình cột · 棒グラフ</div>
+              </div>
+              <Link href="/admin/candidates" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>全件表示 →</Link>
             </div>
             <div style={{ padding:"16px 20px" }}>
               {loading
-                ? <div style={{ display:"flex",flexDirection:"column",gap:"8px" }}>
-                    {Array(4).fill(0).map((_,i) => (
-                      <div key={i} style={{ height:"48px",background:"#F1EFE8",borderRadius:"4px",animation:"pulse 1.5s infinite",width:`${100 - i*15}%`,margin:"0 auto" }}/>
+                ? <div style={{ display:"flex",alignItems:"flex-end",gap:"8px",height:"190px" }}>
+                    {Array(5).fill(0).map((_,i) => (
+                      <div key={i} style={{ flex:1,background:"#F1EFE8",borderRadius:"6px 6px 3px 3px",animation:"pulse 1.5s infinite",height:`${40 + i*20}px` }}/>
                     ))}
                   </div>
-                : <FunnelChart pipeline={d?.pipeline || []} monthly={d?.monthly || { cv:0, jobs:0, offers:0 }} />
+                : <BarChart pipeline={d?.pipeline || []} monthly={d?.monthly || { cv:0, jobs:0, offers:0 }} />
               }
             </div>
           </div>
