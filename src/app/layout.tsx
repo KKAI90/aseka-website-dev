@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import HostGuard from "@/components/HostGuard";
 
 export const metadata: Metadata = {
   title: "Aseka株式会社 | ベトナム人材紹介・年金・ビザサポート",
@@ -21,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body><HostGuard />{children}</body>
     </html>
   );
 }
