@@ -59,12 +59,9 @@ export function middleware(req: NextRequest) {
   }
 
   // ── MAIN website context ───────────────────────────────────────────────
-  // Block admin/BO routes from main website (security)
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    const token = req.cookies.get("sb-access-token")?.value;
-    if (!token) {
-      return NextResponse.redirect(new URL("/admin/login", req.url));
-    }
+  // Block /admin completely on main website — use aseka-admin-dev.vercel.app instead
+  if (pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return NextResponse.next();
