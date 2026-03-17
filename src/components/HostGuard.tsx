@@ -7,8 +7,9 @@ export default function HostGuard() {
     const isAdmin  = host.includes("-admin-")  || host.includes("-admin.")  || host.startsWith("admin.");
     const isMypage = host.includes("-mypage-") || host.includes("-mypage.") || host.startsWith("mypage.");
 
-    if (isAdmin)  { window.location.href = "/admin/login";  return; }
-    if (isMypage) { window.location.href = "/mypage/login"; return; }
+    const path = window.location.pathname;
+    if (isAdmin  && !path.startsWith("/admin"))  { window.location.href = "/admin/login";  return; }
+    if (isMypage && !path.startsWith("/mypage")) { window.location.href = "/mypage/login"; return; }
   }, []);
 
   return null;
