@@ -24,7 +24,7 @@ export async function GET() {
 
     // ── Normalize status: handle both English keys and Japanese values ──
     const STATUS_NORM: Record<string, string> = {
-      // English keys (canonical)
+      // English keys (canonical — pass through unchanged)
       new: "new", interview: "interview", offered: "offered", working: "working", quit: "quit",
       // Japanese aliases
       "新規": "new", "新規登録": "new",
@@ -33,7 +33,12 @@ export async function GET() {
       "就業中": "working", "就労中": "working",
       "退職": "quit", "退社": "quit",
     };
-    const norm = (s: string) => STATUS_NORM[s] ?? "new";
+    // Fallback: keep the original value as-is (never silently map to "new")
+    const norm = (s: string | null | undefined): string =>
+      s ? (STATUS_NORM[s] ?? s) : "new";
+
+    const rawStatuses = Array.from(new Set((candidates || []).map(c => c.status)));
+    console.log("[dashboard] distinct candidate statuses in DB:", rawStatuses);
 
     const cands    = (candidates || []).map(c => ({ ...c, status: norm(c.status) }));
     const jobList  = jobs || [];
@@ -133,6 +138,7 @@ export async function GET() {
       activity,
       totals: { candidates: cands.length, jobs: jobList.length },
       monthly: { cv: cvThisMonth, jobs: jobsThisMonth, offers: offersThisMonth },
+      _debug: { rawStatuses },
     });
   } catch (err) {
     console.error("dashboard error:", err);
