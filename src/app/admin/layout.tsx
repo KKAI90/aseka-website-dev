@@ -30,6 +30,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   if (pathname === "/admin/login") return <>{children}</>;
+
+  // Block admin on main website (client-side guard)
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const isAdminHost = host.includes("-admin-") || host.includes("-admin.") || host.startsWith("admin.") || host === "localhost";
+    if (!isAdminHost) {
+      window.location.href = "/";
+      return null;
+    }
+  }
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
