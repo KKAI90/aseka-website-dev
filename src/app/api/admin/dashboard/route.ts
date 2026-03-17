@@ -107,12 +107,19 @@ export async function GET() {
       .sort(() => 0) // keep order
       .slice(0, 6);
 
+    // ── Monthly stats (this calendar month) ───────────────
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const cvThisMonth     = cands.filter(c => c.created_at >= monthStart).length;
+    const jobsThisMonth   = jobList.filter(j => j.created_at >= monthStart).length;
+    const offersThisMonth = cands.filter(c => c.status === "offered" && c.updated_at >= monthStart).length;
+
     return NextResponse.json({
       stats: { interview, offered, activeJobs, urgentJobs, unreadMsgs },
       pipeline,
       jobsByIndustry,
       activity,
       totals: { candidates: cands.length, jobs: jobList.length },
+      monthly: { cv: cvThisMonth, jobs: jobsThisMonth, offers: offersThisMonth },
     });
   } catch (err) {
     console.error("dashboard error:", err);
