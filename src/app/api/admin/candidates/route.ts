@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAdmin, apiError } from "@/lib/adminAuth";
 
 function db() {
   return createClient(
@@ -9,6 +10,9 @@ function db() {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const search = searchParams.get("search");
@@ -16,19 +20,31 @@ export async function GET(req: NextRequest) {
 
   if (id) {
     const { data, error } = await db().from("candidates").select("*").eq("id", id).single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return apiError("データの取得に失敗しました");
     return NextResponse.json({ data });
   }
 
   let q = db().from("candidates").select("*").order("created_at", { ascending: false });
   if (status && status !== "all") q = q.eq("status", status);
-  if (search) q = q.or(`name.ilike.%${search}%,email.ilike.%${search}%,preferred_job.ilike.%${search}%`);
+  if (search) {
+    const safe = search.replace(/[%_]/g, "\\$&").slice(0, 100);
+    q = q.or(`name.ilike.%${safe}%,email.ilike.%${safe}%,preferred_job.ilike.%${safe}%`);
+  }
   const { data, error } = await q;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return apiError("データの取得に失敗しました");
   return NextResponse.json({ data });
 }
 
 export async function POST(req: NextRequest) {
+  // Public registration from /dang-ky is allowed (no auth needed)
+  // But BO-created candidates require admin auth
+  const { searchParams } = new URL(req.url);
+  const isPublic = searchParams.get("public") === "1";
+  if (!isPublic) {
+    const auth = await requireAdmin(req);
+    if (auth instanceof NextResponse) return auth;
+  }
+
   try {
     const body = await req.json();
     const record = {
@@ -65,33 +81,38 @@ export async function POST(req: NextRequest) {
       ai_data:        body.ai_data || null,
     };
     const { data, error } = await db().from("candidates").insert(record).select().single();
-    if (error) {
-      console.error("Insert error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (error) return apiError("登録に失敗しました");
     return NextResponse.json({ data });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch {
+    return apiError("リクエストが無効です", 400);
   }
 }
 
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id, ...updates } = await req.json();
+    if (!id) return apiError("IDが必要です", 400);
     const { data, error } = await db()
       .from("candidates")
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", id).select().single();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return apiError("更新に失敗しました");
     return NextResponse.json({ data });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch {
+    return apiError("リクエストが無効です", 400);
   }
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+
   const id = new URL(req.url).searchParams.get("id");
-  const { error } = await db().from("candidates").delete().eq("id", id!);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!id) return apiError("IDが必要です", 400);
+  const { error } = await db().from("candidates").delete().eq("id", id);
+  if (error) return apiError("削除に失敗しました");
   return NextResponse.json({ success: true });
 }
