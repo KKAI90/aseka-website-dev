@@ -30,25 +30,22 @@ function NavIcon({ name }: { name: string }) {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  if (pathname === "/admin/login") return <>{children}</>;
 
-  // Block admin on main website (client-side guard)
-  if (typeof window !== "undefined") {
+  // All hooks must be at the top — before any conditional returns
+  useEffect(() => {
+    // Block admin on main website
     const host = window.location.hostname;
     const isAdminHost = host.includes("-admin-") || host.includes("-admin.") || host.startsWith("admin.") || host === "localhost";
-    if (!isAdminHost) {
-      window.location.href = "/";
-      return null;
-    }
-  }
+    if (!isAdminHost) { window.location.href = "/"; return; }
 
-  // Auth check — verify session on every page mount
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
+    // Verify session is still valid
     fetch("/api/admin/me").then(res => {
       if (!res.ok) router.replace("/admin/login");
     });
-  }, [pathname]);
+  }, [pathname, router]);
+
+  if (pathname === "/admin/login") return <>{children}</>;
+
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
