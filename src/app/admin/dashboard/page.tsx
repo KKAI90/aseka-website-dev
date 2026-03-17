@@ -143,12 +143,21 @@ export default function Dashboard() {
   const [data, setData] = useState<DashData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadData = () => {
     setTime(new Date().toLocaleString("ja-JP"));
     fetch("/api/admin/dashboard")
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
+    // Auto-refresh when user returns to this tab (e.g. after updating a candidate)
+    const onVisible = () => { if (!document.hidden) loadData(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const d = data;

@@ -22,9 +22,22 @@ export async function GET() {
       supabase.from("contact_submissions").select("id,created_at,status").order("created_at", { ascending: false }),
     ]);
 
-    const cands = candidates || [];
-    const jobList = jobs || [];
-    const msgs = messages || [];
+    // ── Normalize status: handle both English keys and Japanese values ──
+    const STATUS_NORM: Record<string, string> = {
+      // English keys (canonical)
+      new: "new", interview: "interview", offered: "offered", working: "working", quit: "quit",
+      // Japanese aliases
+      "新規": "new", "新規登録": "new",
+      "面接中": "interview", "面接": "interview",
+      "内定済み": "offered", "内定済": "offered", "内定": "offered",
+      "就業中": "working", "就労中": "working",
+      "退職": "quit", "退社": "quit",
+    };
+    const norm = (s: string) => STATUS_NORM[s] ?? "new";
+
+    const cands    = (candidates || []).map(c => ({ ...c, status: norm(c.status) }));
+    const jobList  = jobs || [];
+    const msgs     = messages || [];
 
     // ── Stats ──────────────────────────────────────────────
     const interview  = cands.filter(c => c.status === "interview").length;
