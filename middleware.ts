@@ -36,13 +36,20 @@ export function middleware(req: NextRequest) {
 
   // ── ADMIN context ──────────────────────────────────────────────────────
   if (isAdminHost) {
-    // Block main website & mypage routes on admin project
+    // Redirect root to admin login
     if (pathname === "/") {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
     // Block non-admin routes
     if (!pathname.startsWith("/admin") && !pathname.startsWith("/api/admin")) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
+    // Auth check: require sb-access-token for all /admin routes except login
+    if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+      const token = req.cookies.get("sb-access-token")?.value;
+      if (!token) {
+        return NextResponse.redirect(new URL("/admin/login", req.url));
+      }
     }
     return NextResponse.next();
   }
