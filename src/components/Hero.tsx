@@ -95,7 +95,7 @@ export default function Hero() {
 
         <div className="flex flex-wrap gap-3 mb-8">
           <Link href="#contact" className="btn-navy no-underline">人材を採用したい →</Link>
-          <Link href="#contact" className="btn-ghost no-underline">仕事を探している</Link>
+          <Link href="/dang-ky" className="btn-ghost no-underline">仕事を探している →</Link>
         </div>
 
         <div className="flex gap-7">

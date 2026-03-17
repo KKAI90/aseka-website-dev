@@ -73,6 +73,9 @@ export default function Navbar() {
             ))}
           </div>
 
+          <Link href="/dang-ky" className="btn-ghost text-sm no-underline" style={{ borderColor:"var(--accent)", color:"var(--accent)" }}>
+            仕事を探す / Tìm việc
+          </Link>
           <Link href="#contact" className="btn-accent text-sm no-underline">
             お問い合わせ
           </Link>
