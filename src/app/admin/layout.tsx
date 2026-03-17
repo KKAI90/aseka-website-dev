@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -40,6 +41,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return null;
     }
   }
+
+  // Auth check — verify session on every page mount
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    fetch("/api/admin/me").then(res => {
+      if (!res.ok) router.replace("/admin/login");
+    });
+  }, [pathname]);
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
