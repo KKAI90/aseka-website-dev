@@ -47,6 +47,9 @@ const navy="#0B1F3A";
 const B={border:"0.5px solid rgba(11,31,58,0.1)"};
 const fmt=(b:number)=>b>1048576?`${(b/1048576).toFixed(1)}MB`:`${(b/1024).toFixed(0)}KB`;
 const fmtDate=(s:string)=>s?new Date(s).toLocaleDateString("ja-JP"):"—";
+const FORM_URL = typeof window !== "undefined"
+  ? `${window.location.origin}/dang-ky`
+  : "https://aseka-website-dev.vercel.app/dang-ky";
 
 /* ─── Export CV as HTML ──────────────────────────────────── */
 function exportCV(c: Candidate) {
@@ -136,6 +139,8 @@ export default function CandidatesPage() {
   const [matchResults, setMatchResults] = useState<Job[]>([]);
   const [matching, setMatching] = useState(false);
   const [retryCountdown, setRetryCountdown] = useState(0);
+  const [showFormPopup, setShowFormPopup] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const retryTimerRef = useRef<ReturnType<typeof setInterval>|null>(null);
 
@@ -364,10 +369,43 @@ export default function CandidatesPage() {
           <div style={{fontSize:"14px",fontWeight:700,color:navy}}>人材管理 / Quản lý Ứng viên</div>
           <div style={{fontSize:"10px",color:"#6B6B6B"}}>Supabase DB · Gemini AI · Export CV · Job Matching</div>
         </div>
-        <div style={{display:"flex",gap:"8px"}}>
+        <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           <input type="text" placeholder="名前・メールで検索..." value={search}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setSearch(e.target.value); load(e.target.value);}}
             style={{padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",width:"180px"}}/>
+
+          {/* Form share button + popup */}
+          <div style={{position:"relative"}}>
+            <button onClick={()=>setShowFormPopup(p=>!p)}
+              style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:showFormPopup?"#E6F1FB":"#fff",color:navy,border:`1px solid ${showFormPopup?navy:"rgba(11,31,58,0.2)"}`,cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              登録フォームを共有
+            </button>
+
+            {showFormPopup && (
+              <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:"12px",padding:"16px",boxShadow:"0 8px 32px rgba(11,31,58,0.14)",zIndex:200,width:"300px",border:"0.5px solid rgba(11,31,58,0.1)"}}>
+                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"6px"}}>📋 ứng viên tự đăng ký qua link này</div>
+                <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"10px"}}>
+                  Gửi link qua Zalo / LINE / Email — ứng viên điền form → tự vào BO
+                </div>
+                <div style={{background:"#F6F7F9",borderRadius:"8px",padding:"8px 10px",fontFamily:"monospace",fontSize:"10px",color:"#185FA5",wordBreak:"break-all",marginBottom:"10px",userSelect:"all"}}>
+                  {FORM_URL}
+                </div>
+                <div style={{display:"flex",gap:"6px"}}>
+                  <button onClick={()=>{navigator.clipboard.writeText(FORM_URL);setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}}
+                    style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:700,background:linkCopied?"#27500A":navy,color:"#fff",border:"none",cursor:"pointer"}}>
+                    {linkCopied?"✓ コピー済み":"🔗 URLをコピー"}
+                  </button>
+                  <a href={FORM_URL} target="_blank" rel="noreferrer"
+                    style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:700,background:"#E6F1FB",color:navy,border:"none",cursor:"pointer",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    フォームを開く
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+
           <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             CV取込 (最大5件)

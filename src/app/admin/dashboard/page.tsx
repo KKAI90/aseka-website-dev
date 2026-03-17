@@ -175,7 +175,13 @@ export default function Dashboard() {
           <div style={{ fontSize:"14px",fontWeight:700,color:navy }}>ダッシュボード / Dashboard</div>
           <div style={{ fontSize:"10px",color:"#6B6B6B" }}>{time}</div>
         </div>
-        <Link href="/admin/jobs" style={{ padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",textDecoration:"none" }}>+ 新規追加 / Thêm mới</Link>
+        <div style={{ display:"flex",gap:"8px" }}>
+          <Link href="/dang-ky" target="_blank" style={{ padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"#E6F1FB",color:navy,textDecoration:"none",display:"flex",alignItems:"center",gap:"5px",border:"1px solid rgba(11,31,58,0.15)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            登録フォーム
+          </Link>
+          <Link href="/admin/jobs" style={{ padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",textDecoration:"none" }}>+ 新規追加 / Thêm mới</Link>
+        </div>
       </div>
 
       <div style={{ padding:"16px 20px" }}>
