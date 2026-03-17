@@ -1,5 +1,11 @@
 "use client";
 import { useState } from "react";
+import { useLang } from "@/contexts/LangContext";
+
+const T = {
+  JP: { eyebrow: "Contact · お問い合わせ", title: "まずは無料でご相談ください", btn: "送信する · Gửi liên hệ →", sending: "送信中... / Đang gửi..." },
+  VN: { eyebrow: "Liên hệ · Contact",     title: "Tư vấn miễn phí ngay hôm nay", btn: "Gửi liên hệ →", sending: "Đang gửi..." },
+};
 
 type FormState = {
   type: string;
@@ -22,6 +28,8 @@ const initialForm: FormState = {
 };
 
 export default function Contact() {
+  const { lang } = useLang();
+  const t = T[lang];
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -78,8 +86,8 @@ export default function Contact() {
     <section id="contact" className="py-16" style={{ background: "var(--surface)" }}>
       <div className="max-w-2xl mx-auto px-6">
         <div className="text-center mb-8">
-          <div className="section-eyebrow">Contact · お問い合わせ</div>
-          <div className="section-title">まずは無料でご相談ください</div>
+          <div className="section-eyebrow">{t.eyebrow}</div>
+          <div className="section-title">{t.title}</div>
           <p className="text-sm" style={{ color: "var(--muted)" }}>Tư vấn miễn phí · Phản hồi trong 24 giờ · Hỗ trợ tiếng Việt</p>
         </div>
         <div className="flex rounded-xl overflow-hidden mb-6" style={{ border: "0.5px solid var(--border)", background: "#fff" }}>
@@ -135,7 +143,7 @@ export default function Contact() {
           </div>
           {error && <p className="text-xs text-center" style={{ color: "var(--accent)" }}>{error}</p>}
           <button type="submit" disabled={loading} className="btn-navy w-full justify-center text-sm py-3" style={{ opacity: loading ? 0.6 : 1 }}>
-            {loading ? "送信中... / Đang gửi..." : "送信する · Gửi liên hệ →"}
+            {loading ? t.sending : t.btn}
           </button>
           <p className="text-xs text-center" style={{ color: "var(--muted)" }}>
             個人情報は適切に管理し、第三者に提供しません。<br />Thông tin của bạn được bảo mật hoàn toàn.

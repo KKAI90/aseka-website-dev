@@ -2,6 +2,34 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useLang } from "@/contexts/LangContext";
+
+const T = {
+  JP: {
+    badge: "ベトナム人材・生活サポート総合窓口",
+    h1a: "日本での", h1b: "生活と仕事", h1c: "を、",
+    h1d: "Asekaが全力サポート。",
+    sub: "Aseka — Đồng hành cùng người Việt tại Nhật Bản",
+    desc: "人材紹介から年金・ビザ手続きまで。\nベトナム語対応スタッフが、あなたの悩みを解決します。",
+    btn1: "人材を採用したい →",
+    btn2: "仕事を探している →",
+    trust1: "ベトナム語で全対応",
+    trust2: "24時間以内に返信",
+    trustBadge: "無料相談",
+  },
+  VN: {
+    badge: "Trung tâm hỗ trợ nhân sự & cuộc sống tại Nhật",
+    h1a: "Cuộc sống & ", h1b: "việc làm tại Nhật", h1c: ",",
+    h1d: "Aseka hỗ trợ toàn diện.",
+    sub: "Aseka — Đồng hành cùng người Việt tại Nhật Bản",
+    desc: "Từ giới thiệu việc làm đến thủ tục nenkin, visa.\nNhân viên tiếng Việt hỗ trợ mọi vấn đề của bạn.",
+    btn1: "Tuyển dụng nhân sự →",
+    btn2: "Tìm việc làm →",
+    trust1: "Hỗ trợ tiếng Việt",
+    trust2: "Phản hồi trong 24 giờ",
+    trustBadge: "Miễn phí",
+  },
+};
 
 const kpis = [
   { num: "800+", label: "登録スタッフ", sub: "Ứng viên đăng ký" },
@@ -46,6 +74,8 @@ function PhotoCard({ photo, height, labelSize = "sm" }: { photo: PhotoCard; heig
 }
 
 export default function Hero() {
+  const { lang } = useLang();
+  const t = T[lang];
   const [cur, setCur] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [fading, setFading] = useState(false);
@@ -79,23 +109,23 @@ export default function Hero() {
           style={{ background: "var(--navy-light)", color: "#0C447C" }}
         >
           <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#378ADD" }} />
-          ベトナム人材・生活サポート総合窓口
+          {t.badge}
         </div>
 
         <h1 className="text-4xl font-bold leading-snug mb-2" style={{ color: "var(--navy)", letterSpacing: "-0.01em" }}>
-          日本での<span style={{ color: "var(--accent)" }}>生活と仕事</span>を、<br />Asekaが全力サポート。
+          {t.h1a}<span style={{ color: "var(--accent)" }}>{t.h1b}</span>{t.h1c}<br />{t.h1d}
         </h1>
 
         <p className="text-sm mb-3" style={{ color: "var(--muted)", letterSpacing: "0.05em" }}>
-          Aseka — Đồng hành cùng người Việt tại Nhật Bản
+          {t.sub}
         </p>
-        <p className="text-sm leading-relaxed mb-7" style={{ color: "var(--muted)" }}>
-          人材紹介から年金・ビザ手続きまで。<br />ベトナム語対応スタッフが、あなたの悩みを解決します。
+        <p className="text-sm leading-relaxed mb-7" style={{ color: "var(--muted)", whiteSpace: "pre-line" }}>
+          {t.desc}
         </p>
 
         <div className="flex flex-wrap gap-3 mb-8">
-          <Link href="#contact" className="btn-navy no-underline">人材を採用したい →</Link>
-          <Link href="/dang-ky" className="btn-ghost no-underline">仕事を探している →</Link>
+          <Link href="#contact" className="btn-navy no-underline">{t.btn1}</Link>
+          <Link href="/dang-ky" className="btn-ghost no-underline">{t.btn2}</Link>
         </div>
 
         <div className="flex gap-7">
@@ -171,10 +201,10 @@ export default function Hero() {
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--navy)" }}>ベトナム語で全対応</div>
-              <div style={{ fontSize: "10px", color: "var(--muted)" }}>24時間以内に返信</div>
+              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--navy)" }}>{t.trust1}</div>
+              <div style={{ fontSize: "10px", color: "var(--muted)" }}>{t.trust2}</div>
             </div>
-            <div style={{ fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", background: "var(--navy-light)", color: "#0C447C", flexShrink: 0 }}>無料相談</div>
+            <div style={{ fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", background: "var(--navy-light)", color: "#0C447C", flexShrink: 0 }}>{t.trustBadge}</div>
           </div>
         </div>
       </div>

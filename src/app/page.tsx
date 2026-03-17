@@ -1,3 +1,4 @@
+import { LangProvider } from "@/contexts/LangContext";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import TrustStrip from "@/components/TrustStrip";
@@ -10,16 +11,18 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main>
-      <Navbar />
-      <Hero />
-      <TrustStrip />
-      <Services />
-      <Nenkin />
-      <Flow />
-      <Visa />
-      <Contact />
-      <Footer />
-    </main>
+    <LangProvider>
+      <main>
+        <Navbar />
+        <Hero />
+        <TrustStrip />
+        <Services />
+        <Nenkin />
+        <Flow />
+        <Visa />
+        <Contact />
+        <Footer />
+      </main>
+    </LangProvider>
   );
 }
