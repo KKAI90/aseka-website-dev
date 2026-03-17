@@ -76,6 +76,12 @@ export default function Navbar() {
           <Link href="/dang-ky" className="btn-ghost text-sm no-underline" style={{ borderColor:"var(--accent)", color:"var(--accent)" }}>
             仕事を探す / Tìm việc
           </Link>
+          <Link href="/mypage/login"
+            className="text-sm no-underline inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold transition-all"
+            style={{ background:"var(--navy)", color:"#fff" }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            マイページ
+          </Link>
           <Link href="#contact" className="btn-accent text-sm no-underline">
             お問い合わせ
           </Link>
