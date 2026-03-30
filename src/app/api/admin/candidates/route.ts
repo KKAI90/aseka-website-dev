@@ -92,8 +92,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, ...updates } = await req.json();
     if (!id) return apiError("IDが必要です", 400);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { created_at, ...safeUpdates } = updates;
+    const { created_at: _ca, ...safeUpdates } = updates;
     const data = await prisma.candidates.update({
       where: { id },
       data: { ...safeUpdates, updated_at: new Date() },

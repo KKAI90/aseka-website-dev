@@ -32,8 +32,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id, created_at, updated_at, ...fields } = body;
+    const { id: _id, created_at: _ca, updated_at: _ua, ...fields } = body;
     const data = await prisma.job_listings.create({
       data: { ...fields, count: Number(body.count) || 1 },
     });
