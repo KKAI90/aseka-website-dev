@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function db() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const id = req.cookies.get("mypage-id")?.value;
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data, error } = await db()
-    .from("candidates")
-    .select("id,name,name_kana,email,phone,date_of_birth,gender,skill,jlpt,preferred_job,visa_type,visa_expiry,status,match_job_name,motivation,availability,work_hours,address,nationality,created_at")
-    .eq("id", id)
-    .single();
+  const data = await prisma.candidates.findUnique({
+    where: { id },
+    select: {
+      id: true, name: true, name_kana: true, email: true, phone: true,
+      date_of_birth: true, gender: true, skill: true, jlpt: true,
+      preferred_job: true, visa_type: true, visa_expiry: true, status: true,
+      match_job_name: true, motivation: true, availability: true,
+      work_hours: true, address: true, nationality: true, created_at: true,
+    },
+  });
 
-  if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ data });
 }

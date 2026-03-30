@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,14 +13,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error } = await supabaseAdmin
-      .from("contact_submissions")
-      .insert({ type, name, company, email, phone, service, message });
-
-    if (error) throw error;
+    await prisma.contact_submissions.create({
+      data: { type, name, company, email, phone, service, message },
+    });
 
     return NextResponse.json({ success: true });
-
   } catch (err) {
     console.error("Contact API error:", err);
     return NextResponse.json(

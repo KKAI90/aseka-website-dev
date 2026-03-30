@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function db() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,32 +8,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "IDとパスワードを入力してください" }, { status: 400 });
     }
 
-    // Normalize: strip non-digit for phone comparison
     const idNorm = loginId.trim();
-    const pwNorm = password.replace(/[-\/]/g, "").trim(); // YYYYMMDD or YYYY/MM/DD
+    const pwNorm = password.replace(/[-\/]/g, "").trim();
 
-    // Try to find candidate by email OR phone
-    const supabase = db();
-    const { data: byEmail } = await supabase
-      .from("candidates")
-      .select("id,name,email,phone,date_of_birth,status,skill,jlpt,preferred_job,visa_type,match_job_name")
-      .eq("email", idNorm)
-      .single();
+    const SELECT = {
+      id: true, name: true, email: true, phone: true,
+      date_of_birth: true, status: true, skill: true,
+      jlpt: true, preferred_job: true, visa_type: true, match_job_name: true,
+    };
 
-    const { data: byPhone } = !byEmail
-      ? await supabase
-          .from("candidates")
-          .select("id,name,email,phone,date_of_birth,status,skill,jlpt,preferred_job,visa_type,match_job_name")
-          .eq("phone", idNorm)
-          .single()
-      : { data: null };
+    const byEmail = await prisma.candidates.findFirst({
+      where: { email: idNorm },
+      select: SELECT,
+    });
 
-    const cand = byEmail || byPhone;
+    const cand = byEmail ?? await prisma.candidates.findFirst({
+      where: { phone: idNorm },
+      select: SELECT,
+    });
+
     if (!cand) {
       return NextResponse.json({ error: "IDが見つかりません / Không tìm thấy tài khoản" }, { status: 401 });
     }
 
-    // Password = date_of_birth in YYYYMMDD format
     const dobNorm = (cand.date_of_birth || "").replace(/[-\/]/g, "");
     if (!dobNorm || dobNorm !== pwNorm) {
       return NextResponse.json({ error: "パスワードが正しくありません / Sai mật khẩu" }, { status: 401 });
@@ -51,7 +41,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
     return res;
