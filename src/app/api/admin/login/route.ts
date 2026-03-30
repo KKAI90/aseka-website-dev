@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
     });
 
     return res;
-  } catch {
-    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
+  } catch (err) {
+    console.error("login error:", err);
+    return NextResponse.json({ error: "サーバーエラーが発生しました", detail: String(err) }, { status: 500 });
   }
 }
