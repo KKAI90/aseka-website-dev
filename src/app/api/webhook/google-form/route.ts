@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       work_hours:     pick(r, "勤務時間", "work hours", "giờ làm việc") || null,
       availability:   pick(r, "来日可能時期", "渡航可能時期", "availability", "thời gian có thể sang nhật", "thời gian đến nhật") || null,
       marital_status: pick(r, "婚姻状況", "marital status", "tình trạng hôn nhân") || null,
-      dependents:     Number(pick(r, "扶養家族数", "dependents", "số người phụ thuộc")) || null,
+      dependents:     pick(r, "扶養家族数", "dependents", "số người phụ thuộc") || null,
       motivation:     pick(r, "志望動機", "来日理由", "motivation", "lý do sang nhật", "động lực") || null,
       self_pr:        pick(r, "自己pr", "自己PR", "自己アピール", "self pr", "giới thiệu bản thân") || null,
       note:           pick(r, "備考", "note", "ghi chú", "その他", "other") || null,
