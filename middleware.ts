@@ -67,9 +67,12 @@ export function middleware(req: NextRequest) {
   }
 
   // ── MAIN website context ───────────────────────────────────────────────
-  // Block /admin completely on main website — use aseka-admin-dev.vercel.app instead
-  if (pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/", req.url));
+  // Auth check for /admin routes (security via JWT, no host restriction needed)
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    const token = req.cookies.get("sb-access-token")?.value;
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin/login", req.url));
+    }
   }
 
   return NextResponse.next();
