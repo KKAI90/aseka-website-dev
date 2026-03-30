@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import getConfig from "next/config";
+
+const { serverRuntimeConfig } = getConfig() || {};
 
 export const maxDuration = 60;
 
 async function analyzeWithGroq(text: string) {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = serverRuntimeConfig?.GROQ_API_KEY || process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error("GROQ_API_KEY not set");
 
   const prompt = `You are an expert HR data extractor for Aseka株式会社.

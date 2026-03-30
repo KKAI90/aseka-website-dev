@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import getConfig from "next/config";
+
+const { serverRuntimeConfig } = getConfig() || {};
 
 export const maxDuration = 60;
 
 async function callGroq(prompt: string): Promise<unknown[]> {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = serverRuntimeConfig?.GROQ_API_KEY || process.env.GROQ_API_KEY;
   if (!apiKey) return [];
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
