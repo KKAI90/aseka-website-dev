@@ -1,133 +1,109 @@
 export default function Hero() {
   return (
     <div style={{
-      height: "100vh", position: "relative",
-      display: "flex", alignItems: "flex-end",
-      padding: "0 60px 80px",
-      background: "linear-gradient(135deg, #1A1A1A 0%, #2C2423 50%, #1A1A1A 100%)",
+      height: "100vh",
+      position: "relative",
       overflow: "hidden",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
     }}>
-      {/* Grid pattern */}
+
+      {/* Background photo — full screen */}
+      <img
+        src="/images/team-office-1.jpg"
+        alt="ASEKA Office"
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center 30%",
+        }}
+      />
+
+      {/* Subtle light overlay to soften photo */}
       <div style={{
-        position: "absolute", inset: 0, zIndex: 1,
-        backgroundImage: `
-          repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(184,150,62,0.04) 80px, rgba(184,150,62,0.04) 81px),
-          repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(184,150,62,0.04) 80px, rgba(184,150,62,0.04) 81px)
-        `,
+        position: "absolute", inset: 0,
+        background: "rgba(240,236,228,0.18)",
       }} />
 
-      {/* Photo panel — right side, 2 photos stacked */}
+      {/* Right-side gradient so text stays readable */}
       <div style={{
-        position: "absolute", top: 0, right: 0,
-        width: "46%", height: "100%",
-        display: "grid",
-        gridTemplateRows: "62% 38%",
-        gap: "3px",
-        zIndex: 0,
+        position: "absolute", inset: 0,
+        background: "linear-gradient(to left, rgba(250,247,242,0.72) 0%, rgba(250,247,242,0.18) 55%, transparent 100%)",
+      }} />
+
+      {/* Main text — right side */}
+      <div style={{
+        position: "relative", zIndex: 2,
+        padding: "0 72px 0 0",
+        maxWidth: "540px",
+        textAlign: "right",
       }}>
-        <div style={{ overflow: "hidden", position: "relative" }}>
-          <img
-            src="/images/ceo-desk.jpg"
-            alt="代表取締役"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }}
-          />
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.45) 35%, rgba(26,26,26,0.2) 100%)",
-          }} />
-        </div>
-        <div style={{ overflow: "hidden", position: "relative" }}>
-          <img
-            src="/images/team-office-1.jpg"
-            alt="チームオフィス"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
-          />
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.4) 35%, rgba(26,26,26,0.15) 100%)",
-          }} />
-        </div>
-      </div>
-
-      {/* Left-side dark gradient */}
-      <div style={{
-        position: "absolute", top: 0, left: 0,
-        width: "60%", height: "100%",
-        background: "linear-gradient(to right, #1A1A1A 55%, transparent 100%)",
-        zIndex: 1,
-      }} />
-
-      {/* Vertical gold line */}
-      <div style={{
-        position: "absolute", left: "60px", top: 0, bottom: 0, zIndex: 2,
-        width: "1px",
-        background: "linear-gradient(to bottom, transparent, #B8963E, transparent)",
-        opacity: 0.4,
-      }} />
-
-      {/* Main content */}
-      <div style={{ position: "relative", zIndex: 3 }}>
-        {/* Eyebrow */}
-        <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "14px", letterSpacing: "6px",
-          color: "var(--gold)", marginBottom: "24px",
-          display: "block", fontStyle: "italic",
-        }}>
-          私たちについて
-        </span>
 
         {/* Main title */}
         <h1 style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "clamp(72px, 10vw, 124px)",
-          fontWeight: 300, lineHeight: 0.88,
-          color: "#FAF7F2", letterSpacing: "-2px",
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "clamp(52px, 7.5vw, 96px)",
+          fontWeight: 700,
+          color: "#0C1F2E",
+          letterSpacing: "-1px",
+          lineHeight: 1,
           margin: 0,
         }}>
-          ABOUT
-          <em style={{ fontStyle: "italic", color: "var(--gold-light)", display: "block" }}>US</em>
+          ABOUT US
         </h1>
 
-        {/* Divider */}
+        {/* Gold divider line */}
         <div style={{
-          width: "48px", height: "1px",
-          background: "var(--gold)", opacity: 0.5,
-          margin: "28px 0",
+          height: "3px",
+          background: "linear-gradient(to left, var(--gold) 0%, rgba(184,150,62,0.15) 100%)",
+          margin: "20px 0 18px",
+          borderRadius: "2px",
         }} />
 
-        {/* Subtitle */}
+        {/* Japanese subtitle */}
         <p style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "13px", letterSpacing: "4px",
-          color: "rgba(250,247,242,0.65)",
-          fontWeight: 300,
+          fontSize: "17px",
+          fontWeight: 400,
+          color: "#1A2E3A",
+          letterSpacing: "5px",
         }}>
-          株式会社 ASEKA
+          私たちについて
         </p>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — bottom center */}
       <div style={{
-        position: "absolute", right: "60px", bottom: "80px", zIndex: 3,
-        writingMode: "vertical-rl",
-        fontSize: "10px", letterSpacing: "4px",
-        color: "var(--gold)", opacity: 0.7,
-        display: "flex", alignItems: "center", gap: "12px",
-        fontFamily: "'Cormorant Garamond', serif",
+        position: "absolute", bottom: "36px", left: "50%",
+        transform: "translateX(-50%)", zIndex: 3,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: "8px",
       }}>
         <div style={{
-          width: "1px", height: "60px",
-          background: "var(--gold)", opacity: 0.5,
+          width: "1px", height: "52px",
+          background: "linear-gradient(to bottom, var(--gold), transparent)",
           animation: "scrollLine 2s ease-in-out infinite",
         }} />
-        SCROLL
+        <span style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: "10px", letterSpacing: "4px",
+          color: "var(--gold)", opacity: 0.7,
+          fontStyle: "italic",
+        }}>SCROLL</span>
       </div>
 
       <style>{`
         @keyframes scrollLine {
-          0%, 100% { transform: scaleY(1); transform-origin: top; }
-          50% { transform: scaleY(0.3); transform-origin: top; }
+          0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+          50%       { opacity: 0.4; transform: scaleY(0.4); transform-origin: top; }
+        }
+        @media (max-width: 900px) {
+          .hero-text { padding: 0 32px 0 0 !important; max-width: 100% !important; }
+        }
+        @media (max-width: 600px) {
+          .hero-text { text-align: center !important; padding: 0 24px !important; }
         }
       `}</style>
     </div>
