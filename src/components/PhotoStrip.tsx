@@ -1,8 +1,8 @@
 const photos = [
-  { src: "/images/team-office-2.jpg", alt: "チーム作業風景", label: "チームワーク" },
-  { src: "/images/staff-support.jpg", alt: "スタッフサポート", label: "きめ細かいサポート" },
-  { src: "/images/office-meeting.jpg", alt: "ビジネスミーティング", label: "日越連携" },
-  { src: "/images/team-office-1.jpg", alt: "オフィス作業", label: "チームオフィス" },
+  { src: "/images/team-office-2.jpg", alt: "チーム作業風景",    label: "チームワーク",      sub: "Team Work" },
+  { src: "/images/staff-support.jpg", alt: "スタッフサポート",   label: "きめ細かいサポート", sub: "Dedicated Support" },
+  { src: "/images/office-meeting.jpg", alt: "ビジネスミーティング", label: "日越連携",        sub: "Japan × Vietnam" },
+  { src: "/images/team-office-1.jpg", alt: "オフィス作業",       label: "プロフェッショナル", sub: "Professional" },
 ];
 
 export default function PhotoStrip() {
@@ -11,45 +11,57 @@ export default function PhotoStrip() {
       display: "grid",
       gridTemplateColumns: "repeat(4, 1fr)",
       gap: "3px",
-      height: "280px",
+      height: "300px",
       overflow: "hidden",
     }} className="photo-strip">
       {photos.map((p) => (
-        <div key={p.src} style={{ position: "relative", overflow: "hidden" }}>
+        <div key={p.src} style={{ position: "relative", overflow: "hidden" }} className="photo-strip-item">
           <img
             src={p.src}
             alt={p.alt}
             style={{
               width: "100%", height: "100%",
               objectFit: "cover",
-              transition: "transform 0.6s ease",
+              transition: "transform 0.7s ease",
             }}
             className="photo-strip-img"
           />
-          {/* Overlay */}
+          {/* Gradient overlay */}
           <div style={{
             position: "absolute", inset: 0,
-            background: "linear-gradient(to top, rgba(26,26,26,0.75) 0%, transparent 50%)",
+            background: "linear-gradient(to top, rgba(20,15,10,0.82) 0%, rgba(20,15,10,0.15) 55%, transparent 100%)",
           }} />
-          {/* Label */}
+          {/* Labels */}
           <div style={{
-            position: "absolute", bottom: "16px", left: "20px",
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "12px", letterSpacing: "2px",
-            color: "rgba(250,247,242,0.85)",
+            position: "absolute", bottom: "20px", left: "22px",
           }}>
-            {p.label}
+            <div style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "14px", letterSpacing: "1.5px",
+              color: "rgba(250,247,242,0.95)",
+              marginBottom: "4px", fontWeight: 400,
+            }}>
+              {p.label}
+            </div>
+            <div style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "12px", letterSpacing: "2px",
+              color: "rgba(184,150,62,0.8)",
+              fontStyle: "italic",
+            }}>
+              {p.sub}
+            </div>
           </div>
         </div>
       ))}
 
       <style>{`
-        .photo-strip-img:hover { transform: scale(1.04); }
+        .photo-strip-item:hover .photo-strip-img { transform: scale(1.05); }
         @media (max-width: 900px) {
-          .photo-strip { grid-template-columns: 1fr 1fr !important; height: 360px !important; }
+          .photo-strip { grid-template-columns: 1fr 1fr !important; height: 380px !important; }
         }
         @media (max-width: 600px) {
-          .photo-strip { grid-template-columns: 1fr 1fr !important; height: 280px !important; }
+          .photo-strip { grid-template-columns: 1fr 1fr !important; height: 300px !important; }
         }
       `}</style>
     </div>

@@ -38,6 +38,9 @@ body {
   color: var(--dark);
   background: var(--cream);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "palt" 1;
 }
 
 .btn-navy {

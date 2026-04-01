@@ -25,7 +25,6 @@ export default function Hero() {
         gap: "3px",
         zIndex: 0,
       }}>
-        {/* Top: CEO at desk */}
         <div style={{ overflow: "hidden", position: "relative" }}>
           <img
             src="/images/ceo-desk.jpg"
@@ -37,7 +36,6 @@ export default function Hero() {
             background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.45) 35%, rgba(26,26,26,0.2) 100%)",
           }} />
         </div>
-        {/* Bottom: team Vietnam */}
         <div style={{ overflow: "hidden", position: "relative" }}>
           <img
             src="/images/team-office-1.jpg"
@@ -51,19 +49,11 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Left-side dark gradient over photos */}
+      {/* Left-side dark gradient */}
       <div style={{
         position: "absolute", top: 0, left: 0,
         width: "60%", height: "100%",
         background: "linear-gradient(to right, #1A1A1A 55%, transparent 100%)",
-        zIndex: 1,
-      }} />
-
-      {/* Gold accent */}
-      <div style={{
-        position: "absolute", top: 0, right: "48%",
-        width: "20%", height: "100%",
-        background: "linear-gradient(160deg, rgba(184,150,62,0.08) 0%, transparent 60%)",
         zIndex: 1,
       }} />
 
@@ -77,29 +67,41 @@ export default function Hero() {
 
       {/* Main content */}
       <div style={{ position: "relative", zIndex: 3 }}>
+        {/* Eyebrow */}
         <span style={{
           fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "13px", letterSpacing: "6px",
-          color: "var(--gold)", marginBottom: "20px",
+          fontSize: "14px", letterSpacing: "6px",
+          color: "var(--gold)", marginBottom: "24px",
           display: "block", fontStyle: "italic",
         }}>
           私たちについて
         </span>
+
+        {/* Main title */}
         <h1 style={{
           fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "clamp(64px, 10vw, 120px)",
-          fontWeight: 300, lineHeight: 0.9,
+          fontSize: "clamp(72px, 10vw, 124px)",
+          fontWeight: 300, lineHeight: 0.88,
           color: "#FAF7F2", letterSpacing: "-2px",
           margin: 0,
         }}>
           ABOUT
           <em style={{ fontStyle: "italic", color: "var(--gold-light)", display: "block" }}>US</em>
         </h1>
+
+        {/* Divider */}
+        <div style={{
+          width: "48px", height: "1px",
+          background: "var(--gold)", opacity: 0.5,
+          margin: "28px 0",
+        }} />
+
+        {/* Subtitle */}
         <p style={{
-          marginTop: "24px",
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "15px", letterSpacing: "3px",
-          color: "rgba(250,247,242,0.5)",
+          fontSize: "13px", letterSpacing: "4px",
+          color: "rgba(250,247,242,0.65)",
+          fontWeight: 300,
         }}>
           株式会社 ASEKA
         </p>
@@ -109,9 +111,10 @@ export default function Hero() {
       <div style={{
         position: "absolute", right: "60px", bottom: "80px", zIndex: 3,
         writingMode: "vertical-rl",
-        fontSize: "10px", letterSpacing: "3px",
+        fontSize: "10px", letterSpacing: "4px",
         color: "var(--gold)", opacity: 0.7,
         display: "flex", alignItems: "center", gap: "12px",
+        fontFamily: "'Cormorant Garamond', serif",
       }}>
         <div style={{
           width: "1px", height: "60px",
@@ -125,9 +128,6 @@ export default function Hero() {
         @keyframes scrollLine {
           0%, 100% { transform: scaleY(1); transform-origin: top; }
           50% { transform: scaleY(0.3); transform-origin: top; }
-        }
-        @media (max-width: 900px) {
-          .hero-photo-collage { display: none !important; }
         }
       `}</style>
     </div>
