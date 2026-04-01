@@ -50,6 +50,7 @@ export default function Hero() {
           letterSpacing: "-1px",
           lineHeight: 1,
           margin: 0,
+          whiteSpace: "nowrap",
         }}>
           ABOUT US
         </h1>
