@@ -16,45 +16,38 @@ export default function Hero() {
         `,
       }} />
 
-      {/* Photo collage — right side */}
+      {/* Photo panel — right side, 2 photos stacked */}
       <div style={{
         position: "absolute", top: 0, right: 0,
-        width: "48%", height: "100%",
+        width: "46%", height: "100%",
         display: "grid",
-        gridTemplateRows: "1fr 1fr",
-        gridTemplateColumns: "1fr 1fr",
+        gridTemplateRows: "62% 38%",
         gap: "3px",
         zIndex: 0,
       }}>
-        {/* Top: CEO at desk — spans both columns */}
-        <div style={{ gridRow: "1", gridColumn: "1 / 3", overflow: "hidden", position: "relative" }}>
+        {/* Top: CEO at desk */}
+        <div style={{ overflow: "hidden", position: "relative" }}>
           <img
             src="/images/ceo-desk.jpg"
             alt="代表取締役"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%" }}
           />
           <div style={{
             position: "absolute", inset: 0,
-            background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.5) 40%, rgba(26,26,26,0.25) 100%)",
+            background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.45) 35%, rgba(26,26,26,0.2) 100%)",
           }} />
         </div>
-        {/* Bottom left: team Vietnam */}
+        {/* Bottom: team Vietnam */}
         <div style={{ overflow: "hidden", position: "relative" }}>
           <img
             src="/images/team-office-1.jpg"
             alt="チームオフィス"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }}
           />
-          <div style={{ position: "absolute", inset: 0, background: "rgba(26,26,26,0.55)" }} />
-        </div>
-        {/* Bottom right: business meeting */}
-        <div style={{ overflow: "hidden", position: "relative" }}>
-          <img
-            src="/images/office-meeting.jpg"
-            alt="ビジネスミーティング"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <div style={{ position: "absolute", inset: 0, background: "rgba(26,26,26,0.55)" }} />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to right, #1A1A1A 0%, rgba(26,26,26,0.4) 35%, rgba(26,26,26,0.15) 100%)",
+          }} />
         </div>
       </div>
 
