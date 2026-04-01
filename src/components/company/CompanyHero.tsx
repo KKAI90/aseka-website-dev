@@ -1,84 +1,109 @@
 export default function CompanyHero() {
   return (
     <div style={{
-      height: "100vh", position: "relative",
-      display: "flex", alignItems: "flex-end",
-      padding: "0 60px 80px",
+      height: "100vh",
+      position: "relative",
       overflow: "hidden",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
     }}>
-      {/* Background image */}
+
+      {/* Background photo — full screen */}
+      <img
+        src="/images/hero-vietnam.jpg"
+        alt="ASEKA Company"
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center 40%",
+        }}
+      />
+
+      {/* Subtle light overlay to soften photo */}
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: "url('/images/hero-vietnam.jpg')",
-        backgroundSize: "cover", backgroundPosition: "center",
+        background: "rgba(240,236,228,0.18)",
       }} />
-      {/* Dark overlay */}
+
+      {/* Right-side gradient so text stays readable */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to right, rgba(14,34,51,0.88) 40%, rgba(14,34,51,0.45) 100%)",
+        background: "linear-gradient(to left, rgba(250,247,242,0.72) 0%, rgba(250,247,242,0.18) 55%, transparent 100%)",
       }} />
 
-      {/* Vertical gold line */}
+      {/* Main text — right side */}
       <div style={{
-        position: "absolute", left: "60px", top: 0, bottom: 0,
-        width: "1px",
-        background: "linear-gradient(to bottom, transparent, #B8963E, transparent)",
-        opacity: 0.4, zIndex: 1,
-      }} />
+        position: "relative", zIndex: 2,
+        padding: "0 72px 0 0",
+        maxWidth: "540px",
+        textAlign: "right",
+      }}>
 
-      {/* Content */}
-      <div style={{ position: "relative", zIndex: 2 }}>
-        <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "13px", letterSpacing: "6px",
-          color: "var(--gold)", marginBottom: "20px",
-          display: "block", fontStyle: "italic",
-        }}>
-          事業内容
-        </span>
+        {/* Main title */}
         <h1 style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "clamp(64px, 10vw, 120px)",
-          fontWeight: 300, lineHeight: 0.9,
-          color: "#FAF7F2", letterSpacing: "-2px",
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "clamp(52px, 7.5vw, 96px)",
+          fontWeight: 700,
+          color: "#0C1F2E",
+          letterSpacing: "-1px",
+          lineHeight: 1,
           margin: 0,
         }}>
-          COM
-          <em style={{ fontStyle: "italic", color: "var(--gold-light)", display: "block" }}>PANY</em>
+          COMPANY
         </h1>
+
+        {/* Gold divider line */}
+        <div style={{
+          height: "3px",
+          background: "linear-gradient(to left, var(--gold) 0%, rgba(184,150,62,0.15) 100%)",
+          margin: "20px 0 18px",
+          borderRadius: "2px",
+        }} />
+
+        {/* Japanese subtitle */}
         <p style={{
-          marginTop: "24px",
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "15px", letterSpacing: "3px",
-          color: "rgba(250,247,242,0.55)",
+          fontSize: "17px",
+          fontWeight: 400,
+          color: "#1A2E3A",
+          letterSpacing: "5px",
         }}>
-          株式会社 ASEKA
+          事業内容
         </p>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — bottom center */}
       <div style={{
-        position: "absolute", right: "60px", bottom: "80px", zIndex: 2,
-        writingMode: "vertical-rl",
-        fontSize: "10px", letterSpacing: "3px",
-        color: "var(--gold)", opacity: 0.7,
-        display: "flex", alignItems: "center", gap: "12px",
+        position: "absolute", bottom: "36px", left: "50%",
+        transform: "translateX(-50%)", zIndex: 3,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: "8px",
       }}>
         <div style={{
-          width: "1px", height: "60px",
-          background: "var(--gold)", opacity: 0.5,
+          width: "1px", height: "52px",
+          background: "linear-gradient(to bottom, var(--gold), transparent)",
           animation: "scrollLine 2s ease-in-out infinite",
         }} />
-        SCROLL
+        <span style={{
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: "10px", letterSpacing: "4px",
+          color: "var(--gold)", opacity: 0.7,
+          fontStyle: "italic",
+        }}>SCROLL</span>
       </div>
 
       <style>{`
         @keyframes scrollLine {
-          0%, 100% { transform: scaleY(1); transform-origin: top; }
-          50% { transform: scaleY(0.3); transform-origin: top; }
+          0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+          50%       { opacity: 0.4; transform: scaleY(0.4); transform-origin: top; }
+        }
+        @media (max-width: 900px) {
+          .company-hero-text { padding: 0 32px 0 0 !important; max-width: 100% !important; }
         }
         @media (max-width: 600px) {
-          .company-hero { padding: 0 24px 60px !important; }
+          .company-hero-text { text-align: center !important; padding: 0 24px !important; }
         }
       `}</style>
     </div>
