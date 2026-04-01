@@ -37,18 +37,20 @@ export default function TopMessage() {
               position: "absolute", top: "16px", left: "16px", right: "-16px", bottom: "-16px",
               border: "1px solid var(--gold)", opacity: 0.3, zIndex: 0,
             }} />
-            {/* Placeholder */}
-            <div style={{
-              width: "100%", aspectRatio: "3/4",
-              background: "linear-gradient(160deg, #2C2C2C 0%, #3a3530 100%)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              position: "relative", zIndex: 1,
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "13px", letterSpacing: "3px",
-              color: "var(--gold)", opacity: 0.5,
-            }}>
-              PHOTO
-            </div>
+            {/* CEO portrait */}
+            <img
+              src="/images/ceo-portrait.jpg"
+              alt="代表取締役 グェン ティラン タリ"
+              style={{
+                width: "100%",
+                aspectRatio: "3/4",
+                objectFit: "cover",
+                objectPosition: "center top",
+                display: "block",
+                position: "relative",
+                zIndex: 1,
+              }}
+            />
           </div>
           {/* Name tag */}
           <div style={{
@@ -119,7 +121,6 @@ export default function TopMessage() {
         }
         @media (max-width: 600px) {
           .message-inner { padding: 0; }
-          section { padding: 80px 24px !important; }
         }
       `}</style>
     </section>

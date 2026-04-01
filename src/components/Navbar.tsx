@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const links = [
   { href: "/", label: "TOP" },
@@ -17,26 +18,22 @@ export default function Navbar() {
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "20px 60px",
+      padding: "16px 60px",
       background: "rgba(250,247,242,0.92)",
       backdropFilter: "blur(12px)",
       WebkitBackdropFilter: "blur(12px)",
       borderBottom: "1px solid rgba(184,150,62,0.25)",
     }}>
       {/* Logo */}
-      <Link href="/" style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "26px",
-        letterSpacing: "4px",
-        color: "var(--gold)",
-        fontWeight: 300,
-        display: "flex",
-        alignItems: "center",
-        gap: "10px",
-        textDecoration: "none",
-      }}>
-        <span style={{ fontSize: "20px" }}>⊡</span>
-        ASEKA
+      <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+        <Image
+          src="/images/aseka-logo.png"
+          alt="ASEKA"
+          width={120}
+          height={40}
+          style={{ objectFit: "contain", height: "36px", width: "auto" }}
+          priority
+        />
       </Link>
 
       {/* Desktop links */}

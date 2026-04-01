@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer style={{
@@ -8,13 +10,13 @@ export default function Footer() {
       alignItems: "center",
       borderTop: "1px solid rgba(184,150,62,0.15)",
     }} className="lux-footer">
-      <div style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "28px", letterSpacing: "5px",
-        color: "var(--gold)", fontWeight: 300,
-      }}>
-        ASEKA
-      </div>
+      <Image
+        src="/images/aseka-logo.png"
+        alt="ASEKA"
+        width={160}
+        height={54}
+        style={{ objectFit: "contain", height: "48px", width: "auto" }}
+      />
 
       <div style={{
         fontFamily: "'Noto Sans JP', sans-serif",

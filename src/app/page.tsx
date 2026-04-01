@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Philosophy from "@/components/Philosophy";
+import PhotoStrip from "@/components/PhotoStrip";
 import TopMessage from "@/components/TopMessage";
 import CompanyInfo from "@/components/CompanyInfo";
 import Footer from "@/components/Footer";
@@ -11,6 +12,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Philosophy />
+      <PhotoStrip />
       <TopMessage />
       <CompanyInfo />
       <Footer />
