@@ -1,11 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useLang } from "@/contexts/LangContext";
-
-const T = {
-  JP: { eyebrow: "Contact · お問い合わせ", title: "まずは無料でご相談ください", btn: "送信する · Gửi liên hệ →", sending: "送信中... / Đang gửi..." },
-  VN: { eyebrow: "Liên hệ · Contact",     title: "Tư vấn miễn phí ngay hôm nay", btn: "Gửi liên hệ →", sending: "Đang gửi..." },
-};
 
 type FormState = {
   type: string;
@@ -28,8 +22,6 @@ const initialForm: FormState = {
 };
 
 export default function Contact() {
-  const { lang } = useLang();
-  const t = T[lang];
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,18 +55,53 @@ export default function Contact() {
 
   if (submitted) {
     return (
-      <section id="contact" className="py-16 max-w-6xl mx-auto px-6 text-center">
-        <div className="inline-flex flex-col items-center gap-4 rounded-2xl p-10 max-w-md mx-auto" style={{ border: "0.5px solid var(--border)" }}>
-          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "#EAF3DE" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#27500A" strokeWidth="2">
-              <path d="M9 12l2 2 4-4M12 3a9 9 0 100 18 9 9 0 000-18z" />
+      <section style={{ padding: "120px 60px", background: "var(--cream)", minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          textAlign: "center", maxWidth: "480px",
+          padding: "64px 48px",
+          border: "1px solid rgba(184,150,62,0.25)",
+          background: "#fff",
+        }}>
+          {/* Gold check icon */}
+          <div style={{
+            width: "56px", height: "56px", borderRadius: "50%",
+            background: "rgba(184,150,62,0.1)",
+            border: "1px solid rgba(184,150,62,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            margin: "0 auto 28px",
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold" style={{ color: "var(--navy)" }}>送信完了 / Đã gửi thành công</h3>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            24時間以内にご連絡いたします。<br />Chúng tôi sẽ liên hệ trong vòng 24 giờ.
+          <h3 style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "20px", fontWeight: 400,
+            color: "var(--dark)", marginBottom: "12px",
+            letterSpacing: "1px",
+          }}>
+            送信完了
+          </h3>
+          <p style={{
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "14px", lineHeight: 1.9,
+            color: "var(--warm-gray)", marginBottom: "32px",
+          }}>
+            お問い合わせありがとうございます。<br />
+            24時間以内にご連絡いたします。<br />
+            <span style={{ fontSize: "13px", opacity: 0.75 }}>Chúng tôi sẽ liên hệ trong vòng 24 giờ.</span>
           </p>
-          <button className="btn-ghost text-sm" onClick={() => { setSubmitted(false); setForm(initialForm); }}>
+          <button
+            onClick={() => { setSubmitted(false); setForm(initialForm); }}
+            style={{
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "12px", letterSpacing: "2px",
+              color: "var(--gold)", background: "none",
+              border: "1px solid rgba(184,150,62,0.4)",
+              padding: "10px 28px", cursor: "pointer",
+              transition: "all 0.3s",
+            }}
+          >
             別のお問い合わせ
           </button>
         </div>
@@ -82,53 +109,153 @@ export default function Contact() {
     );
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "14px 16px",
+    fontFamily: "'Noto Sans JP', sans-serif",
+    fontSize: "14px",
+    color: "var(--dark)",
+    background: "#fff",
+    border: "1px solid rgba(184,150,62,0.25)",
+    borderRadius: "0",
+    outline: "none",
+    transition: "border-color 0.3s",
+    boxSizing: "border-box",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontFamily: "'Noto Sans JP', sans-serif",
+    fontSize: "11px",
+    letterSpacing: "1.5px",
+    color: "var(--warm-gray)",
+    marginBottom: "8px",
+  };
+
   return (
-    <section id="contact" className="py-16" style={{ background: "var(--surface)" }}>
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="text-center mb-8">
-          <div className="section-eyebrow">{t.eyebrow}</div>
-          <div className="section-title">{t.title}</div>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>Tư vấn miễn phí · Phản hồi trong 24 giờ · Hỗ trợ tiếng Việt</p>
+    <section style={{ padding: "100px 60px 120px", background: "var(--cream)" }}>
+      <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+
+        {/* Section header */}
+        <div style={{ textAlign: "center", marginBottom: "64px" }}>
+          <div style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "12px", color: "var(--gold)",
+            letterSpacing: "5px", fontStyle: "italic",
+            marginBottom: "16px",
+          }}>
+            Contact · お問い合わせ
+          </div>
+          <h2 style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "clamp(26px, 4vw, 38px)",
+            fontWeight: 400, color: "var(--dark)",
+            letterSpacing: "1px", margin: "0 0 16px",
+          }}>
+            まずは無料でご相談ください
+          </h2>
+          <div style={{
+            width: "48px", height: "1px",
+            background: "var(--gold)", opacity: 0.5,
+            margin: "0 auto 20px",
+          }} />
+          <p style={{
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "13px", color: "var(--warm-gray)",
+            letterSpacing: "0.5px",
+          }}>
+            Tư vấn miễn phí · Phản hồi trong 24 giờ · Hỗ trợ tiếng Việt
+          </p>
         </div>
-        <div className="flex rounded-xl overflow-hidden mb-6" style={{ border: "0.5px solid var(--border)", background: "#fff" }}>
+
+        {/* Type selector */}
+        <div style={{
+          display: "grid", gridTemplateColumns: "1fr 1fr",
+          marginBottom: "48px",
+          border: "1px solid rgba(184,150,62,0.25)",
+        }}>
           {[
-            { val: "business", label: "企業・採用担当者", sub: "Doanh nghiệp" },
-            { val: "individual", label: "個人・求職者", sub: "Cá nhân / ứng viên" },
-          ].map((t) => (
-            <button key={t.val} className="flex-1 py-3 text-sm font-medium border-none cursor-pointer transition-all"
-              style={{ background: form.type === t.val ? "var(--navy)" : "transparent", color: form.type === t.val ? "#fff" : "var(--muted)" }}
-              onClick={() => setForm((f) => ({ ...f, type: t.val }))}>
-              {t.label}
-              <span className="block text-xs mt-0.5" style={{ opacity: 0.65 }}>{t.sub}</span>
+            { val: "business",   jp: "企業・採用担当者", vn: "Doanh nghiệp" },
+            { val: "individual", jp: "個人・求職者",     vn: "Cá nhân / ứng viên" },
+          ].map((tab) => (
+            <button
+              key={tab.val}
+              onClick={() => setForm((f) => ({ ...f, type: tab.val }))}
+              style={{
+                padding: "20px 16px",
+                background: form.type === tab.val ? "var(--dark)" : "#fff",
+                color: form.type === tab.val ? "#FAF7F2" : "var(--warm-gray)",
+                border: "none", cursor: "pointer",
+                fontFamily: "'Noto Sans JP', sans-serif",
+                fontSize: "14px", fontWeight: 500,
+                letterSpacing: "0.5px",
+                transition: "all 0.3s",
+                borderRight: tab.val === "business" ? "1px solid rgba(184,150,62,0.25)" : "none",
+              }}
+            >
+              {tab.jp}
+              <span style={{
+                display: "block", fontSize: "11px",
+                opacity: 0.6, marginTop: "4px",
+                fontWeight: 400,
+              }}>{tab.vn}</span>
             </button>
           ))}
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+
+          {/* Row 1: Name + Company */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-grid">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>お名前 / Họ tên *</label>
-              <input required type="text" className="w-full" placeholder="山田 太郎 / Nguyễn Văn A" value={form.name} onChange={set("name")} />
+              <label style={labelStyle}>お名前 / Họ tên *</label>
+              <input
+                required type="text"
+                placeholder="山田 太郎 / Nguyễn Văn A"
+                value={form.name} onChange={set("name")}
+                style={inputStyle}
+              />
             </div>
             {form.type === "business" && (
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>会社名 / Tên công ty *</label>
-                <input required type="text" className="w-full" placeholder="株式会社〇〇" value={form.company} onChange={set("company")} />
+                <label style={labelStyle}>会社名 / Tên công ty *</label>
+                <input
+                  required type="text"
+                  placeholder="株式会社〇〇"
+                  value={form.company} onChange={set("company")}
+                  style={inputStyle}
+                />
               </div>
             )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Row 2: Email + Phone */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-grid">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>メールアドレス / Email *</label>
-              <input required type="email" className="w-full" placeholder="example@email.com" value={form.email} onChange={set("email")} />
+              <label style={labelStyle}>メールアドレス / Email *</label>
+              <input
+                required type="email"
+                placeholder="example@email.com"
+                value={form.email} onChange={set("email")}
+                style={inputStyle}
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>電話番号 / Số điện thoại</label>
-              <input type="tel" className="w-full" placeholder="090-0000-0000" value={form.phone} onChange={set("phone")} />
+              <label style={labelStyle}>電話番号 / Số điện thoại</label>
+              <input
+                type="tel"
+                placeholder="090-0000-0000"
+                value={form.phone} onChange={set("phone")}
+                style={inputStyle}
+              />
             </div>
           </div>
+
+          {/* Service select */}
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>ご相談内容 / Dịch vụ quan tâm</label>
-            <select className="w-full" value={form.service} onChange={set("service")}>
+            <label style={labelStyle}>ご相談内容 / Dịch vụ quan tâm</label>
+            <select value={form.service} onChange={set("service")} style={{ ...inputStyle, cursor: "pointer" }}>
               <option value="">選択してください / Chọn dịch vụ</option>
               <option value="hr">人材紹介 / Giới thiệu nhân sự</option>
               <option value="nenkin">年金・社会保険 / Nenkin</option>
@@ -137,19 +264,69 @@ export default function Contact() {
               <option value="other">その他 / Khác</option>
             </select>
           </div>
+
+          {/* Message */}
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>メッセージ / Nội dung</label>
-            <textarea rows={4} className="w-full" placeholder="ご質問・ご要望をご記入ください / Nhập nội dung..." value={form.message} onChange={set("message")} />
+            <label style={labelStyle}>メッセージ / Nội dung</label>
+            <textarea
+              rows={5}
+              placeholder="ご質問・ご要望をご記入ください / Nhập nội dung..."
+              value={form.message} onChange={set("message")}
+              style={{ ...inputStyle, resize: "vertical" }}
+            />
           </div>
-          {error && <p className="text-xs text-center" style={{ color: "var(--accent)" }}>{error}</p>}
-          <button type="submit" disabled={loading} className="btn-navy w-full justify-center text-sm py-3" style={{ opacity: loading ? 0.6 : 1 }}>
-            {loading ? t.sending : t.btn}
+
+          {error && (
+            <p style={{
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "13px", color: "#C8002A",
+              textAlign: "center",
+            }}>{error}</p>
+          )}
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%", padding: "18px",
+              background: loading ? "rgba(12,31,46,0.6)" : "#0C1F2E",
+              color: "#FAF7F2",
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "14px", letterSpacing: "3px",
+              border: "none", cursor: loading ? "not-allowed" : "pointer",
+              transition: "background 0.3s",
+            }}
+          >
+            {loading ? "送信中... / Đang gửi..." : "送信する · Gửi liên hệ →"}
           </button>
-          <p className="text-xs text-center" style={{ color: "var(--muted)" }}>
-            個人情報は適切に管理し、第三者に提供しません。<br />Thông tin của bạn được bảo mật hoàn toàn.
+
+          <p style={{
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "11px", color: "var(--warm-gray)",
+            textAlign: "center", letterSpacing: "0.5px",
+          }}>
+            個人情報は適切に管理し、第三者に提供しません。<br />
+            Thông tin của bạn được bảo mật hoàn toàn.
           </p>
         </form>
       </div>
+
+      <style>{`
+        input:focus, textarea:focus, select:focus {
+          border-color: var(--gold) !important;
+          box-shadow: 0 0 0 2px rgba(184,150,62,0.12);
+        }
+        input::placeholder, textarea::placeholder {
+          color: rgba(138,130,120,0.5);
+        }
+        @media (max-width: 700px) {
+          .contact-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          section { padding: 80px 24px 100px !important; }
+        }
+      `}</style>
     </section>
   );
 }

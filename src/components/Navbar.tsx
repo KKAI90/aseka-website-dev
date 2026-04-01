@@ -8,7 +8,7 @@ const links = [
   { href: "/#about", label: "ABOUT US" },
   { href: "/company", label: "COMPANY" },
   { href: "#services", label: "SERVICES" },
-  { href: "#contact", label: "CONTACT" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 export default function Navbar() {
