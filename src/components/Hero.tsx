@@ -1,4 +1,16 @@
+"use client";
+import { useLang } from "@/contexts/LangContext";
+
+const T = {
+  JP: { title: "ABOUT US", subtitle: "私たちについて" },
+  EN: { title: "ABOUT US", subtitle: "About Our Company" },
+  VN: { title: "ABOUT US", subtitle: "Về Chúng Tôi" },
+};
+
 export default function Hero() {
+  const { lang } = useLang();
+  const t = T[lang];
+
   return (
     <div style={{
       height: "100vh",
@@ -41,7 +53,6 @@ export default function Hero() {
         textAlign: "right",
       }}>
 
-        {/* Main title */}
         <h1 style={{
           fontFamily: "'Noto Sans JP', sans-serif",
           fontSize: "clamp(52px, 7.5vw, 96px)",
@@ -52,7 +63,7 @@ export default function Hero() {
           margin: 0,
           whiteSpace: "nowrap",
         }}>
-          ABOUT US
+          {t.title}
         </h1>
 
         {/* Gold divider line */}
@@ -63,15 +74,14 @@ export default function Hero() {
           borderRadius: "2px",
         }} />
 
-        {/* Japanese subtitle */}
         <p style={{
           fontFamily: "'Noto Serif JP', serif",
           fontSize: "17px",
           fontWeight: 400,
           color: "#1A2E3A",
-          letterSpacing: "5px",
+          letterSpacing: lang === "JP" ? "5px" : "2px",
         }}>
-          私たちについて
+          {t.subtitle}
         </p>
       </div>
 

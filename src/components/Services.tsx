@@ -48,9 +48,10 @@ const services = [
   },
 ];
 
-const T = {
+const T: Record<string, { eyebrow: string; title: string; sub: string; more: string }> = {
   JP: { eyebrow: "Services · サービス一覧", title: "Asekaが提供する\n6つのサポート", sub: "6 dịch vụ hỗ trợ toàn diện cho người Việt tại Nhật", more: "詳しく見る →" },
-  VN: { eyebrow: "Dịch vụ · Services",      title: "6 dịch vụ hỗ trợ\ntoàn diện của Aseka",    sub: "Hỗ trợ người Việt tại Nhật từ việc làm đến thủ tục giấy tờ", more: "Xem chi tiết →" },
+  EN: { eyebrow: "Our Services",             title: "6 Comprehensive\nSupport Services", sub: "Full support for Vietnamese residents in Japan", more: "Learn more →" },
+  VN: { eyebrow: "Dịch vụ · Services",       title: "6 dịch vụ hỗ trợ\ntoàn diện của Aseka", sub: "Hỗ trợ người Việt tại Nhật từ việc làm đến thủ tục giấy tờ", more: "Xem chi tiết →" },
 };
 
 export default function Services() {

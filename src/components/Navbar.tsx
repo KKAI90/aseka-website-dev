@@ -2,17 +2,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useLang, type Lang } from "@/contexts/LangContext";
 
-const links = [
-  { href: "/", label: "TOP" },
-  { href: "/#about", label: "ABOUT US" },
-  { href: "/company", label: "COMPANY" },
-  { href: "#services", label: "SERVICES" },
-  { href: "/contact", label: "CONTACT" },
-];
+const NAV_LABELS: Record<Lang, { top: string; about: string; company: string; services: string; contact: string }> = {
+  JP: { top: "TOP", about: "ABOUT US", company: "COMPANY", services: "SERVICES", contact: "CONTACT" },
+  EN: { top: "TOP", about: "ABOUT US", company: "COMPANY", services: "SERVICES", contact: "CONTACT" },
+  VN: { top: "TRANG CHỦ", about: "GIỚI THIỆU", company: "CÔNG TY", services: "DỊCH VỤ", contact: "LIÊN HỆ" },
+};
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { lang, setLang } = useLang();
+  const labels = NAV_LABELS[lang];
+
+  const links = [
+    { href: "/", label: labels.top },
+    { href: "/#about", label: labels.about },
+    { href: "/company", label: labels.company },
+    { href: "#services", label: labels.services },
+    { href: "/contact", label: labels.contact },
+  ];
 
   return (
     <nav style={{
@@ -36,22 +45,52 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* Desktop links */}
-      <ul style={{ display: "flex", gap: "36px", listStyle: "none", margin: 0, padding: 0 }}
-        className="hidden md:flex">
-        {links.map((item) => (
-          <li key={item.href}>
-            <Link href={item.href} className="lux-nav-link" style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "11px", letterSpacing: "2px",
-              textDecoration: "none", color: "var(--warm-gray)",
-              textTransform: "uppercase", transition: "color 0.3s",
-            }}>
-              {item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* Desktop: nav links + lang switcher */}
+      <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "36px" }}>
+        <ul style={{ display: "flex", gap: "36px", listStyle: "none", margin: 0, padding: 0 }}>
+          {links.map((item) => (
+            <li key={item.href}>
+              <Link href={item.href} className="lux-nav-link" style={{
+                fontFamily: "'Noto Sans JP', sans-serif",
+                fontSize: "11px", letterSpacing: "2px",
+                textDecoration: "none", color: "var(--warm-gray)",
+                textTransform: "uppercase", transition: "color 0.3s",
+              }}>
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Divider */}
+        <div style={{ width: "1px", height: "16px", background: "rgba(184,150,62,0.35)", flexShrink: 0 }} />
+
+        {/* Language switcher */}
+        <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
+          {(["JP", "EN", "VN"] as const).map((l, i) => (
+            <span key={l} style={{ display: "flex", alignItems: "center" }}>
+              {i > 0 && (
+                <span style={{ color: "rgba(184,150,62,0.3)", fontSize: "10px", padding: "0 3px" }}>|</span>
+              )}
+              <button
+                onClick={() => setLang(l)}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "12px", letterSpacing: "1.5px",
+                  color: lang === l ? "var(--gold)" : "var(--warm-gray)",
+                  fontWeight: lang === l ? 600 : 400,
+                  padding: "3px 4px",
+                  borderBottom: lang === l ? "1px solid var(--gold)" : "1px solid transparent",
+                  transition: "all 0.2s",
+                }}
+              >
+                {l}
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Mobile burger */}
       <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}
@@ -83,6 +122,26 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
+          {/* Mobile lang switcher */}
+          <div style={{ display: "flex", gap: "12px", paddingTop: "8px", borderTop: "1px solid rgba(184,150,62,0.2)" }}>
+            {(["JP", "EN", "VN"] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => { setLang(l); setMobileOpen(false); }}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: "13px", letterSpacing: "1.5px",
+                  color: lang === l ? "var(--gold)" : "var(--warm-gray)",
+                  fontWeight: lang === l ? 600 : 400,
+                  padding: "4px 0",
+                  borderBottom: lang === l ? "1px solid var(--gold)" : "1px solid transparent",
+                }}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
