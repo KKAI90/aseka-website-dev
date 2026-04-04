@@ -1,21 +1,19 @@
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Philosophy from "@/components/Philosophy";
-import PhotoStrip from "@/components/PhotoStrip";
-import TopMessage from "@/components/TopMessage";
-import CompanyInfo from "@/components/CompanyInfo";
+import HomeHero from "@/components/HomeHero";
+import StatsStrip from "@/components/StatsStrip";
+import Services from "@/components/Services";
+import WhyAseka from "@/components/WhyAseka";
 import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default function TopPage() {
   return (
     <main>
       <Navbar />
-      <Hero />
-      <Philosophy />
-      <PhotoStrip />
-      <TopMessage />
-      <CompanyInfo />
+      <HomeHero />
+      <StatsStrip />
+      <Services />
+      <WhyAseka />
       <ContactCTA />
       <Footer />
     </main>
