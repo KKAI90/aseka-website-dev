@@ -4,26 +4,12 @@ import { useLang } from "@/contexts/LangContext";
 const T = {
   JP: {
     sectionLabel: "Top Message",
-    // --- Thao ---
-    thao: {
-      title1: "Top", title2: "Message",
-      subtitle: "取締役挨拶",
-      ceoLabel: "取締役",
-      ceoSignatureLabel: "取締役 / Director",
-      ceoName: "グェン　フォン　タオ",
-      paragraphs: [
-        "2015年に留学生として来日し、2018年にリクルートグループへ入社、グローバル人材採用に携わってまいりました。2021年に株式会社ASEKAを創業し、現在は取締役として事業に関わっております。",
-        "私自身、日本での生活の中で多くの支えをいただく一方で、言語や文化の違いによる壁にも直面してきました。だからこそ、日本で挑戦する外国人材の力になりたいという想いが、この事業の原点です。",
-        "現在は、SNS総２０万人のネットワークと日本語教育事業を強みに、意欲の高い外国人材と企業様をつなぐ取り組みを行っております。",
-        "今後も、企業様と求職者様双方にとって価値ある出会いを創出し続けてまいります。",
-      ],
-    },
-    // --- Uchida ---
     uchida: {
-      title1: "代表取締役", title2: "挨拶",
+      eyebrow: "代表取締役より",
+      title: "代表取締役挨拶",
       subtitle: "代表取締役就任にあたって",
       ceoLabel: "代表取締役",
-      ceoSignatureLabel: "代表取締役 / Representative Director",
+      ceoSignatureLabel: "代表取締役",
       ceoName: "内田 隆嗣",
       paragraphs: [
         "このたび、株式会社クローバーホールディングスによる株式取得により、株式会社ASEKAの代表取締役に就任いたしました、内田隆嗣でございます。",
@@ -34,25 +20,27 @@ const T = {
         "タオ氏と共に、そして社員の皆様と共に、ASEKAの未来を創り上げてまいります。今後とも、皆様の変わらぬご支援を賜りますよう、何卒よろしくお願い申し上げます。",
       ],
     },
+    thao: {
+      eyebrow: "取締役より",
+      title: "取締役挨拶",
+      subtitle: "創業者・取締役",
+      ceoLabel: "取締役",
+      ceoSignatureLabel: "取締役",
+      ceoName: "グェン　フォン　タオ",
+      paragraphs: [
+        "2015年に留学生として来日し、2018年にリクルートグループへ入社、グローバル人材採用に携わってまいりました。2021年に株式会社ASEKAを創業し、現在は取締役として事業に関わっております。",
+        "私自身、日本での生活の中で多くの支えをいただく一方で、言語や文化の違いによる壁にも直面してきました。だからこそ、日本で挑戦する外国人材の力になりたいという想いが、この事業の原点です。",
+        "現在は、SNS総２０万人のネットワークと日本語教育事業を強みに、意欲の高い外国人材と企業様をつなぐ取り組みを行っております。",
+        "今後も、企業様と求職者様双方にとって価値ある出会いを創出し続けてまいります。",
+      ],
+    },
   },
   EN: {
     sectionLabel: "Top Message",
-    thao: {
-      title1: "Top", title2: "Message",
-      subtitle: "Message from the Director",
-      ceoLabel: "Director",
-      ceoSignatureLabel: "Director",
-      ceoName: "Nguyen Phuong Thao",
-      paragraphs: [
-        "I came to Japan in 2015 as an international student, joined Recruit Group in 2018, and was involved in global talent recruitment. In 2021, I co-founded ASEKA Co., Ltd. and currently serve as a Director.",
-        "While living in Japan, I have received tremendous support from those around me, yet I have also faced barriers due to language and cultural differences. That experience is the very foundation of what drives this business — a sincere desire to empower foreign professionals who are taking on the challenge of working in Japan.",
-        "Today, leveraging a social media network of 200,000 followers and our Japanese language education business, we work to connect highly motivated foreign talent with companies that need them.",
-        "We are committed to continuing to create valuable encounters for both companies and job seekers.",
-      ],
-    },
     uchida: {
-      title1: "Representative", title2: "Director",
-      subtitle: "Message from the Representative Director",
+      eyebrow: "From the Representative Director",
+      title: "Representative Director's Message",
+      subtitle: "On My Appointment as Representative Director",
       ceoLabel: "Representative Director",
       ceoSignatureLabel: "Representative Director",
       ceoName: "Takashi Uchida",
@@ -65,25 +53,27 @@ const T = {
         "Together with Ms. Thao and all our employees, we will shape the future of ASEKA. We sincerely appreciate your continued support.",
       ],
     },
+    thao: {
+      eyebrow: "From the Director",
+      title: "Director's Message",
+      subtitle: "Founder & Director",
+      ceoLabel: "Director",
+      ceoSignatureLabel: "Director",
+      ceoName: "Nguyen Phuong Thao",
+      paragraphs: [
+        "I came to Japan in 2015 as an international student, joined Recruit Group in 2018, and was involved in global talent recruitment. In 2021, I co-founded ASEKA Co., Ltd. and currently serve as a Director.",
+        "While living in Japan, I have received tremendous support from those around me, yet I have also faced barriers due to language and cultural differences. That experience is the very foundation of what drives this business — a sincere desire to empower foreign professionals who are taking on the challenge of working in Japan.",
+        "Today, leveraging a social media network of 200,000 followers and our Japanese language education business, we work to connect highly motivated foreign talent with companies that need them.",
+        "We are committed to continuing to create valuable encounters for both companies and job seekers.",
+      ],
+    },
   },
   VN: {
     sectionLabel: "Thông điệp Lãnh đạo",
-    thao: {
-      title1: "Thông điệp", title2: "Lãnh đạo",
-      subtitle: "Lời nhắn từ Giám đốc",
-      ceoLabel: "Giám đốc",
-      ceoSignatureLabel: "Giám đốc",
-      ceoName: "Nguyễn Phương Thảo",
-      paragraphs: [
-        "Tôi đến Nhật Bản năm 2015 với tư cách sinh viên du học, gia nhập Recruit Group năm 2018 và tham gia vào tuyển dụng nhân tài toàn cầu. Năm 2021, tôi đồng sáng lập Công ty Cổ phần ASEKA và hiện đang giữ vai trò Giám đốc.",
-        "Trong cuộc sống tại Nhật, tôi đã nhận được rất nhiều sự hỗ trợ từ mọi người, nhưng cũng đối mặt với những rào cản về ngôn ngữ và văn hóa. Chính những trải nghiệm đó là nguồn gốc của sự nghiệp này — mong muốn chân thành được trở thành chỗ dựa cho những người nước ngoài đang dũng cảm thách thức bản thân tại Nhật Bản.",
-        "Hiện tại, với mạng lưới 200.000 người trên mạng xã hội và dịch vụ giáo dục tiếng Nhật, chúng tôi nỗ lực kết nối những nhân tài có động lực cao với các doanh nghiệp đang cần họ.",
-        "Chúng tôi cam kết tiếp tục tạo ra những cuộc gặp gỡ có giá trị cho cả doanh nghiệp lẫn người tìm việc.",
-      ],
-    },
     uchida: {
-      title1: "Giám đốc", title2: "Điều hành",
-      subtitle: "Thông điệp từ Giám đốc Điều hành",
+      eyebrow: "Từ Giám đốc Điều hành",
+      title: "Thông điệp Giám đốc Điều hành",
+      subtitle: "Nhân dịp nhậm chức Giám đốc Điều hành",
       ceoLabel: "Giám đốc Điều hành",
       ceoSignatureLabel: "Giám đốc Điều hành",
       ceoName: "Uchida Takashi (内田 隆嗣)",
@@ -96,18 +86,31 @@ const T = {
         "Cùng với bà Thảo và toàn thể nhân viên, chúng tôi sẽ cùng nhau xây dựng tương lai của ASEKA. Kính mong tiếp tục nhận được sự ủng hộ của quý vị.",
       ],
     },
+    thao: {
+      eyebrow: "Từ Giám đốc",
+      title: "Thông điệp Giám đốc",
+      subtitle: "Người sáng lập & Giám đốc",
+      ceoLabel: "Giám đốc",
+      ceoSignatureLabel: "Giám đốc",
+      ceoName: "Nguyễn Phương Thảo",
+      paragraphs: [
+        "Tôi đến Nhật Bản năm 2015 với tư cách sinh viên du học, gia nhập Recruit Group năm 2018 và tham gia vào tuyển dụng nhân tài toàn cầu. Năm 2021, tôi đồng sáng lập Công ty Cổ phần ASEKA và hiện đang giữ vai trò Giám đốc.",
+        "Trong cuộc sống tại Nhật, tôi đã nhận được rất nhiều sự hỗ trợ từ mọi người, nhưng cũng đối mặt với những rào cản về ngôn ngữ và văn hóa. Chính những trải nghiệm đó là nguồn gốc của sự nghiệp này — mong muốn chân thành được trở thành chỗ dựa cho những người nước ngoài đang dũng cảm thách thức bản thân tại Nhật Bản.",
+        "Hiện tại, với mạng lưới 200.000 người trên mạng xã hội và dịch vụ giáo dục tiếng Nhật, chúng tôi nỗ lực kết nối những nhân tài có động lực cao với các doanh nghiệp đang cần họ.",
+        "Chúng tôi cam kết tiếp tục tạo ra những cuộc gặp gỡ có giá trị cho cả doanh nghiệp lẫn người tìm việc.",
+      ],
+    },
   },
 };
 
 function PersonBlock({
-  photoSrc, photoAlt, ceoLabel, ceoSignatureLabel, ceoName,
-  title1, title2, subtitle, paragraphs,
-  photoLeft,
+  photoSrc, photoAlt, eyebrow, title, subtitle,
+  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft,
 }: {
   photoSrc: string; photoAlt: string;
+  eyebrow: string; title: string; subtitle: string;
   ceoLabel: string; ceoSignatureLabel: string; ceoName: string;
-  title1: string; title2: string; subtitle: string; paragraphs: string[];
-  photoLeft: boolean;
+  paragraphs: string[]; photoLeft: boolean;
 }) {
   const photo = (
     <div style={{ position: "relative" }}>
@@ -121,8 +124,7 @@ function PersonBlock({
           border: "1px solid var(--gold)", opacity: 0.3, zIndex: 0,
         }} />
         <img
-          src={photoSrc}
-          alt={photoAlt}
+          src={photoSrc} alt={photoAlt}
           style={{
             width: "100%", aspectRatio: "3/4",
             objectFit: "cover", objectPosition: "center top",
@@ -146,36 +148,53 @@ function PersonBlock({
 
   const text = (
     <div style={{ paddingTop: "8px" }}>
-      <h2 style={{
+      {/* Eyebrow */}
+      <div style={{
         fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "clamp(36px, 3.5vw, 56px)", fontWeight: 300,
-        lineHeight: 1.05, color: "var(--dark)",
-        marginBottom: "6px", letterSpacing: "-0.5px",
+        fontSize: "12px", letterSpacing: "4px",
+        color: "var(--gold)", fontStyle: "italic",
+        textTransform: "uppercase", marginBottom: "12px",
       }}>
-        {title1}<em style={{ fontStyle: "italic", color: "var(--gold)" }}>{title2}</em>
-      </h2>
-      <p style={{
+        {eyebrow}
+      </div>
+
+      {/* Title */}
+      <h2 style={{
         fontFamily: "'Noto Serif JP', serif",
-        fontSize: "13px", letterSpacing: "4px",
+        fontSize: "clamp(22px, 2.8vw, 34px)", fontWeight: 400,
+        color: "var(--dark)", letterSpacing: "2px",
+        marginBottom: "8px", lineHeight: 1.3,
+      }}>
+        {title}
+      </h2>
+
+      {/* Subtitle */}
+      <p style={{
+        fontFamily: "'Noto Sans JP', sans-serif",
+        fontSize: "12px", letterSpacing: "3px",
         color: "var(--warm-gray)", fontWeight: 300,
-        marginBottom: "40px", paddingBottom: "28px",
+        marginBottom: "36px", paddingBottom: "24px",
         borderBottom: "1px solid rgba(184,150,62,0.25)",
       }}>
         {subtitle}
       </p>
+
+      {/* Paragraphs */}
       {paragraphs.map((text, i) => (
         <p key={i} style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "15.5px", lineHeight: 1.95,
-          color: "#3d3833", marginBottom: "22px", letterSpacing: "0.01em",
+          fontSize: "15px", lineHeight: 2,
+          color: "#3d3833", marginBottom: "20px", letterSpacing: "0.01em",
         }}>
           {text}
         </p>
       ))}
+
+      {/* Signature */}
       <div style={{
-        marginTop: "44px", paddingTop: "28px",
+        marginTop: "40px", paddingTop: "24px",
         borderTop: "1px solid rgba(184,150,62,0.25)",
-        display: "flex", flexDirection: "column", gap: "10px",
+        display: "flex", flexDirection: "column", gap: "8px",
       }}>
         <span style={{
           fontFamily: "'Cormorant Garamond', serif",
@@ -186,7 +205,7 @@ function PersonBlock({
         </span>
         <div style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "24px", color: "var(--dark)",
+          fontSize: "22px", color: "var(--dark)",
           letterSpacing: "3px", fontWeight: 400,
         }}>
           {ceoName}
@@ -198,8 +217,8 @@ function PersonBlock({
   return (
     <div className="message-inner" style={{
       display: "grid",
-      gridTemplateColumns: photoLeft ? "1fr 1.5fr" : "1.5fr 1fr",
-      gap: "88px", alignItems: "start",
+      gridTemplateColumns: photoLeft ? "1fr 1.6fr" : "1.6fr 1fr",
+      gap: "80px", alignItems: "start",
     }}>
       {photoLeft ? photo : text}
       {photoLeft ? text : photo}
@@ -214,33 +233,33 @@ export default function TopMessage() {
   return (
     <section style={{ padding: "120px 60px", background: "white" }}>
       {/* Section header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "72px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "80px" }}>
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>02</span>
         <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
       </div>
 
-      {/* Thao — text left, photo right */}
-      <PersonBlock
-        photoSrc="/images/ceo-portrait.jpg"
-        photoAlt={t.thao.ceoName}
-        photoLeft={false}
-        {...t.thao}
-      />
-
-      {/* Divider */}
-      <div style={{
-        margin: "100px 0",
-        height: "1px",
-        background: "linear-gradient(to right, transparent, rgba(184,150,62,0.4), transparent)",
-      }} />
-
-      {/* Uchida — photo left, text right */}
+      {/* Uchida — photo left, text right (FIRST) */}
       <PersonBlock
         photoSrc="/images/ceo-uchida.jpg"
         photoAlt={t.uchida.ceoName}
         photoLeft={true}
         {...t.uchida}
+      />
+
+      {/* Divider */}
+      <div style={{
+        margin: "96px 0",
+        height: "1px",
+        background: "linear-gradient(to right, transparent, rgba(184,150,62,0.4), transparent)",
+      }} />
+
+      {/* Thao — text left, photo right (SECOND) */}
+      <PersonBlock
+        photoSrc="/images/ceo-portrait.jpg"
+        photoAlt={t.thao.ceoName}
+        photoLeft={false}
+        {...t.thao}
       />
 
       <style>{`
