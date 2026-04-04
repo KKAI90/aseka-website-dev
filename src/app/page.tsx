@@ -1,7 +1,5 @@
 import Navbar from "@/components/Navbar";
-import HomeHero from "@/components/HomeHero";
-import StatsStrip from "@/components/StatsStrip";
-import Services from "@/components/Services";
+import Hero from "@/components/Hero";
 import Philosophy from "@/components/Philosophy";
 import PhotoStrip from "@/components/PhotoStrip";
 import TopMessage from "@/components/TopMessage";
@@ -13,9 +11,7 @@ export default function Home() {
   return (
     <main>
       <Navbar />
-      <HomeHero />
-      <StatsStrip />
-      <Services />
+      <Hero />
       <Philosophy />
       <PhotoStrip />
       <TopMessage />
