@@ -6,19 +6,19 @@ import { useLang } from "@/contexts/LangContext";
 const NAV_LABELS = {
   JP: [
     { href: "/",        label: "TOP" },
-    { href: "/#about",  label: "ABOUT US" },
+    { href: "/about",   label: "ABOUT US" },
     { href: "/company", label: "COMPANY" },
     { href: "/contact", label: "CONTACT" },
   ],
   EN: [
     { href: "/",        label: "TOP" },
-    { href: "/#about",  label: "ABOUT US" },
+    { href: "/about",   label: "ABOUT US" },
     { href: "/company", label: "COMPANY" },
     { href: "/contact", label: "CONTACT" },
   ],
   VN: [
     { href: "/",        label: "TRANG CHỦ" },
-    { href: "/#about",  label: "GIỚI THIỆU" },
+    { href: "/about",   label: "GIỚI THIỆU" },
     { href: "/company", label: "CÔNG TY" },
     { href: "/contact", label: "LIÊN HỆ" },
   ],
@@ -66,7 +66,7 @@ export default function Footer() {
         }}>
           {ADDRESS[lang]}<br />
           <span style={{ color: "rgba(250,247,242,0.35)" }}>
-            Tel: 03-6231-9969 ｜ {lang === "JP" ? "代表取締役：グェン ティラン タリ" : "CEO: Nguyen Thi Lan Tari"}
+            Tel: 03-6231-9969 ｜ {lang === "JP" ? "代表取締役：内田 隆嗣" : lang === "EN" ? "Representative Director: Takashi Uchida" : "Giám đốc Điều hành: Uchida Takashi"}
           </span>
         </div>
       </div>
