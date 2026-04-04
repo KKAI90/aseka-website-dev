@@ -9,7 +9,7 @@ const T = {
     subtitle: "代表挨拶",
     ceoLabel: "取締役",
     ceoSignatureLabel: "取締役 / Director",
-    ceoName: "グェン ティラン タリ",
+    ceoName: "グェン　フォン　タオ",
     paragraphs: [
       "2015年に留学生として来日し、2018年にリクルートグループへ入社、グローバル人材採用に携わってまいりました。2021年に株式会社ASEKAを創業し、現在は取締役として事業に関わっております。",
       "私自身、日本での生活の中で多くの支えをいただく一方で、言語や文化の違いによる壁にも直面してきました。だからこそ、日本で挑戦する外国人材の力になりたいという想いが、この事業の原点です。",
@@ -24,7 +24,7 @@ const T = {
     subtitle: "Message from the Director",
     ceoLabel: "Director",
     ceoSignatureLabel: "Director",
-    ceoName: "Nguyen Thi Lan Tari",
+    ceoName: "Nguyen Phuong Thao",
     paragraphs: [
       "I came to Japan in 2015 as an international student, joined Recruit Group in 2018, and was involved in global talent recruitment. In 2021, I co-founded ASEKA Co., Ltd. and currently serve as a Director.",
       "While living in Japan, I have received tremendous support from those around me, yet I have also faced barriers due to language and cultural differences. That experience is the very foundation of what drives this business — a sincere desire to empower foreign professionals who are taking on the challenge of working in Japan.",
@@ -39,7 +39,7 @@ const T = {
     subtitle: "Lời nhắn từ Ban Giám đốc",
     ceoLabel: "Giám đốc",
     ceoSignatureLabel: "Giám đốc",
-    ceoName: "Nguyễn Thị Lan Tari",
+    ceoName: "Nguyễn Phương Thảo",
     paragraphs: [
       "Tôi đến Nhật Bản năm 2015 với tư cách sinh viên du học, gia nhập Recruit Group năm 2018 và tham gia vào tuyển dụng nhân tài toàn cầu. Năm 2021, tôi đồng sáng lập Công ty Cổ phần ASEKA và hiện đang giữ vai trò Giám đốc.",
       "Trong cuộc sống tại Nhật, tôi đã nhận được rất nhiều sự hỗ trợ từ mọi người, nhưng cũng đối mặt với những rào cản về ngôn ngữ và văn hóa. Chính những trải nghiệm đó là nguồn gốc của sự nghiệp này — mong muốn chân thành được trở thành chỗ dựa cho những người nước ngoài đang dũng cảm thách thức bản thân tại Nhật Bản.",
