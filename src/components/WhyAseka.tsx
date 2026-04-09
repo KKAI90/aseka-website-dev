@@ -179,13 +179,13 @@ export default function WhyAseka() {
       </div>
 
       {/* Image with overlay text */}
-      <div style={{ marginTop: "64px", position: "relative", overflow: "hidden" }}>
+      <div style={{ marginTop: "64px", position: "relative" }}>
         <img
           src="/images/staff-consult.jpg"
           alt="ASEKA support"
-          style={{ width: "100%", height: "auto", display: "block", objectFit: "cover", objectPosition: "center center" }}
+          style={{ width: "100%", height: "auto", display: "block" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.78) 0%, rgba(10,20,35,0.45) 55%, rgba(10,20,35,0.15) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.72) 0%, rgba(10,20,35,0.38) 50%, rgba(10,20,35,0.08) 100%)" }} />
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center",
