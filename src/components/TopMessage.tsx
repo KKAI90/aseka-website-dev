@@ -7,10 +7,11 @@ const T = {
     uchida: {
       eyebrow: "代表取締役より",
       title: "代表取締役挨拶",
-      subtitle: "代表取締役就任にあたって",
+      subtitle: "",
       ceoLabel: "代表取締役",
       ceoSignatureLabel: "代表取締役",
       ceoName: "内田 隆嗣",
+      closing: { date: "令和８年３月", company: "株式会社ASEKA", name: "代表取締役　内田 隆嗣" },
       paragraphs: [
         "このたび、株式会社クローバーホールディングスによる株式取得により、株式会社ASEKAの代表取締役に就任いたしました、内田隆嗣でございます。",
         "まずは、創業者でありこれまでASEKAを牽引してこられたグェン・フォン・タオ氏に心より敬意を表するとともに、社員の皆様、お取引先の皆様に深く感謝申し上げます。",
@@ -27,6 +28,7 @@ const T = {
       ceoLabel: "取締役",
       ceoSignatureLabel: "取締役",
       ceoName: "グェン　フォン　タオ",
+      closing: null,
       paragraphs: [
         "2015年に留学生として来日し、2018年にリクルートグループへ入社、グローバル人材採用に携わってまいりました。2021年に株式会社ASEKAを創業し、現在は取締役として事業に関わっております。",
         "私自身、日本での生活の中で多くの支えをいただく一方で、言語や文化の違いによる壁にも直面してきました。だからこそ、日本で挑戦する外国人材の力になりたいという想いが、この事業の原点です。",
@@ -40,10 +42,11 @@ const T = {
     uchida: {
       eyebrow: "From the Representative Director",
       title: "Representative Director's Message",
-      subtitle: "On My Appointment as Representative Director",
+      subtitle: "",
       ceoLabel: "Representative Director",
       ceoSignatureLabel: "Representative Director",
       ceoName: "Takashi Uchida",
+      closing: { date: "March 2026", company: "ASEKA Co., Ltd.", name: "Representative Director   Takashi Uchida" },
       paragraphs: [
         "I am Takashi Uchida, appointed as Representative Director of ASEKA Co., Ltd. following the acquisition of shares by Clover Holdings Co., Ltd.",
         "First and foremost, I would like to express my deepest respect to Ms. Nguyen Phuong Thao, the founder who has led ASEKA with dedication, and extend my sincere gratitude to all employees and business partners.",
@@ -60,6 +63,7 @@ const T = {
       ceoLabel: "Director",
       ceoSignatureLabel: "Director",
       ceoName: "Nguyen Phuong Thao",
+      closing: null,
       paragraphs: [
         "I came to Japan in 2015 as an international student, joined Recruit Group in 2018, and was involved in global talent recruitment. In 2021, I co-founded ASEKA Co., Ltd. and currently serve as a Director.",
         "While living in Japan, I have received tremendous support from those around me, yet I have also faced barriers due to language and cultural differences. That experience is the very foundation of what drives this business — a sincere desire to empower foreign professionals who are taking on the challenge of working in Japan.",
@@ -73,10 +77,11 @@ const T = {
     uchida: {
       eyebrow: "Từ Giám đốc Điều hành",
       title: "Thông điệp Giám đốc Điều hành",
-      subtitle: "Nhân dịp nhậm chức Giám đốc Điều hành",
+      subtitle: "",
       ceoLabel: "Giám đốc Điều hành",
       ceoSignatureLabel: "Giám đốc Điều hành",
       ceoName: "Uchida Takashi (内田 隆嗣)",
+      closing: { date: "Tháng 3, 2026", company: "Công ty Cổ phần ASEKA", name: "Giám đốc Điều hành   Uchida Takashi" },
       paragraphs: [
         "Tôi là Uchida Takashi, được bổ nhiệm làm Giám đốc Điều hành Công ty Cổ phần ASEKA sau khi Clover Holdings Co., Ltd. hoàn tất việc mua lại cổ phần.",
         "Trước hết, tôi xin bày tỏ sự kính trọng sâu sắc đối với bà Nguyễn Phương Thảo — người sáng lập đã dẫn dắt ASEKA với tất cả tâm huyết, và gửi lời cảm ơn chân thành đến toàn thể nhân viên cũng như các đối tác kinh doanh.",
@@ -93,6 +98,7 @@ const T = {
       ceoLabel: "Giám đốc",
       ceoSignatureLabel: "Giám đốc",
       ceoName: "Nguyễn Phương Thảo",
+      closing: null,
       paragraphs: [
         "Tôi đến Nhật Bản năm 2015 với tư cách sinh viên du học, gia nhập Recruit Group năm 2018 và tham gia vào tuyển dụng nhân tài toàn cầu. Năm 2021, tôi đồng sáng lập Công ty Cổ phần ASEKA và hiện đang giữ vai trò Giám đốc.",
         "Trong cuộc sống tại Nhật, tôi đã nhận được rất nhiều sự hỗ trợ từ mọi người, nhưng cũng đối mặt với những rào cản về ngôn ngữ và văn hóa. Chính những trải nghiệm đó là nguồn gốc của sự nghiệp này — mong muốn chân thành được trở thành chỗ dựa cho những người nước ngoài đang dũng cảm thách thức bản thân tại Nhật Bản.",
@@ -103,14 +109,16 @@ const T = {
   },
 };
 
+type Closing = { date: string; company: string; name: string } | null;
+
 function PersonBlock({
   photoSrc, photoAlt, eyebrow, title, subtitle,
-  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft,
+  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft, closing,
 }: {
   photoSrc: string; photoAlt: string;
   eyebrow: string; title: string; subtitle: string;
   ceoLabel: string; ceoSignatureLabel: string; ceoName: string;
-  paragraphs: string[]; photoLeft: boolean;
+  paragraphs: string[]; photoLeft: boolean; closing: Closing;
 }) {
   const photo = (
     <div style={{ position: "relative" }}>
@@ -163,53 +171,82 @@ function PersonBlock({
         fontFamily: "'Noto Serif JP', serif",
         fontSize: "clamp(22px, 2.8vw, 34px)", fontWeight: 400,
         color: "var(--dark)", letterSpacing: "2px",
-        marginBottom: "8px", lineHeight: 1.3,
+        marginBottom: subtitle ? "8px" : "36px",
+        paddingBottom: subtitle ? "0" : "24px",
+        borderBottom: subtitle ? "none" : "1px solid rgba(184,150,62,0.25)",
+        lineHeight: 1.3,
       }}>
         {title}
       </h2>
 
-      {/* Subtitle */}
-      <p style={{
-        fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "3px",
-        color: "var(--warm-gray)", fontWeight: 300,
-        marginBottom: "36px", paddingBottom: "24px",
-        borderBottom: "1px solid rgba(184,150,62,0.25)",
-      }}>
-        {subtitle}
-      </p>
+      {/* Subtitle (only if non-empty) */}
+      {subtitle && (
+        <p style={{
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "12px", letterSpacing: "3px",
+          color: "var(--warm-gray)", fontWeight: 300,
+          marginBottom: "36px", paddingBottom: "24px",
+          borderBottom: "1px solid rgba(184,150,62,0.25)",
+        }}>
+          {subtitle}
+        </p>
+      )}
 
       {/* Paragraphs */}
-      {paragraphs.map((text, i) => (
+      {paragraphs.map((p, i) => (
         <p key={i} style={{
           fontFamily: "'Noto Serif JP', serif",
           fontSize: "15px", lineHeight: 2,
           color: "#3d3833", marginBottom: "20px", letterSpacing: "0.01em",
         }}>
-          {text}
+          {p}
         </p>
       ))}
 
-      {/* Signature */}
+      {/* Signature row */}
       <div style={{
         marginTop: "40px", paddingTop: "24px",
         borderTop: "1px solid rgba(184,150,62,0.25)",
-        display: "flex", flexDirection: "column", gap: "8px",
+        display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+        gap: "24px",
       }}>
-        <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "11px", letterSpacing: "3px",
-          color: "var(--gold)", textTransform: "uppercase", fontStyle: "italic",
-        }}>
-          {ceoSignatureLabel}
-        </span>
-        <div style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "22px", color: "var(--dark)",
-          letterSpacing: "3px", fontWeight: 400,
-        }}>
-          {ceoName}
+        {/* Left: name signature */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <span style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "11px", letterSpacing: "3px",
+            color: "var(--gold)", textTransform: "uppercase", fontStyle: "italic",
+          }}>
+            {ceoSignatureLabel}
+          </span>
+          <div style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "22px", color: "var(--dark)",
+            letterSpacing: "3px", fontWeight: 400,
+          }}>
+            {ceoName}
+          </div>
         </div>
+
+        {/* Right: closing block (date / company / full name) — Uchida only */}
+        {closing && (
+          <div style={{
+            border: "1px solid rgba(184,150,62,0.3)",
+            padding: "18px 28px",
+            display: "flex", flexDirection: "column", gap: "6px",
+            minWidth: "220px",
+          }}>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+              {closing.date}
+            </span>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+              {closing.company}
+            </span>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+              {closing.name}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -234,12 +271,12 @@ export default function TopMessage() {
     <section style={{ padding: "120px 60px", background: "white" }}>
       {/* Section header */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "80px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>02</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>01</span>
         <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
       </div>
 
-      {/* Uchida — photo left, text right (FIRST) */}
+      {/* Uchida — photo left, text right */}
       <PersonBlock
         photoSrc="/images/ceo-uchida.jpg"
         photoAlt={t.uchida.ceoName}
@@ -254,7 +291,7 @@ export default function TopMessage() {
         background: "linear-gradient(to right, transparent, rgba(184,150,62,0.4), transparent)",
       }} />
 
-      {/* Thao — text left, photo right (SECOND) */}
+      {/* Thao — text left, photo right */}
       <PersonBlock
         photoSrc="/images/ceo-portrait.jpg"
         photoAlt={t.thao.ceoName}
