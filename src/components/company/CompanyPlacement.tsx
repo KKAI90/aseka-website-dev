@@ -87,12 +87,11 @@ export default function CompanyPlacement() {
           <h4 style={{ fontSize: "12px", letterSpacing: "2px", color: "var(--gold)", marginBottom: "16px", textTransform: "uppercase" }}>
             ＜{t.highJobsLabel}＞
           </h4>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             {t.highJobs.map((job) => (
-              <div key={job} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                <span style={{ color: "var(--gold)", flexShrink: 0, fontSize: "16px", lineHeight: 1.6 }}>›</span>
-                <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", lineHeight: 1.8, color: "var(--dark)" }}>{job}</span>
-              </div>
+              <span key={job} className="job-tag" style={{ padding: "8px 20px", border: "1px solid var(--border)", fontSize: "13px", color: "var(--dark)", transition: "all 0.3s", cursor: "default" }}>
+                {job}
+              </span>
             ))}
           </div>
         </div>
