@@ -136,6 +136,26 @@ export default function HomeNetwork() {
           ))}
         </div>
 
+        {/* Staff photo — full scene */}
+        <div style={{
+          marginTop: "64px",
+          display: "flex", justifyContent: "center",
+        }}>
+          <div style={{
+            maxWidth: "560px", width: "100%",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.12)",
+            borderRadius: "2px",
+            overflow: "hidden",
+            border: "1px solid rgba(184,150,62,0.15)",
+          }}>
+            <img
+              src="/images/ズェン.jpg"
+              alt="ASEKA staff"
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+          </div>
+        </div>
+
       </div>
 
       <style>{`
