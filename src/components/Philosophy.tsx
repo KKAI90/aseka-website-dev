@@ -43,12 +43,6 @@ export default function Philosophy() {
 
   return (
     <section id="about" style={{ padding: "120px 60px", background: "var(--cream)" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "72px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>01</span>
-        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
-      </div>
-
       <div className="phil-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "2px" }}>
         {t.cards.map((card) => (
           <div key={card.letter} className="phil-card" style={{
