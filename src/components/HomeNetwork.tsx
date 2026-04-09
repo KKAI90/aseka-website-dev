@@ -136,15 +136,6 @@ export default function HomeNetwork() {
           ))}
         </div>
 
-        {/* Bottom photo */}
-        <div style={{ marginTop: "64px", position: "relative", overflow: "hidden" }}>
-          <img
-            src="/images/staff-support.jpg"
-            alt="ASEKA team"
-            style={{ width: "100%", height: "380px", objectFit: "cover", objectPosition: "center 30%", display: "block" }}
-          />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,20,35,0.3) 0%, transparent 50%)" }} />
-        </div>
       </div>
 
       <style>{`
