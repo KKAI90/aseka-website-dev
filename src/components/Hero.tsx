@@ -23,13 +23,13 @@ export default function Hero() {
 
       {/* Background photo — full screen */}
       <img
-        src="/images/team-office-1.jpg"
+        src="/images/ズェン.jpg"
         alt="ASEKA Office"
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
           objectFit: "cover",
-          objectPosition: "center 30%",
+          objectPosition: "center center",
         }}
       />
 
