@@ -183,9 +183,9 @@ export default function WhyAseka() {
         <img
           src="/images/836A0134.JPG"
           alt="ASEKA support"
-          style={{ width: "100%", height: "420px", objectFit: "cover", objectPosition: "center 30%", display: "block" }}
+          style={{ width: "100%", height: "auto", display: "block" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.82) 0%, rgba(10,20,35,0.55) 60%, rgba(10,20,35,0.25) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.78) 0%, rgba(10,20,35,0.45) 55%, rgba(10,20,35,0.15) 100%)" }} />
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center",
