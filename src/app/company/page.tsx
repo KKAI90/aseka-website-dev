@@ -6,7 +6,7 @@ import CompanyPlacement from "@/components/company/CompanyPlacement";
 import CompanyFlow from "@/components/company/CompanyFlow";
 import CompanyCases from "@/components/company/CompanyCases";
 import CompanyTraining from "@/components/company/CompanyTraining";
-import CompanyContact from "@/components/company/CompanyContact";
+import ContactCTA from "@/components/ContactCTA";
 
 export const metadata = {
   title: "COMPANY | 株式会社ASEKA",
@@ -23,7 +23,7 @@ export default function CompanyPage() {
       <CompanyFlow />
       <CompanyCases />
       <CompanyTraining />
-      <CompanyContact />
+      <ContactCTA />
       <Footer />
     </main>
   );
