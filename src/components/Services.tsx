@@ -24,27 +24,6 @@ const SERVICES = {
       desc: "THAO TOKYOオンライン日本語スクール運営。試験対策・ビジネス日本語・面接対策まで幅広く対応。",
       icon: "📚",
     },
-    {
-      num: "04",
-      title: "年金・社会保険サポート",
-      sub: "Pension & Insurance",
-      desc: "脱退一時金の申請代行・年金受給資格の確認・社会保険手続きをベトナム語で丁寧にサポート。",
-      icon: "💼",
-    },
-    {
-      num: "05",
-      title: "観光ビザ申請",
-      sub: "Tourist Visa Application",
-      desc: "ご両親・ご家族の日本観光ビザ申請を代行。招聘状作成から大使館提出まで一括対応します。",
-      icon: "✈️",
-    },
-    {
-      num: "06",
-      title: "在留・各種手続き",
-      sub: "Residence Procedures",
-      desc: "在留カード更新・住民票・マイナンバーなど、日常の行政手続きをベトナム語でサポートします。",
-      icon: "📋",
-    },
   ],
   EN: [
     {
@@ -68,27 +47,6 @@ const SERVICES = {
       desc: "We operate THAO TOKYO Online Japanese School — covering exam prep, business Japanese, and interview coaching for Vietnamese learners.",
       icon: "📚",
     },
-    {
-      num: "04",
-      title: "Pension & Insurance Support",
-      sub: "年金・社会保険サポート",
-      desc: "We handle lump-sum withdrawal applications, pension eligibility checks, and social insurance procedures — all supported in Vietnamese.",
-      icon: "💼",
-    },
-    {
-      num: "05",
-      title: "Tourist Visa Application",
-      sub: "観光ビザ申請",
-      desc: "We manage tourist visa applications for family members visiting Japan — from drafting invitation letters to embassy submission.",
-      icon: "✈️",
-    },
-    {
-      num: "06",
-      title: "Residence Procedures",
-      sub: "在留・各種手続き",
-      desc: "We support daily administrative tasks including residence card renewal, residence registration, and My Number procedures — in Vietnamese.",
-      icon: "📋",
-    },
   ],
   VN: [
     {
@@ -111,27 +69,6 @@ const SERVICES = {
       sub: "日本語教育",
       desc: "Vận hành Trường Tiếng Nhật Trực tuyến THAO TOKYO — bao gồm luyện thi, tiếng Nhật thương mại và luyện phỏng vấn cho người học Việt Nam.",
       icon: "📚",
-    },
-    {
-      num: "04",
-      title: "Hỗ trợ Nenkin & Bảo hiểm",
-      sub: "年金・社会保険サポート",
-      desc: "Đại diện hoàn trả nenkin, kiểm tra điều kiện nhận lương hưu và thủ tục bảo hiểm xã hội — tất cả hỗ trợ bằng tiếng Việt.",
-      icon: "💼",
-    },
-    {
-      num: "05",
-      title: "Xin Visa Du lịch",
-      sub: "観光ビザ申請",
-      desc: "Đại diện xin visa du lịch Nhật Bản cho bố mẹ, gia đình — từ soạn thư bảo lãnh đến nộp hồ sơ đại sứ quán.",
-      icon: "✈️",
-    },
-    {
-      num: "06",
-      title: "Thủ tục Lưu trú & Giấy tờ",
-      sub: "在留・各種手続き",
-      desc: "Hỗ trợ các thủ tục hành chính hàng ngày như gia hạn thẻ ngoại kiều, đăng ký hộ khẩu, My Number — bằng tiếng Việt.",
-      icon: "📋",
     },
   ],
 };
