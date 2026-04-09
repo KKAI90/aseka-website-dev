@@ -11,10 +11,14 @@ const T = {
       { val: "business",   label: "企業・採用担当者",   sub: "企業・法人のお客様" },
       { val: "individual", label: "個人・求職者",        sub: "個人のお客様" },
     ],
-    fields: { name: "お名前 *", company: "会社名 *", email: "メールアドレス *", phone: "電話番号", service: "ご相談内容", message: "メッセージ" },
-    namePh: "山田 太郎", companyPh: "株式会社〇〇",
+    fields: { name: "お名前", furigana: "ふりがな", company: "会社名", email: "メールアドレス", phone: "電話番号", service: "ご相談内容", message: "メッセージ" },
+    namePh: "山田 太郎", furiganaPh: "やまだ たろう", companyPh: "株式会社〇〇",
     servicePh: "選択してください",
-    services: [{ v: "hr", l: "人材紹介" }, { v: "nenkin", l: "年金・社会保険" }, { v: "visa", l: "観光ビザ申請" }, { v: "zairyu", l: "在留手続き" }, { v: "other", l: "その他" }],
+    services: [
+      { v: "brochure", l: "まずは資料だけ見てみたい" },
+      { v: "consult",  l: "外国人財の採用について相談したい" },
+      { v: "hire",     l: "今すぐ外国人財を採用したい" },
+    ],
     messagePh: "ご質問・ご要望をご記入ください",
     submit: "送信する →", sending: "送信中...",
     privacy: "個人情報は適切に管理し、第三者に提供しません。",
@@ -30,10 +34,14 @@ const T = {
       { val: "business",   label: "For Companies",   sub: "Corporate Inquiry" },
       { val: "individual", label: "For Job Seekers",  sub: "Individual Inquiry" },
     ],
-    fields: { name: "Full Name *", company: "Company Name *", email: "Email Address *", phone: "Phone Number", service: "Service of Interest", message: "Message" },
-    namePh: "Yamada Taro / Nguyen Van A", companyPh: "ASEKA Co., Ltd.",
+    fields: { name: "Full Name", furigana: "Furigana", company: "Company Name", email: "Email Address", phone: "Phone Number", service: "Service of Interest", message: "Message" },
+    namePh: "Yamada Taro / Nguyen Van A", furiganaPh: "やまだ たろう", companyPh: "ASEKA Co., Ltd.",
     servicePh: "Please select",
-    services: [{ v: "hr", l: "HR Placement" }, { v: "nenkin", l: "Pension / Social Insurance" }, { v: "visa", l: "Tourist Visa" }, { v: "zairyu", l: "Residence Procedures" }, { v: "other", l: "Other" }],
+    services: [
+      { v: "brochure", l: "I'd like to see the materials first" },
+      { v: "consult",  l: "I'd like to consult about hiring foreign talent" },
+      { v: "hire",     l: "I want to hire foreign talent right away" },
+    ],
     messagePh: "Please enter your questions or requests...",
     submit: "Send Inquiry →", sending: "Sending...",
     privacy: "Your personal information is handled securely and will not be shared with third parties.",
@@ -49,10 +57,14 @@ const T = {
       { val: "business",   label: "Doanh nghiệp",    sub: "Tuyển dụng / Nhân sự" },
       { val: "individual", label: "Cá nhân / Ứng viên", sub: "Tìm việc / Hỏi thăm" },
     ],
-    fields: { name: "Họ và tên *", company: "Tên công ty *", email: "Địa chỉ Email *", phone: "Số điện thoại", service: "Dịch vụ quan tâm", message: "Nội dung" },
-    namePh: "Nguyễn Văn A", companyPh: "Công ty Cổ phần ...",
+    fields: { name: "Họ và tên", furigana: "Furigana", company: "Tên công ty", email: "Địa chỉ Email", phone: "Số điện thoại", service: "Dịch vụ quan tâm", message: "Nội dung" },
+    namePh: "Nguyễn Văn A", furiganaPh: "やまだ たろう", companyPh: "Công ty Cổ phần ...",
     servicePh: "Chọn dịch vụ",
-    services: [{ v: "hr", l: "Giới thiệu Nhân sự" }, { v: "nenkin", l: "Nenkin / Bảo hiểm Xã hội" }, { v: "visa", l: "Visa Du lịch" }, { v: "zairyu", l: "Thủ tục Lưu trú" }, { v: "other", l: "Khác" }],
+    services: [
+      { v: "brochure", l: "Xem tài liệu trước" },
+      { v: "consult",  l: "Tư vấn về tuyển dụng nhân tài nước ngoài" },
+      { v: "hire",     l: "Muốn tuyển dụng ngay bây giờ" },
+    ],
     messagePh: "Nhập câu hỏi hoặc yêu cầu của bạn...",
     submit: "Gửi Liên hệ →", sending: "Đang gửi...",
     privacy: "Thông tin của bạn được bảo mật hoàn toàn và không chia sẻ với bên thứ ba.",
@@ -62,8 +74,8 @@ const T = {
   },
 };
 
-type FormState = { type: string; name: string; company: string; email: string; phone: string; service: string; message: string };
-const initial: FormState = { type: "business", name: "", company: "", email: "", phone: "", service: "", message: "" };
+type FormState = { type: string; name: string; furigana: string; company: string; email: string; phone: string; service: string; message: string };
+const initial: FormState = { type: "business", name: "", furigana: "", company: "", email: "", phone: "", service: "", message: "" };
 
 export default function Contact() {
   const { lang } = useLang();
@@ -87,6 +99,10 @@ export default function Contact() {
       setError(err instanceof Error ? err.message : "Error");
     } finally { setLoading(false); }
   };
+
+  const Required = () => (
+    <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#C8002A", letterSpacing: "1px", verticalAlign: "middle" }}>必須</span>
+  );
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "14px 16px",
@@ -145,36 +161,40 @@ export default function Contact() {
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-form-grid">
             <div>
-              <label style={labelStyle}>{t.fields.name}</label>
+              <label style={labelStyle}>{t.fields.name}<Required /></label>
               <input required type="text" placeholder={t.namePh} value={form.name} onChange={set("name")} style={inputStyle} />
             </div>
-            {form.type === "business" && (
-              <div>
-                <label style={labelStyle}>{t.fields.company}</label>
-                <input required type="text" placeholder={t.companyPh} value={form.company} onChange={set("company")} style={inputStyle} />
-              </div>
-            )}
+            <div>
+              <label style={labelStyle}>{t.fields.furigana}<Required /></label>
+              <input required type="text" placeholder={t.furiganaPh} value={form.furigana} onChange={set("furigana")} style={inputStyle} />
+            </div>
           </div>
+          {form.type === "business" && (
+            <div>
+              <label style={labelStyle}>{t.fields.company}<Required /></label>
+              <input required type="text" placeholder={t.companyPh} value={form.company} onChange={set("company")} style={inputStyle} />
+            </div>
+          )}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-form-grid">
             <div>
-              <label style={labelStyle}>{t.fields.email}</label>
+              <label style={labelStyle}>{t.fields.email}<Required /></label>
               <input required type="email" placeholder="example@email.com" value={form.email} onChange={set("email")} style={inputStyle} />
             </div>
             <div>
-              <label style={labelStyle}>{t.fields.phone}</label>
-              <input type="tel" placeholder="090-0000-0000" value={form.phone} onChange={set("phone")} style={inputStyle} />
+              <label style={labelStyle}>{t.fields.phone}<Required /></label>
+              <input required type="tel" placeholder="090-0000-0000" value={form.phone} onChange={set("phone")} style={inputStyle} />
             </div>
           </div>
           <div>
-            <label style={labelStyle}>{t.fields.service}</label>
-            <select value={form.service} onChange={set("service")} style={{ ...inputStyle, cursor: "pointer" }}>
+            <label style={labelStyle}>{t.fields.service}<Required /></label>
+            <select required value={form.service} onChange={set("service")} style={{ ...inputStyle, cursor: "pointer" }}>
               <option value="">{t.servicePh}</option>
               {t.services.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
             </select>
           </div>
           <div>
-            <label style={labelStyle}>{t.fields.message}</label>
-            <textarea rows={5} placeholder={t.messagePh} value={form.message} onChange={set("message")} style={{ ...inputStyle, resize: "vertical" }} />
+            <label style={labelStyle}>{t.fields.message}<Required /></label>
+            <textarea required rows={5} placeholder={t.messagePh} value={form.message} onChange={set("message")} style={{ ...inputStyle, resize: "vertical" }} />
           </div>
           {error && <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", color: "#C8002A", textAlign: "center" }}>{error}</p>}
           <button type="submit" disabled={loading} style={{
