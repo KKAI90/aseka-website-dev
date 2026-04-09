@@ -178,31 +178,6 @@ export default function WhyAseka() {
         ))}
       </div>
 
-      {/* Image with overlay text */}
-      <div style={{ marginTop: "64px", position: "relative" }}>
-        <img
-          src="/images/836A0134.JPG"
-          alt="ASEKA support"
-          style={{ width: "100%", height: "auto", display: "block" }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.72) 0%, rgba(10,20,35,0.38) 50%, rgba(10,20,35,0.08) 100%)" }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          display: "flex", alignItems: "center",
-          padding: "0 64px",
-        }}>
-          <p style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(14px, 1.5vw, 17px)",
-            lineHeight: 2.1,
-            color: "rgba(250,247,242,0.92)",
-            maxWidth: "600px",
-            letterSpacing: "0.03em",
-          }}>
-            {t.imgOverlay}
-          </p>
-        </div>
-      </div>
 
       <style>{`
         .why-card:hover { border-top-color: var(--gold) !important; transform: translateY(-4px); }
