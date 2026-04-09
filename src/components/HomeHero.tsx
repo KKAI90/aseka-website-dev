@@ -5,9 +5,9 @@ import { useLang } from "@/contexts/LangContext";
 const T = {
   JP: {
     tag: "登録支援機関 · 有料職業紹介事業",
-    title1: "日本とベトナムを",
-    title2: "つなぐ人材のプロ。",
-    desc: "SNS総フォロワー20万人のネットワークと日本語教育事業を強みに、意欲ある外国人材と企業様を最短2週間でマッチング。",
+    title1: "日本でもっと頑張りたい",
+    title2: "という気持ちを",
+    desc: "SNS20万人のネットワークと日本語教育を強みに、即戦力の外国人材をご紹介します",
     btn1: "企業様・採用担当者の方へ",
     btn2: "求職者・応募者の方へ",
   },
@@ -41,7 +41,7 @@ export default function HomeHero() {
     }}>
       {/* Background */}
       <img
-        src="/images/team-office-2.jpg"
+        src="/images/HOME01.JPG"
         alt="ASEKA"
         style={{
           position: "absolute", inset: 0,
