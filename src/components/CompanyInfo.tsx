@@ -13,10 +13,9 @@ const ROWS = {
     { label: "本社",          value: "〒101-0025 東京都千代田区神田佐久間町 3-27-3\nレーベンハークビル 5F" },
     { label: "連絡先",        value: "03-6231-9969", href: "tel:0362319969" },
     { label: "会社サイト",    value: "aseka.co.jp",  href: "http://aseka.co.jp", target: "_blank" },
-    { label: "事業内容", span: true, value: "外国人人材紹介及び支援業務\n外国人向け日本語教育サービス" },
-    { label: "許認可・届出", span: true, value: "有料職業紹介事業（許可番号：13-ユ-313472）\n登録支援機関（登録番号：22登-007089）" },
+    { label: "事業内容", span: true, value: "登録支援機関（登録番号：22登-007089）\n有料職業紹介事業（許可番号：13-ゆ-313472）\n人材育成サービス" },
     { label: "顧問",          value: "税理士法人大石会計事務所" },
-    { label: "グループ会社",  value: "株式会社クローバーホールディングス" },
+    { label: "関係会社",      value: "株式会社THAO TOKYO（タオ トウキョウ）" },
     { label: "主要取引銀行", span: true, value: "三井住友銀行 新宿岩戸支店 / 東京シティ信用金庫　秋葉原支店" },
   ] as Row[],
   EN: [
@@ -28,10 +27,9 @@ const ROWS = {
     { label: "Head Office",         value: "〒101-0025 Kanda Sakumacho 3-27-3, Chiyoda-ku, Tokyo\nRevenharque Building 5F" },
     { label: "Phone",               value: "03-6231-9969", href: "tel:0362319969" },
     { label: "Website",             value: "aseka.co.jp",  href: "http://aseka.co.jp", target: "_blank" },
-    { label: "Business", span: true, value: "Foreign HR Placement and Support Services\nJapanese Language Education Services for Foreign Nationals" },
-    { label: "Licenses", span: true, value: "Fee-based Employment Placement (Permit No.: 13-ユ-313472)\nRegistered Support Organization (No.: 22登-007089)" },
+    { label: "Business", span: true, value: "Registered Support Organization (No.: 22登-007089)\nFee-based Employment Placement (No.: 13-ゆ-313472)\nHuman Resource Development Services" },
     { label: "Advisor",             value: "Oishi Accounting Tax Corporation" },
-    { label: "Group Company",       value: "Clover Holdings Co., Ltd." },
+    { label: "Affiliated Co.",      value: "THAO TOKYO Co., Ltd." },
     { label: "Main Banks", span: true, value: "SMBC Shinjuku Iwato Branch / Tokyo City Shinkin Bank Akihabara Branch" },
   ] as Row[],
   VN: [
@@ -43,10 +41,9 @@ const ROWS = {
     { label: "Trụ sở chính",       value: "〒101-0025 3-27-3 Kanda Sakumacho, Chiyoda-ku, Tokyo\nTòa nhà Revenharque, Tầng 5" },
     { label: "Điện thoại",          value: "03-6231-9969", href: "tel:0362319969" },
     { label: "Website",             value: "aseka.co.jp",  href: "http://aseka.co.jp", target: "_blank" },
-    { label: "Dịch vụ", span: true, value: "Giới thiệu và Hỗ trợ Nhân sự Nước ngoài\nDịch vụ Giáo dục Tiếng Nhật cho Người Nước ngoài" },
-    { label: "Giấy phép", span: true, value: "Dịch vụ Giới thiệu Việc làm có Phí (Số: 13-ユ-313472)\nTổ chức Hỗ trợ Đăng ký (Số: 22登-007089)" },
+    { label: "Dịch vụ", span: true, value: "Tổ chức Hỗ trợ Đăng ký (Số: 22登-007089)\nDịch vụ Giới thiệu Việc làm có Phí (Số: 13-ゆ-313472)\nDịch vụ Phát triển Nhân lực" },
     { label: "Cố vấn",              value: "Văn phòng Kế toán Thuế Oishi" },
-    { label: "Công ty Tập đoàn",    value: "Công ty Cổ phần Clover Holdings" },
+    { label: "Công ty liên kết",    value: "Công ty Cổ phần THAO TOKYO" },
     { label: "Ngân hàng giao dịch", span: true, value: "SMBC Chi nhánh Shinjuku Iwato / Tokyo City Shinkin Bank Chi nhánh Akihabara" },
   ] as Row[],
 };
@@ -64,7 +61,7 @@ export default function CompanyInfo() {
   return (
     <section id="company" style={{ padding: "120px 60px", background: "var(--dark)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "72px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>02</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>03</span>
         <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "rgba(250,247,242,0.45)", textTransform: "uppercase" }}>Company Overview</span>
       </div>
