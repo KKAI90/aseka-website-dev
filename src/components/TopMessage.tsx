@@ -231,18 +231,16 @@ function PersonBlock({
         {/* Right: closing block (date / company / full name) — Uchida only */}
         {closing && (
           <div style={{
-            border: "1px solid rgba(184,150,62,0.3)",
-            padding: "18px 28px",
-            display: "flex", flexDirection: "column", gap: "6px",
-            minWidth: "220px",
+            display: "flex", flexDirection: "column", gap: "10px",
+            textAlign: "right", alignSelf: "flex-end",
           }}>
-            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "12px", color: "var(--warm-gray)", letterSpacing: "1px" }}>
               {closing.date}
             </span>
-            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "12px", color: "var(--dark)", letterSpacing: "1px" }}>
               {closing.company}
             </span>
-            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1px" }}>
+            <span style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "13px", color: "var(--dark)", letterSpacing: "1.5px", fontWeight: 500 }}>
               {closing.name}
             </span>
           </div>

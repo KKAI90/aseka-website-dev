@@ -42,10 +42,10 @@ export default function Footer() {
         alignItems: "center", gap: "40px",
       }} className="lux-footer-inner">
         <Image
-          src="/images/aseka-logo.png"
+          src="/images/aseka-logo-white.png"
           alt="ASEKA"
-          width={140} height={48}
-          style={{ objectFit: "contain", height: "42px", width: "auto" }}
+          width={140} height={80}
+          style={{ objectFit: "contain", height: "56px", width: "auto" }}
         />
         <div style={{ display: "flex", gap: "32px" }} className="footer-links">
           {links.map((l) => (
