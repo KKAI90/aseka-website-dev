@@ -6,6 +6,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "なぜASEKAが選ばれるのか",
     sub: "日本とベトナムをつなぐ、3つの強み。",
+    imgOverlay: "外国人材の定着率向上に向け、入社後のフォロー体制を整えています。ミスマッチを防ぎ、長期的な雇用につなげます。また、返金制度を設けているため、安心してご導入いただけます。",
     pillars: [
       {
         num: "01",
@@ -34,6 +35,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "Why Companies Choose ASEKA",
     sub: "Three pillars connecting Japan and Vietnam.",
+    imgOverlay: "We provide thorough post-hire follow-up to improve retention of foreign talent, prevent mismatches, and build long-term employment. We also offer a refund policy for added peace of mind.",
     pillars: [
       {
         num: "01",
@@ -62,6 +64,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "Tại sao chọn ASEKA?",
     sub: "Ba thế mạnh kết nối Nhật Bản và Việt Nam.",
+    imgOverlay: "Chúng tôi xây dựng hệ thống hỗ trợ sau tuyển dụng nhằm nâng cao tỷ lệ gắn bó của nhân lực nước ngoài, ngăn chặn sự không phù hợp và hướng đến hợp đồng lao động dài hạn. Ngoài ra, chính sách hoàn tiền giúp doanh nghiệp yên tâm triển khai.",
     pillars: [
       {
         num: "01",
@@ -173,6 +176,32 @@ export default function WhyAseka() {
             }}>{p.desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Image with overlay text */}
+      <div style={{ marginTop: "64px", position: "relative", overflow: "hidden" }}>
+        <img
+          src="/images/836A0134.JPG"
+          alt="ASEKA support"
+          style={{ width: "100%", height: "420px", objectFit: "cover", objectPosition: "center 30%", display: "block" }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.82) 0%, rgba(10,20,35,0.55) 60%, rgba(10,20,35,0.25) 100%)" }} />
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center",
+          padding: "0 64px",
+        }}>
+          <p style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "clamp(14px, 1.5vw, 17px)",
+            lineHeight: 2.1,
+            color: "rgba(250,247,242,0.92)",
+            maxWidth: "600px",
+            letterSpacing: "0.03em",
+          }}>
+            {t.imgOverlay}
+          </p>
+        </div>
       </div>
 
       <style>{`
