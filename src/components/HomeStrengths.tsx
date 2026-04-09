@@ -4,74 +4,77 @@ import { useLang } from "@/contexts/LangContext";
 
 const T = {
   JP: {
-    eyebrow: "ASEKA の強み",
+    eyebrow: "ASEKAの強み",
     title: "選ばれる3つの理由",
+    intro: "SNS23万人の独自ネットワークと日本語教育を強みに、人材の「集客・選定・定着」までを一貫して提供しています。これにより、「人材が集まらない」「採用しても定着しない」といった企業様の課題を解決します。",
     cta1: "最短即日で人材をご提案可能です",
     cta2: "まずはお気軽にご相談ください",
-    ctaBtn: "無料相談はこちら",
+    ctaBtn: "問い合わせフォーム",
     strengths: [
       {
         num: "①",
-        title: "20万人のSNSネットワーク",
-        desc: "創業者タオ氏が築いたベトナム人コミュニティへ直接アクセス。他社にはない圧倒的なネットワークで、意欲ある即戦力人材を最短でご紹介します。",
+        title: "圧倒的な集客力",
+        desc: "SNS20万人のネットワークにより、意欲の高い人材が安定して集まります。他社では難しい母集団形成を実現しています。",
       },
       {
         num: "②",
-        title: "日本語教育×採用支援",
-        desc: "N3以上の人材を中心に、日本語教育と採用をワンストップで提供。企業が求めるコミュニケーション能力を備えた人材だけをご紹介します。",
+        title: "即戦力人材のご紹介",
+        desc: "日本語教育と選考により、入社後すぐに活躍できる人材をご紹介しています。",
       },
       {
         num: "③",
-        title: "入社後の定着サポート",
-        desc: "ビザ・保険・生活サポートまで一貫対応。返金制度も完備しており、ミスマッチを防ぎながら長期的な雇用関係の構築を全力でバックアップします。",
+        title: "高い定着率の実現",
+        desc: "入社前後のフォロー体制により、長期就業につながる採用を実現しています。",
       },
     ],
   },
   EN: {
     eyebrow: "ASEKA Strengths",
     title: "3 Reasons to Choose ASEKA",
+    intro: "Leveraging our unique network of 230,000 SNS followers and Japanese language education, we provide end-to-end support for talent attraction, selection, and retention — solving the challenges of 'can't find people' and 'can't retain them'.",
     cta1: "We can propose candidates as quickly as same-day.",
     cta2: "Feel free to reach out for a free consultation.",
-    ctaBtn: "Contact Us Free",
+    ctaBtn: "Contact Form",
     strengths: [
       {
         num: "①",
-        title: "200K SNS Network",
-        desc: "Direct access to the Vietnamese community built by our founder Thao. An unmatched network that allows us to introduce motivated, ready-to-work talent faster than any competitor.",
+        title: "Unmatched Talent Reach",
+        desc: "Our 200,000-strong SNS network ensures a steady flow of motivated candidates — enabling talent pooling that other agencies simply cannot match.",
       },
       {
         num: "②",
-        title: "Language Training × Hiring",
-        desc: "We provide both Japanese language education and recruitment in one package, focusing on N3+ candidates who meet the communication standards companies need.",
+        title: "Ready-to-Work Candidates",
+        desc: "Through Japanese language training and rigorous screening, we introduce candidates who can contribute from day one.",
       },
       {
         num: "③",
-        title: "Post-Hire Retention Support",
-        desc: "Full support from visa processing to insurance and daily life assistance. With our refund policy, we prevent mismatches and back you up for long-term employment success.",
+        title: "High Retention Rates",
+        desc: "Our pre- and post-hire follow-up system supports long-term employment, helping companies build stable, committed teams.",
       },
     ],
   },
   VN: {
     eyebrow: "Thế mạnh của ASEKA",
     title: "3 Lý Do Chọn ASEKA",
-    cta1: "Chúng tôi có thể giới thiệu ứng viên trong ngay hôm nay.",
+    intro: "Với mạng lưới 230.000 người trên mạng xã hội và thế mạnh giáo dục tiếng Nhật, chúng tôi cung cấp dịch vụ toàn diện từ thu hút, tuyển chọn đến giữ chân nhân tài — giải quyết bài toán \"không tuyển được người\" và \"tuyển xong lại nghỉ\".",
+    cta1: "Chúng tôi có thể giới thiệu ứng viên ngay trong ngày.",
     cta2: "Hãy liên hệ để được tư vấn miễn phí.",
-    ctaBtn: "Tư vấn miễn phí",
+    ctaBtn: "Form liên hệ",
     strengths: [
       {
         num: "①",
-        title: "Mạng lưới 200.000 người",
-        desc: "Tiếp cận trực tiếp cộng đồng người Việt do Giám đốc Thảo xây dựng — mạng lưới độc đáo giúp giới thiệu nhân tài sẵn sàng làm việc nhanh hơn bất kỳ đối thủ nào.",
+        title: "Sức hút nhân tài vượt trội",
+        desc: "Mạng lưới 200.000 người trên SNS giúp thu hút liên tục nguồn nhân lực có động lực cao — tạo lập nguồn ứng viên mà các công ty khác không thể đạt được.",
       },
       {
         num: "②",
-        title: "Đào tạo tiếng Nhật + Tuyển dụng",
-        desc: "Dịch vụ giáo dục tiếng Nhật và tuyển dụng trọn gói, tập trung vào ứng viên N3 trở lên đáp ứng tiêu chuẩn giao tiếp doanh nghiệp yêu cầu.",
+        title: "Ứng viên sẵn sàng làm việc ngay",
+        desc: "Qua đào tạo tiếng Nhật và quy trình tuyển chọn nghiêm ngặt, chúng tôi giới thiệu ứng viên có thể đóng góp ngay từ ngày đầu.",
       },
       {
         num: "③",
-        title: "Hỗ trợ định cư sau tuyển dụng",
-        desc: "Hỗ trợ toàn diện từ visa, bảo hiểm đến cuộc sống hàng ngày. Chính sách hoàn tiền giúp ngăn sự không phù hợp và đảm bảo quan hệ lao động bền vững.",
+        title: "Tỷ lệ gắn bó cao",
+        desc: "Hệ thống hỗ trợ trước và sau khi nhận việc giúp duy trì việc làm lâu dài, xây dựng đội ngũ ổn định cho doanh nghiệp.",
       },
     ],
   },
@@ -84,7 +87,7 @@ export default function HomeStrengths() {
   return (
     <section style={{ background: "var(--dark)", padding: "100px 60px 0" }}>
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "72px" }}>
+      <div style={{ textAlign: "center", marginBottom: "56px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", marginBottom: "20px" }}>
           <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
           <span style={{
@@ -98,8 +101,18 @@ export default function HomeStrengths() {
           fontFamily: "'Noto Serif JP', serif",
           fontSize: "clamp(24px, 3vw, 38px)", fontWeight: 400,
           color: "#FAF7F2", letterSpacing: "2px",
+          marginBottom: "28px",
         }}>{t.title}</h2>
-        <div style={{ width: "48px", height: "2px", background: "var(--gold)", opacity: 0.5, margin: "20px auto 0" }} />
+        <div style={{ width: "48px", height: "2px", background: "var(--gold)", opacity: 0.5, margin: "0 auto 28px" }} />
+        <p style={{
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "clamp(13px, 1.3vw, 15px)",
+          lineHeight: 2,
+          color: "rgba(250,247,242,0.65)",
+          maxWidth: "720px",
+          margin: "0 auto",
+          letterSpacing: "0.03em",
+        }}>{t.intro}</p>
       </div>
 
       {/* Strengths grid */}
