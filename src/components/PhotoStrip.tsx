@@ -3,7 +3,7 @@ import { useLang } from "@/contexts/LangContext";
 
 const PHOTOS = [
   { src: "/images/team-office-2.jpg", alt: "チーム作業風景" },
-  { src: "/images/staff-support.jpg", alt: "スタッフサポート" },
+  { src: "/images/ズェン.jpg", alt: "スタッフサポート" },
   { src: "/images/office-meeting.jpg", alt: "ビジネスミーティング" },
   { src: "/images/team-office-1.jpg", alt: "オフィス作業" },
 ];
