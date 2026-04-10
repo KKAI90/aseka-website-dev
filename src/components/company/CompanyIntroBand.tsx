@@ -24,12 +24,6 @@ export default function CompanyIntroBand() {
           width={52} height={52}
           style={{ objectFit: "contain", width: "52px", height: "52px" }}
         />
-        <Image
-          src="/images/aseka-logo-text.png"
-          alt="ASEKA"
-          width={100} height={30}
-          style={{ objectFit: "contain", height: "22px", width: "auto", filter: "brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(700%) hue-rotate(5deg) brightness(90%)" }}
-        />
       </div>
       <p style={{
         fontFamily: "'Noto Serif JP', serif",
