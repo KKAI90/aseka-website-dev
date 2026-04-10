@@ -60,11 +60,18 @@ export default function Philosophy() {
               color: "var(--gold)", opacity: 0.07, position: "absolute", top: "-8px", right: "20px",
               letterSpacing: "-4px", lineHeight: 1, userSelect: "none",
             }}>{card.letter}</div>
-            <span style={{
-              display: "inline-block", fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "11px", letterSpacing: "3px", color: "#B8963E", textTransform: "uppercase",
-              marginBottom: "22px", paddingBottom: "14px", borderBottom: "1px solid rgba(184,150,62,0.3)",
-            }}>{card.tag}</span>
+            <div style={{
+              display: "flex", alignItems: "center", gap: "12px",
+              marginBottom: "26px", paddingBottom: "18px",
+              borderBottom: "1px solid rgba(184,150,62,0.28)",
+            }}>
+              <div style={{ width: "22px", height: "1px", background: "#9A7820", flexShrink: 0 }} />
+              <span style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "13px", letterSpacing: "2px",
+                color: "#7A5C10", textTransform: "uppercase", fontStyle: "italic",
+              }}>{card.tag}</span>
+            </div>
             <h3 style={{
               fontFamily: "'Noto Serif JP', serif", fontSize: "24px", fontWeight: 400,
               color: "var(--dark)", marginBottom: "18px", lineHeight: 1.35, letterSpacing: "1px",

@@ -7,13 +7,13 @@ const NAV_LABELS = {
   JP: [
     { href: "/",        label: "TOP" },
     { href: "/about",   label: "ABOUT US" },
-    { href: "/company", label: "COMPANY" },
+    { href: "/company", label: "SERVICE" },
     { href: "/contact", label: "CONTACT" },
   ],
   EN: [
     { href: "/",        label: "TOP" },
     { href: "/about",   label: "ABOUT US" },
-    { href: "/company", label: "COMPANY" },
+    { href: "/company", label: "SERVICE" },
     { href: "/contact", label: "CONTACT" },
   ],
   VN: [
@@ -25,9 +25,9 @@ const NAV_LABELS = {
 };
 
 const ADDRESS = {
-  JP: "〒101-0025 東京都千代田区神田佐久間町 3-27-3 レーベンハークビル5F",
-  EN: "Kanda Sakumacho 3-27-3, Chiyoda-ku, Tokyo 101-0025 Revenharque Bldg. 5F",
-  VN: "3-27-3 Kanda Sakumacho, Chiyoda-ku, Tokyo 101-0025 Tòa nhà Revenharque, Tầng 5",
+  JP: { line1: "〒101-0025 東京都千代田区神田佐久間町3-27-3", line2: "ガーデンパークビル５F" },
+  EN: { line1: "Kanda Sakumacho 3-27-3, Chiyoda-ku, Tokyo 101-0025", line2: "Garden Park Building 5F" },
+  VN: { line1: "3-27-3 Kanda Sakumacho, Chiyoda-ku, Tokyo 101-0025", line2: "Tòa nhà Garden Park, Tầng 5" },
 };
 
 export default function Footer() {
@@ -48,12 +48,6 @@ export default function Footer() {
             width={48} height={48}
             style={{ objectFit: "contain", width: "48px", height: "48px" }}
           />
-          <Image
-            src="/images/aseka-logo-text.png"
-            alt="ASEKA"
-            width={100} height={30}
-            style={{ objectFit: "contain", height: "20px", width: "auto", filter: "brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(700%) hue-rotate(5deg) brightness(90%)" }}
-          />
         </div>
         <div style={{ display: "flex", gap: "32px" }} className="footer-links">
           {links.map((l) => (
@@ -72,7 +66,7 @@ export default function Footer() {
           fontSize: "12px", lineHeight: 2,
           color: "rgba(250,247,242,0.5)", textAlign: "right",
         }}>
-          {ADDRESS[lang]}<br />
+          {ADDRESS[lang].line1}<br />{ADDRESS[lang].line2}<br />
           <span style={{ color: "rgba(250,247,242,0.35)" }}>
             Tel: 03-6231-9969 ｜ {lang === "JP" ? "代表取締役：内田 隆嗣" : lang === "EN" ? "Representative Director: Takashi Uchida" : "Giám đốc Điều hành: Uchida Takashi"}
           </span>
