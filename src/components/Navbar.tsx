@@ -4,10 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLang, type Lang } from "@/contexts/LangContext";
 
-const NAV_LABELS: Record<Lang, { top: string; about: string; company: string; services: string; contact: string }> = {
-  JP: { top: "TOP", about: "ABOUT US", company: "COMPANY", services: "SERVICES", contact: "CONTACT" },
-  EN: { top: "TOP", about: "ABOUT US", company: "COMPANY", services: "SERVICES", contact: "CONTACT" },
-  VN: { top: "TRANG CHỦ", about: "GIỚI THIỆU", company: "CÔNG TY", services: "DỊCH VỤ", contact: "LIÊN HỆ" },
+const NAV_LABELS: Record<Lang, { top: string; about: string; company: string; contact: string }> = {
+  JP: { top: "TOP", about: "ABOUT US", company: "COMPANY", contact: "CONTACT" },
+  EN: { top: "TOP", about: "ABOUT US", company: "COMPANY", contact: "CONTACT" },
+  VN: { top: "TRANG CHỦ", about: "GIỚI THIỆU", company: "CÔNG TY", contact: "LIÊN HỆ" },
 };
 
 export default function Navbar() {
@@ -19,7 +19,6 @@ export default function Navbar() {
     { href: "/", label: labels.top },
     { href: "/about", label: labels.about },
     { href: "/company", label: labels.company },
-    { href: "/#services", label: labels.services },
     { href: "/contact", label: labels.contact },
   ];
 
