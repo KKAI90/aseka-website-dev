@@ -59,60 +59,107 @@ export default function CompanyInfo() {
   const rows = ROWS[lang];
 
   return (
-    <section id="company" style={{ padding: "100px 60px", background: "white" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "64px" }}>
+    <section id="company" style={{ padding: "100px 60px", background: "#F7F5F0" }}>
+
+      {/* Section label */}
+      <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "56px" }}>
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>03</span>
         <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>Company Overview</span>
       </div>
 
-      <div className="info-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: "rgba(184,150,62,0.12)", border: "1px solid rgba(184,150,62,0.12)" }}>
+      {/* Info table */}
+      <div
+        className="info-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "2px",
+          background: "rgba(184,150,62,0.2)",
+          border: "1px solid rgba(184,150,62,0.2)",
+        }}
+      >
         {rows.map((row, i) => (
-          <div key={i} style={{
-            display: "flex", background: "white",
-            borderBottom: "1px solid rgba(184,150,62,0.12)",
-            ...(row.span ? { gridColumn: "1 / -1" } : {}),
-          }}>
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              ...(row.span ? { gridColumn: "1 / -1" } : {}),
+            }}
+          >
+            {/* Label cell */}
             <div style={{
-              flexShrink: 0, width: "180px", padding: "20px 28px",
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "12px", letterSpacing: "1.5px",
-              color: "var(--gold)", fontWeight: 400,
-              borderRight: "1px solid rgba(184,150,62,0.15)",
-              display: "flex", alignItems: "center",
-              background: "rgba(184,150,62,0.04)",
+              flexShrink: 0,
+              width: "168px",
+              padding: "22px 20px 22px 0",
+              background: "#1B3A5C",
+              display: "flex",
+              alignItems: "center",
+              borderLeft: "4px solid #B8963E",
+              paddingLeft: "20px",
             }}>
-              {row.label}
+              <span style={{
+                fontFamily: "'Noto Sans JP', sans-serif",
+                fontSize: "12px",
+                letterSpacing: "1px",
+                color: "rgba(250,247,242,0.88)",
+                fontWeight: 400,
+                lineHeight: 1.6,
+              }}>{row.label}</span>
             </div>
+
+            {/* Value cell */}
             <div style={{
-              padding: "20px 32px", fontFamily: "'Noto Serif JP', serif",
-              fontSize: "15px", lineHeight: 1.85,
-              color: "#3d3833", whiteSpace: "pre-line",
-              display: "flex", alignItems: "center",
+              flex: 1,
+              padding: "22px 32px",
+              background: "white",
+              display: "flex",
+              alignItems: "center",
             }}>
               {row.href ? (
                 <a href={row.href} target={row.target} style={{
-                  color: "var(--gold)", textDecoration: "none",
-                  borderBottom: "1px solid rgba(184,150,62,0.35)", paddingBottom: "1px",
+                  fontFamily: "'Noto Serif JP', serif",
+                  fontSize: "15px",
+                  lineHeight: 1.85,
+                  color: "#B8963E",
+                  textDecoration: "none",
+                  borderBottom: "1px solid rgba(184,150,62,0.4)",
+                  paddingBottom: "1px",
+                  whiteSpace: "pre-line",
                 }}>
                   {row.value}
                 </a>
-              ) : row.value}
+              ) : (
+                <span style={{
+                  fontFamily: "'Noto Serif JP', serif",
+                  fontSize: "15px",
+                  lineHeight: 1.85,
+                  color: "#1B3A5C",
+                  whiteSpace: "pre-line",
+                }}>
+                  {row.value}
+                </span>
+              )}
             </div>
           </div>
         ))}
       </div>
 
+      {/* Note */}
       <div style={{
-        marginTop: "48px", padding: "36px 48px",
-        border: "1px solid rgba(184,150,62,0.25)",
-        display: "flex", gap: "24px", alignItems: "flex-start",
-        background: "rgba(184,150,62,0.03)",
+        marginTop: "40px",
+        padding: "32px 40px",
+        background: "white",
+        borderLeft: "4px solid #B8963E",
       }}>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "28px", color: "var(--gold)", flexShrink: 0, lineHeight: 1, marginTop: "2px" }}>⊡</div>
         <p style={{
-          fontFamily: "'Noto Serif JP', serif", fontSize: "14px", lineHeight: 1.95,
-          color: "#5a5550", letterSpacing: "0.02em", whiteSpace: "pre-line",
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "14px",
+          lineHeight: 2.0,
+          color: "#3d3833",
+          letterSpacing: "0.02em",
+          whiteSpace: "pre-line",
+          margin: 0,
         }}>
           {NOTE[lang]}
         </p>
