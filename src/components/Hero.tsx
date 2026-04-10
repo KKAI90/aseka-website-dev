@@ -29,14 +29,14 @@ export default function Hero() {
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
           objectFit: "cover",
-          objectPosition: "65% 28%",
+          objectPosition: "50% 28%",
         }}
       />
 
-      {/* Dark overlay on left — hides background posters */}
+      {/* Subtle dark overlay on edges — keeps scene visible */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to right, rgba(15,25,40,0.75) 0%, rgba(15,25,40,0.35) 45%, transparent 70%)",
+        background: "linear-gradient(to right, rgba(15,25,40,0.30) 0%, transparent 40%, transparent 60%, rgba(15,25,40,0.10) 100%)",
       }} />
 
       {/* Right-side light gradient so text stays readable */}
