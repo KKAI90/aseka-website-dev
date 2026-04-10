@@ -41,12 +41,12 @@ export default function HomeHero() {
     }}>
       {/* Background */}
       <img
-        src="/images/HOME01.JPG"
+        src="/images/836A0134.JPG"
         alt="ASEKA"
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 25%",
+          objectFit: "cover", objectPosition: "center 35%",
         }}
       />
 
