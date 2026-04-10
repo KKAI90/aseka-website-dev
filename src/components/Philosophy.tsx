@@ -65,11 +65,11 @@ export default function Philosophy() {
               marginBottom: "26px", paddingBottom: "18px",
               borderBottom: "1px solid rgba(184,150,62,0.28)",
             }}>
-              <div style={{ width: "22px", height: "1px", background: "#9A7820", flexShrink: 0 }} />
+              <div style={{ width: "22px", height: "1px", background: "#9A7410", flexShrink: 0 }} />
               <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Noto Serif JP', serif",
                 fontSize: "13px", letterSpacing: "2px",
-                color: "#7A5C10", textTransform: "uppercase", fontStyle: "italic",
+                color: "#9A7410", fontWeight: 500,
               }}>{card.tag}</span>
             </div>
             <h3 style={{
