@@ -234,7 +234,7 @@ export default function TopMessage() {
     <section style={{ padding: "120px 60px", background: "white" }}>
       {/* Section header */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "80px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>02</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>01</span>
         <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
       </div>
