@@ -13,7 +13,7 @@ export default function CompanyHero() {
 
   return (
     <div style={{
-      height: "100vh", position: "relative", overflow: "hidden",
+      height: "72vh", minHeight: "500px", position: "relative", overflow: "hidden",
       display: "flex", alignItems: "center", justifyContent: "flex-end",
     }}>
       <img
@@ -22,13 +22,15 @@ export default function CompanyHero() {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 40%",
+          objectFit: "cover", objectPosition: "center 22%",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, background: "rgba(240,236,228,0.18)" }} />
+      {/* Dark overall tint for depth */}
+      <div style={{ position: "absolute", inset: 0, background: "rgba(10,20,35,0.32)" }} />
+      {/* Right gradient for text readability */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to left, rgba(250,247,242,0.72) 0%, rgba(250,247,242,0.18) 55%, transparent 100%)",
+        background: "linear-gradient(to left, rgba(250,247,242,0.82) 0%, rgba(250,247,242,0.25) 50%, transparent 100%)",
       }} />
       <div style={{ position: "relative", zIndex: 2, padding: "0 72px 0 0", maxWidth: "540px", textAlign: "right" }}>
         <h1 style={{
