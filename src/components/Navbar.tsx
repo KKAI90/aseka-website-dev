@@ -5,9 +5,9 @@ import Image from "next/image";
 import { useLang, type Lang } from "@/contexts/LangContext";
 
 const NAV_LABELS: Record<Lang, { top: string; about: string; company: string; contact: string }> = {
-  JP: { top: "TOP", about: "ABOUT US", company: "COMPANY", contact: "CONTACT" },
-  EN: { top: "TOP", about: "ABOUT US", company: "COMPANY", contact: "CONTACT" },
-  VN: { top: "TRANG CHỦ", about: "GIỚI THIỆU", company: "CÔNG TY", contact: "LIÊN HỆ" },
+  JP: { top: "TOP", about: "ABOUT US", company: "SERVICE", contact: "CONTACT" },
+  EN: { top: "TOP", about: "ABOUT US", company: "SERVICE", contact: "CONTACT" },
+  VN: { top: "TRANG CHỦ", about: "GIỚI THIỆU", company: "SERVICE", contact: "LIÊN HỆ" },
 };
 
 export default function Navbar() {

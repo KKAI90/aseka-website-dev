@@ -57,7 +57,7 @@ export default function Hero() {
           fontFamily: "'Noto Sans JP', sans-serif",
           fontSize: "clamp(52px, 7.5vw, 96px)",
           fontWeight: 700,
-          color: "#ffffff",
+          color: "#1B3A5C",
           letterSpacing: "-1px",
           lineHeight: 1,
           margin: 0,
@@ -78,7 +78,7 @@ export default function Hero() {
           fontFamily: "'Noto Serif JP', serif",
           fontSize: "17px",
           fontWeight: 400,
-          color: "#ffffff",
+          color: "#1B3A5C",
           letterSpacing: lang === "JP" ? "5px" : "2px",
         }}>
           {t.subtitle}
