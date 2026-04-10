@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -78,24 +79,29 @@ export default function Philosophy() {
 
       <div style={{
         marginTop: "3px", padding: "52px 60px", background: "var(--dark)",
-        display: "flex", alignItems: "center", gap: "48px",
+        display: "flex", alignItems: "center", gap: "64px",
       }} className="aseka-name-block">
-        <div style={{
-          fontFamily: "'Cormorant Garamond', serif", fontSize: "48px", fontWeight: 300,
-          color: "var(--gold)", letterSpacing: "8px", flexShrink: 0, lineHeight: 1,
-        }}>ASEKA</div>
+        <div style={{ flexShrink: 0 }}>
+          <Image
+            src="/images/aseka-logo-white.png"
+            alt="ASEKA"
+            width={200}
+            height={80}
+            style={{ objectFit: "contain", width: "200px", height: "auto" }}
+          />
+        </div>
         <div>
           <p style={{
-            fontFamily: "'Noto Serif JP', serif", fontSize: "16px", lineHeight: 1.85,
-            color: "rgba(250,247,242,0.82)", marginBottom: "10px",
+            fontFamily: "'Noto Serif JP', serif", fontSize: "20px", lineHeight: 2,
+            color: "rgba(250,247,242,0.88)", marginBottom: "14px", letterSpacing: "0.05em",
           }}>
             {t.asekaDesc1}{" "}
             <strong style={{ color: "var(--gold-light)", fontWeight: 500 }}>ASEKA</strong>{" "}
             {t.asekaDesc2}
           </p>
           <p style={{
-            fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", letterSpacing: "2px",
-            color: "rgba(250,247,242,0.45)", fontStyle: "italic",
+            fontFamily: "'Cormorant Garamond', serif", fontSize: "17px", letterSpacing: "3px",
+            color: "rgba(250,247,242,0.55)", fontStyle: "italic",
           }}>{t.asekaTagline}</p>
         </div>
       </div>
