@@ -13,7 +13,7 @@ export default function Hero() {
 
   return (
     <div style={{
-      height: "100vh",
+      height: "72vh", minHeight: "500px",
       position: "relative",
       overflow: "hidden",
       display: "flex",
@@ -21,7 +21,7 @@ export default function Hero() {
       justifyContent: "flex-end",
     }}>
 
-      {/* Background photo — full screen */}
+      {/* Background photo */}
       <img
         src="/images/HOME01.JPG"
         alt="ASEKA Office"
@@ -29,20 +29,20 @@ export default function Hero() {
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
           objectFit: "cover",
-          objectPosition: "center 30%",
+          objectPosition: "65% 28%",
         }}
       />
 
-      {/* Subtle light overlay to soften photo */}
+      {/* Dark overlay on left — hides background posters */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "rgba(240,236,228,0.18)",
+        background: "linear-gradient(to right, rgba(15,25,40,0.75) 0%, rgba(15,25,40,0.35) 45%, transparent 70%)",
       }} />
 
-      {/* Right-side gradient so text stays readable */}
+      {/* Right-side light gradient so text stays readable */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to left, rgba(250,247,242,0.72) 0%, rgba(250,247,242,0.18) 55%, transparent 100%)",
+        background: "linear-gradient(to left, rgba(250,247,242,0.78) 0%, rgba(250,247,242,0.15) 50%, transparent 100%)",
       }} />
 
       {/* Main text — right side */}
