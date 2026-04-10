@@ -26,42 +26,43 @@ export default function Navbar() {
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "16px 60px",
-      background: "rgba(250,247,242,0.92)",
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      borderBottom: "1px solid rgba(184,150,62,0.25)",
+      padding: "18px 64px",
+      background: "rgba(250,247,242,0.95)",
+      backdropFilter: "blur(16px)",
+      WebkitBackdropFilter: "blur(16px)",
+      borderBottom: "1px solid rgba(184,150,62,0.28)",
     }}>
       {/* Logo */}
-      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
         <Image
           src="/images/aseka-logo-icon.png"
           alt=""
-          width={40}
-          height={40}
-          style={{ objectFit: "contain", height: "38px", width: "auto" }}
+          width={48}
+          height={48}
+          style={{ objectFit: "contain", height: "44px", width: "auto" }}
           priority
         />
         <Image
           src="/images/aseka-logo-text.png"
           alt="ASEKA"
-          width={100}
-          height={30}
-          style={{ objectFit: "contain", height: "20px", width: "auto" }}
+          width={120}
+          height={36}
+          style={{ objectFit: "contain", height: "26px", width: "auto" }}
           priority
         />
       </Link>
 
       {/* Desktop: nav links + lang switcher */}
-      <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "36px" }}>
-        <ul style={{ display: "flex", gap: "36px", listStyle: "none", margin: 0, padding: 0 }}>
+      <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "40px" }}>
+        <ul style={{ display: "flex", gap: "40px", listStyle: "none", margin: 0, padding: 0 }}>
           {links.map((item) => (
             <li key={item.href}>
               <Link href={item.href} className="lux-nav-link" style={{
                 fontFamily: "'Noto Sans JP', sans-serif",
-                fontSize: "11px", letterSpacing: "2px",
-                textDecoration: "none", color: "var(--warm-gray)",
+                fontSize: "13px", letterSpacing: "2px",
+                textDecoration: "none", color: "#4a4540",
                 textTransform: "uppercase", transition: "color 0.3s",
+                fontWeight: 400,
               }}>
                 {item.label}
               </Link>
@@ -70,24 +71,24 @@ export default function Navbar() {
         </ul>
 
         {/* Divider */}
-        <div style={{ width: "1px", height: "16px", background: "rgba(184,150,62,0.35)", flexShrink: 0 }} />
+        <div style={{ width: "1px", height: "18px", background: "rgba(184,150,62,0.4)", flexShrink: 0 }} />
 
         {/* Language switcher */}
         <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
           {(["JP", "EN", "VN"] as const).map((l, i) => (
             <span key={l} style={{ display: "flex", alignItems: "center" }}>
               {i > 0 && (
-                <span style={{ color: "rgba(184,150,62,0.3)", fontSize: "10px", padding: "0 3px" }}>|</span>
+                <span style={{ color: "rgba(184,150,62,0.35)", fontSize: "11px", padding: "0 4px" }}>|</span>
               )}
               <button
                 onClick={() => setLang(l)}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
                   fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "12px", letterSpacing: "1.5px",
-                  color: lang === l ? "var(--gold)" : "var(--warm-gray)",
+                  fontSize: "14px", letterSpacing: "2px",
+                  color: lang === l ? "var(--gold)" : "#4a4540",
                   fontWeight: lang === l ? 600 : 400,
-                  padding: "3px 4px",
+                  padding: "3px 5px",
                   borderBottom: lang === l ? "1px solid var(--gold)" : "1px solid transparent",
                   transition: "all 0.2s",
                 }}
