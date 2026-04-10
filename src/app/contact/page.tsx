@@ -16,14 +16,14 @@ function ContactHero() {
 
   return (
     <div style={{
-      height: "52vh", minHeight: "380px",
+      height: "68vh", minHeight: "460px",
       position: "relative", overflow: "hidden",
       display: "flex", alignItems: "center", justifyContent: "flex-end",
     }}>
       <img
         src="/images/contact.jpg"
         alt="ASEKA Contact"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 35%" }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 50%" }}
       />
       <div style={{ position: "absolute", inset: 0, background: "rgba(240,236,228,0.22)" }} />
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to left, rgba(250,247,242,0.78) 0%, rgba(250,247,242,0.2) 55%, transparent 100%)" }} />
