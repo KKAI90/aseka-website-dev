@@ -108,7 +108,7 @@ const T = {
 
 function PersonBlock({
   photoSrc, photoAlt, eyebrow, title,
-  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft, signatureNote,
+  ceoLabel, paragraphs, photoLeft, signatureNote,
 }: {
   photoSrc: string; photoAlt: string;
   eyebrow: string; title: string;
@@ -189,45 +189,25 @@ function PersonBlock({
       ))}
 
       {/* Signature */}
-      <div style={{
-        marginTop: "40px", paddingTop: "24px",
-        borderTop: "1px solid rgba(184,150,62,0.25)",
-        display: "flex", flexDirection: "row", alignItems: "flex-end",
-        justifyContent: "space-between", gap: "24px",
-      }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "11px", letterSpacing: "3px",
-            color: "var(--gold)", textTransform: "uppercase", fontStyle: "italic",
-          }}>
-            {ceoSignatureLabel}
-          </span>
-          <div style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "22px", color: "var(--dark)",
-            letterSpacing: "3px", fontWeight: 400,
-          }}>
-            {ceoName}
-          </div>
+      {signatureNote && (
+        <div style={{
+          marginTop: "40px", paddingTop: "24px",
+          borderTop: "1px solid rgba(184,150,62,0.25)",
+          display: "flex", flexDirection: "column", gap: "4px",
+          textAlign: "right",
+        }}>
+          {signatureNote.map((line, i) => (
+            <span key={i} style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "13px",
+              color: i === signatureNote.length - 1 ? "var(--gold)" : "#3d3833",
+              letterSpacing: "0.05em", lineHeight: 1.8,
+            }}>
+              {line}
+            </span>
+          ))}
         </div>
-        {signatureNote && (
-          <div style={{
-            display: "flex", flexDirection: "column", gap: "4px",
-            textAlign: "right",
-          }}>
-            {signatureNote.map((line, i) => (
-              <span key={i} style={{
-                fontFamily: "'Noto Serif JP', serif",
-                fontSize: "13px", color: "#3d3833",
-                letterSpacing: "0.05em", lineHeight: 1.8,
-              }}>
-                {line}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 
