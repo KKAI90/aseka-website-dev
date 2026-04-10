@@ -7,12 +7,12 @@ const T = {
     sectionLabel: "Our Philosophy",
     cards: [
       { letter: "A", tag: "AI — 人に愛", title: "人に愛", body: "私たちは、思いやりの心を持って、相手の身になって考え、人々の幸福に貢献します。" },
-      { letter: "S", tag: "SEII — 仕事に誠実", title: "仕事に誠実", body: "私たちは、それぞれの個性・能力を認め合い、公正で透明な関わりで、企業活動に励みます。" },
-      { letter: "K", tag: "KANSHA — 出会いに感謝", title: "出会いに感謝", body: "私たちは、多くの人々との出会いに感謝し、信頼をいただき、人間関係を構築します。" },
+      { letter: "SE", tag: "SEII — 仕事に誠意", title: "仕事に誠意", body: "私たちは、それぞれの個性・能力を認め合い、公正で透明な関わりで、企業活動に励みます。" },
+      { letter: "KA", tag: "KANSHA — 出会いに感謝", title: "出会いに感謝", body: "私たちは、多くの人々との出会いに感謝し、信頼をいただき、人間関係を構築します。" },
     ],
     asekaDesc1: "以下3つの頭文字をとって、社名を",
     asekaDesc2: "と命名しました。",
-    asekaTagline: "愛（AI）· 誠実（SEII）· 感謝（KANSHA）",
+    asekaTagline: "愛（AI）· 誠意（SEII）· 感謝（KANSHA）",
   },
   EN: {
     sectionLabel: "Our Philosophy",
@@ -62,7 +62,7 @@ export default function Philosophy() {
             }}>{card.letter}</div>
             <span style={{
               display: "inline-block", fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "11px", letterSpacing: "3px", color: "var(--gold)", textTransform: "uppercase",
+              fontSize: "11px", letterSpacing: "3px", color: "#B8963E", textTransform: "uppercase",
               marginBottom: "22px", paddingBottom: "14px", borderBottom: "1px solid rgba(184,150,62,0.3)",
             }}>{card.tag}</span>
             <h3 style={{

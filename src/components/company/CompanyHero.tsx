@@ -2,9 +2,9 @@
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
-  JP: { title: "COMPANY", subtitle: "事業内容" },
-  EN: { title: "COMPANY", subtitle: "Our Business" },
-  VN: { title: "COMPANY", subtitle: "Về Công ty Chúng tôi" },
+  JP: { title: "SERVICE", subtitle: "事業内容" },
+  EN: { title: "SERVICE", subtitle: "Our Business" },
+  VN: { title: "SERVICE", subtitle: "Dịch vụ của Chúng tôi" },
 };
 
 export default function CompanyHero() {

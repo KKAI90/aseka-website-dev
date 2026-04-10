@@ -17,12 +17,18 @@ export default function CompanyIntroBand() {
       background: "#0E2233", padding: "60px",
       display: "flex", alignItems: "center", gap: "40px",
     }} className="intro-band">
-      <div style={{ flexShrink: 0 }}>
+      <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "10px" }}>
         <Image
-          src="/images/aseka-logo-white.png"
+          src="/images/aseka-logo-icon.png"
           alt="ASEKA"
-          width={80} height={80}
-          style={{ objectFit: "contain", height: "64px", width: "auto" }}
+          width={52} height={52}
+          style={{ objectFit: "contain", width: "52px", height: "52px" }}
+        />
+        <Image
+          src="/images/aseka-logo-text.png"
+          alt="ASEKA"
+          width={100} height={30}
+          style={{ objectFit: "contain", height: "22px", width: "auto", filter: "brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(700%) hue-rotate(5deg) brightness(90%)" }}
         />
       </div>
       <p style={{
