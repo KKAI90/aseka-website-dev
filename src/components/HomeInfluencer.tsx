@@ -11,6 +11,10 @@ const T = {
       "日本語や文化の違い、そして日本で働くための情報をわかりやすく発信することで、多くの外国人から支持を集めています。",
       "現在では、こうした発信を通じて、日本で働きたいと考える人々の挑戦を後押しし続けています。",
     ],
+    stats: [
+      { value: "200,000+", label: "SNSフォロワー" },
+      { value: "2019", label: "YouTube開始" },
+    ],
   },
   EN: {
     eyebrow: "INFLUENCER",
@@ -20,6 +24,10 @@ const T = {
       "Her motivation was simple: to share the challenges and struggles she experienced in Japan with those who would come after her, hoping to make their journey a little easier.",
       "By communicating clearly about the Japanese language, cultural differences, and the realities of working in Japan, she has earned the trust and support of many foreign nationals.",
       "Today, through this ongoing outreach, she continues to encourage and empower people who aspire to work in Japan.",
+    ],
+    stats: [
+      { value: "200,000+", label: "SNS Followers" },
+      { value: "2019", label: "YouTube Launch" },
     ],
   },
   VN: {
@@ -31,6 +39,10 @@ const T = {
       "Bằng cách truyền đạt rõ ràng về tiếng Nhật, sự khác biệt văn hóa và thực tế làm việc tại Nhật, cô đã nhận được sự tin tưởng và ủng hộ từ rất nhiều người nước ngoài.",
       "Hiện tại, thông qua những chia sẻ liên tục này, cô tiếp tục khuyến khích và trao thêm động lực cho những ai khao khát làm việc tại Nhật Bản.",
     ],
+    stats: [
+      { value: "200,000+", label: "Người theo dõi SNS" },
+      { value: "2019", label: "Bắt đầu YouTube" },
+    ],
   },
 };
 
@@ -39,74 +51,82 @@ export default function HomeInfluencer() {
   const t = T[lang];
 
   return (
-    <section style={{ padding: "100px 60px", background: "var(--cream)" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }} className="influencer-grid">
+    <section style={{ padding: "100px 60px", background: "white" }}>
+      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
 
-        {/* Left: Photo */}
-        <div style={{ position: "relative" }}>
-          <div style={{ position: "relative", background: "var(--dark)", padding: "4px" }}>
-            <div style={{
-              position: "absolute", top: "20px", left: "20px", right: "-20px", bottom: "-20px",
-              border: "1px solid rgba(184,150,62,0.3)", zIndex: 0,
-            }} />
-            <img
-              src="/images/ceo-portrait.jpg"
-              alt="Nguyen Phuong Thao"
-              style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "center top", display: "block", position: "relative", zIndex: 1 }}
-            />
-          </div>
-          {/* Badge */}
-          <div style={{
-            position: "absolute", bottom: "-16px", right: "-16px",
-            background: "#0C1F2E", padding: "20px 28px",
-            border: "1px solid rgba(184,150,62,0.3)", zIndex: 2,
-          }}>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "28px", color: "var(--gold)", lineHeight: 1 }}>20万+</div>
-            <div style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "10px", letterSpacing: "2px", color: "rgba(250,247,242,0.6)", marginTop: "4px" }}>SNS FOLLOWERS</div>
-          </div>
+        {/* Eyebrow */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
+          <div style={{ width: "40px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
+          <span style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "12px", letterSpacing: "5px",
+            color: "var(--gold)", fontStyle: "italic",
+          }}>{t.eyebrow}</span>
         </div>
 
-        {/* Right: Text */}
-        <div>
-          {/* Eyebrow */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-            <div style={{ width: "40px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
-            <span style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "12px", letterSpacing: "5px",
-              color: "var(--gold)", fontStyle: "italic",
-            }}>{t.eyebrow}</span>
-          </div>
+        {/* Title */}
+        <h2 style={{
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
+          color: "var(--dark)", letterSpacing: "2px",
+          marginBottom: "0",
+        }}>
+          {t.title}
+        </h2>
+        <div style={{ width: "100%", height: "1px", background: "var(--gold)", opacity: 0.35, margin: "20px 0 40px" }} />
 
-          {/* Title */}
-          <h2 style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
-            color: "var(--dark)", letterSpacing: "2px",
-            marginBottom: "12px",
-          }}>
-            {t.title}
-          </h2>
-          <div style={{ width: "48px", height: "2px", background: "var(--gold)", opacity: 0.6, marginBottom: "36px" }} />
-
-          {/* Paragraphs */}
+        {/* Paragraphs */}
+        <div style={{ marginBottom: "56px" }}>
           {t.paragraphs.map((p, i) => (
             <p key={i} style={{
               fontFamily: "'Noto Serif JP', serif",
-              fontSize: "15px", lineHeight: 2,
-              color: "#3d3833", marginBottom: "18px", letterSpacing: "0.01em",
+              fontSize: "15px", lineHeight: 2.1,
+              color: "#3d3833", marginBottom: "0", letterSpacing: "0.02em",
             }}>
               {p}
             </p>
           ))}
         </div>
+
+        {/* Stats row */}
+        <div style={{
+          display: "flex", gap: "2px",
+          borderTop: "1px solid rgba(184,150,62,0.2)",
+          paddingTop: "40px",
+        }}>
+          {t.stats.map((s, i) => (
+            <div key={i} style={{
+              flex: 1, padding: "32px 40px",
+              background: "#0C1F2E",
+              borderRight: i < t.stats.length - 1 ? "1px solid rgba(184,150,62,0.15)" : "none",
+              textAlign: "center",
+            }}>
+              <div style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "clamp(32px, 3.5vw, 48px)",
+                fontWeight: 300, color: "var(--gold)",
+                letterSpacing: "-1px", lineHeight: 1,
+                marginBottom: "10px",
+              }}>
+                {s.value}
+              </div>
+              <div style={{
+                fontFamily: "'Noto Sans JP', sans-serif",
+                fontSize: "11px", letterSpacing: "2px",
+                color: "rgba(250,247,242,0.7)",
+              }}>
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+
       </div>
 
       <style>{`
-        @media (max-width: 900px) {
-          .influencer-grid { grid-template-columns: 1fr !important; gap: 56px !important; }
+        @media (max-width: 600px) {
+          #influencer-stats { flex-direction: column !important; }
         }
-        @media (max-width: 600px) { section { padding: 72px 24px !important; } }
       `}</style>
     </section>
   );

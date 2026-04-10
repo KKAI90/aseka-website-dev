@@ -81,20 +81,13 @@ export default function Philosophy() {
         marginTop: "3px", padding: "52px 60px", background: "var(--dark)",
         display: "flex", alignItems: "center", gap: "64px",
       }} className="aseka-name-block">
-        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ flexShrink: 0 }}>
           <Image
             src="/images/aseka-logo-icon.png"
-            alt=""
-            width={56}
-            height={56}
-            style={{ objectFit: "contain", width: "56px", height: "56px" }}
-          />
-          <Image
-            src="/images/aseka-logo-text.png"
             alt="ASEKA"
-            width={120}
-            height={36}
-            style={{ objectFit: "contain", width: "120px", height: "auto", filter: "brightness(0) saturate(100%) invert(72%) sepia(42%) saturate(500%) hue-rotate(5deg) brightness(95%)" }}
+            width={72}
+            height={72}
+            style={{ objectFit: "contain", width: "72px", height: "72px" }}
           />
         </div>
         <div>

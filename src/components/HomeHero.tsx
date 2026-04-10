@@ -86,12 +86,13 @@ export default function HomeHero() {
         {/* Headline */}
         <h1 style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(36px, 5.5vw, 72px)",
+          fontSize: "clamp(28px, 3.8vw, 56px)",
           fontWeight: 600,
           color: "#FAF7F2",
           lineHeight: 1.2,
           letterSpacing: "0.02em",
           margin: "0 0 24px",
+          whiteSpace: "nowrap",
         }}>
           {t.title1}<br />
           <span style={{ color: "var(--gold-light)" }}>{t.title2}</span>

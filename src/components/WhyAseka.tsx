@@ -179,26 +179,49 @@ export default function WhyAseka() {
       </div>
 
 
-      {/* Image with overlay text */}
-      <div style={{ marginTop: "64px", position: "relative" }}>
-        <img
-          src="/images/836A0134.JPG"
-          alt="ASEKA support"
-          style={{ width: "100%", height: "auto", display: "block" }}
-        />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(10,20,35,0.72) 0%, rgba(10,20,35,0.38) 50%, rgba(10,20,35,0.08) 100%)" }} />
+      {/* Quote band */}
+      <div style={{
+        marginTop: "64px",
+        display: "grid",
+        gridTemplateColumns: "auto 1fr",
+        gap: "0",
+        background: "#0C1F2E",
+        overflow: "hidden",
+      }}>
+        {/* Left photo */}
+        <div style={{ width: "320px", flexShrink: 0, position: "relative", overflow: "hidden" }} className="why-photo">
+          <img
+            src="/images/836A0134.JPG"
+            alt="ASEKA support"
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center top",
+              display: "block",
+            }}
+          />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to right, transparent 60%, rgba(12,31,46,0.9) 100%)",
+          }} />
+        </div>
+
+        {/* Right text */}
         <div style={{
-          position: "absolute", inset: 0,
-          display: "flex", alignItems: "center",
-          padding: "0 64px",
+          padding: "56px 64px",
+          display: "flex", flexDirection: "column", justifyContent: "center",
         }}>
+          <div style={{
+            width: "32px", height: "2px",
+            background: "var(--gold)", opacity: 0.6,
+            marginBottom: "28px",
+          }} />
           <p style={{
             fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(14px, 1.5vw, 17px)",
-            lineHeight: 2.1,
-            color: "rgba(250,247,242,0.92)",
-            maxWidth: "600px",
-            letterSpacing: "0.03em",
+            fontSize: "clamp(14px, 1.4vw, 16px)",
+            lineHeight: 2.2,
+            color: "rgba(250,247,242,0.85)",
+            letterSpacing: "0.04em",
+            margin: 0,
           }}>
             {t.imgOverlay}
           </p>
@@ -207,7 +230,14 @@ export default function WhyAseka() {
 
       <style>{`
         .why-card:hover { border-top-color: var(--gold) !important; transform: translateY(-4px); }
-        @media (max-width: 900px) { .why-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 900px) {
+          .why-grid { grid-template-columns: 1fr !important; }
+          .why-photo { width: 200px !important; }
+        }
+        @media (max-width: 700px) {
+          .why-photo { display: none !important; }
+          div[style*="grid-template-columns: auto 1fr"] { grid-template-columns: 1fr !important; }
+        }
         @media (max-width: 600px) { section { padding: 80px 24px !important; } }
       `}</style>
     </section>

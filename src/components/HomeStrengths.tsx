@@ -165,43 +165,6 @@ export default function HomeStrengths() {
         ))}
       </div>
 
-      {/* CTA banner */}
-      <div style={{
-        marginTop: "80px",
-        padding: "72px 60px",
-        textAlign: "center",
-        borderTop: "1px solid rgba(184,150,62,0.15)",
-      }}>
-        <p style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(18px, 2.5vw, 28px)", fontWeight: 400,
-          color: "#FAF7F2",
-          letterSpacing: "2px",
-          marginBottom: "12px",
-        }}>{t.cta1}</p>
-        <p style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "14px",
-          color: "rgba(250,247,242,0.55)",
-          letterSpacing: "1px",
-          marginBottom: "40px",
-        }}>{t.cta2}</p>
-        <Link href="/contact" style={{
-          display: "inline-flex", alignItems: "center", gap: "10px",
-          padding: "18px 52px",
-          background: "var(--gold)",
-          color: "#0C1F2E",
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "13px", fontWeight: 600, letterSpacing: "2px",
-          textDecoration: "none",
-          transition: "opacity 0.3s",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-        >
-          {t.ctaBtn} →
-        </Link>
-      </div>
 
       <style>{`
         .strength-card:hover { border-top-color: var(--gold) !important; }

@@ -3,22 +3,19 @@ import { useLang } from "@/contexts/LangContext";
 
 const STATS = {
   JP: [
-    { value: "20万+", label: "SNSフォロワー", sub: "Mạng lưới SNS" },
-    { value: "8,000件", label: "累計紹介実績", sub: "Tổng hồ sơ giới thiệu" },
-    { value: "14名", label: "専門スタッフ", sub: "Nhân viên chuyên môn" },
-    { value: "最短2週", label: "最短着任期間", sub: "Thời gian onboarding" },
+    { value: "200,000+", label: "SNSフォロワー", sub: "Mạng lưới SNS" },
+    { value: "700名", label: "累計紹介実績", sub: "Tổng hồ sơ giới thiệu" },
+    { value: "最短３日間", label: "最短着任期間", sub: "Thời gian onboarding" },
   ],
   EN: [
-    { value: "200K+", label: "SNS Followers", sub: "Social media network" },
-    { value: "8,000+", label: "Placements", sub: "Cumulative introductions" },
-    { value: "14", label: "Specialists", sub: "Expert staff members" },
-    { value: "2 Weeks", label: "Fastest Onboarding", sub: "Min. placement period" },
+    { value: "200,000+", label: "SNS Followers", sub: "Social media network" },
+    { value: "700+", label: "Placements", sub: "Cumulative introductions" },
+    { value: "3 Days", label: "Fastest Onboarding", sub: "Min. placement period" },
   ],
   VN: [
-    { value: "200K+", label: "Người theo dõi SNS", sub: "Mạng lưới mạng xã hội" },
-    { value: "8.000+", label: "Hồ sơ đã Giới thiệu", sub: "Tổng cộng" },
-    { value: "14 người", label: "Nhân viên Chuyên môn", sub: "Đội ngũ chuyên nghiệp" },
-    { value: "2 tuần", label: "Nhanh nhất", sub: "Thời gian onboarding tối thiểu" },
+    { value: "200,000+", label: "Người theo dõi SNS", sub: "Mạng lưới mạng xã hội" },
+    { value: "700+", label: "Hồ sơ đã Giới thiệu", sub: "Tổng cộng" },
+    { value: "3 ngày", label: "Nhanh nhất", sub: "Thời gian onboarding tối thiểu" },
   ],
 };
 
@@ -33,16 +30,16 @@ export default function StatsStrip() {
     }}>
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
+        gridTemplateColumns: "repeat(3, 1fr)",
       }} className="stats-grid">
         {stats.map((s, i) => (
           <div key={i} style={{
             padding: "48px 40px",
-            borderRight: i < 3 ? "1px solid rgba(184,150,62,0.15)" : "none",
+            borderRight: i < 2 ? "1px solid rgba(184,150,62,0.15)" : "none",
             textAlign: "center",
             position: "relative",
           }}>
-            {/* Top gold line on hover */}
+            {/* Top gold line */}
             <div style={{
               position: "absolute", top: 0, left: "20%", right: "20%",
               height: "2px", background: "var(--gold)", opacity: 0.5,
