@@ -5,7 +5,7 @@ const PHOTOS = [
   { src: "/images/teamwork.jpg", alt: "チーム作業風景" },
   { src: "/images/ズェン.jpg", alt: "スタッフサポート" },
   { src: "/images/JPVN.jpg", alt: "ビジネスミーティング" },
-  { src: "/images/team-office-1.jpg", alt: "オフィス作業" },
+  { src: "/images/Professional.jpg", alt: "オフィス作業" },
 ];
 
 const LABELS = {
