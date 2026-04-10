@@ -11,6 +11,7 @@ const T = {
       ceoLabel: "代表取締役",
       ceoSignatureLabel: "代表取締役",
       ceoName: "内田 隆嗣",
+      signatureNote: ["令和８年３月", "株式会社ASEKA", "代表取締役　内田 隆嗣"],
       paragraphs: [
         "このたび、株式会社クローバーホールディングスによる株式取得により、株式会社ASEKAの代表取締役に就任いたしました、内田隆嗣でございます。",
         "まずは、創業者でありこれまでASEKAを牽引してこられたグェン・フォン・タオ氏に心より敬意を表するとともに、社員の皆様、お取引先の皆様に深く感謝申し上げます。",
@@ -44,6 +45,7 @@ const T = {
       ceoLabel: "Representative Director",
       ceoSignatureLabel: "Representative Director",
       ceoName: "Takashi Uchida",
+      signatureNote: ["March 2026", "ASEKA Co., Ltd.", "Representative Director　Takashi Uchida"],
       paragraphs: [
         "I am Takashi Uchida, appointed as Representative Director of ASEKA Co., Ltd. following the acquisition of shares by Clover Holdings Co., Ltd.",
         "First and foremost, I would like to express my deepest respect to Ms. Nguyen Phuong Thao, the founder who has led ASEKA with dedication, and extend my sincere gratitude to all employees and business partners.",
@@ -77,6 +79,7 @@ const T = {
       ceoLabel: "Giám đốc Điều hành",
       ceoSignatureLabel: "Giám đốc Điều hành",
       ceoName: "Uchida Takashi (内田 隆嗣)",
+      signatureNote: ["Tháng 3 năm 2026", "Công ty Cổ phần ASEKA", "Giám đốc Điều hành　Uchida Takashi"],
       paragraphs: [
         "Tôi là Uchida Takashi, được bổ nhiệm làm Giám đốc Điều hành Công ty Cổ phần ASEKA sau khi Clover Holdings Co., Ltd. hoàn tất việc mua lại cổ phần.",
         "Trước hết, tôi xin bày tỏ sự kính trọng sâu sắc đối với bà Nguyễn Phương Thảo — người sáng lập đã dẫn dắt ASEKA với tất cả tâm huyết, và gửi lời cảm ơn chân thành đến toàn thể nhân viên cũng như các đối tác kinh doanh.",
@@ -104,13 +107,13 @@ const T = {
 };
 
 function PersonBlock({
-  photoSrc, photoAlt, eyebrow, title, subtitle,
-  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft,
+  photoSrc, photoAlt, eyebrow, title,
+  ceoLabel, ceoSignatureLabel, ceoName, paragraphs, photoLeft, signatureNote,
 }: {
   photoSrc: string; photoAlt: string;
-  eyebrow: string; title: string; subtitle: string;
+  eyebrow: string; title: string;
   ceoLabel: string; ceoSignatureLabel: string; ceoName: string;
-  paragraphs: string[]; photoLeft: boolean;
+  paragraphs: string[]; photoLeft: boolean; signatureNote?: string[];
 }) {
   const photo = (
     <div style={{ position: "relative" }}>
@@ -168,16 +171,11 @@ function PersonBlock({
         {title}
       </h2>
 
-      {/* Subtitle */}
-      <p style={{
-        fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "3px",
-        color: "var(--warm-gray)", fontWeight: 300,
+      {/* Divider */}
+      <div style={{
         marginBottom: "36px", paddingBottom: "24px",
         borderBottom: "1px solid rgba(184,150,62,0.25)",
-      }}>
-        {subtitle}
-      </p>
+      }} />
 
       {/* Paragraphs */}
       {paragraphs.map((text, i) => (
@@ -194,22 +192,41 @@ function PersonBlock({
       <div style={{
         marginTop: "40px", paddingTop: "24px",
         borderTop: "1px solid rgba(184,150,62,0.25)",
-        display: "flex", flexDirection: "column", gap: "8px",
+        display: "flex", flexDirection: "row", alignItems: "flex-end",
+        justifyContent: "space-between", gap: "24px",
       }}>
-        <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "11px", letterSpacing: "3px",
-          color: "var(--gold)", textTransform: "uppercase", fontStyle: "italic",
-        }}>
-          {ceoSignatureLabel}
-        </span>
-        <div style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "22px", color: "var(--dark)",
-          letterSpacing: "3px", fontWeight: 400,
-        }}>
-          {ceoName}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <span style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "11px", letterSpacing: "3px",
+            color: "var(--gold)", textTransform: "uppercase", fontStyle: "italic",
+          }}>
+            {ceoSignatureLabel}
+          </span>
+          <div style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "22px", color: "var(--dark)",
+            letterSpacing: "3px", fontWeight: 400,
+          }}>
+            {ceoName}
+          </div>
         </div>
+        {signatureNote && (
+          <div style={{
+            display: "flex", flexDirection: "column", gap: "4px",
+            textAlign: "right",
+          }}>
+            {signatureNote.map((line, i) => (
+              <span key={i} style={{
+                fontFamily: "'Noto Serif JP', serif",
+                fontSize: "13px", color: "#3d3833",
+                letterSpacing: "0.05em", lineHeight: 1.8,
+              }}>
+                {line}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
