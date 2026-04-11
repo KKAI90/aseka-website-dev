@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { Client } from "pg";
 import { signToken } from "@/lib/auth";
 
+const DB_URL =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL ||
+  "postgres://postgres.eftgkvtpvaixipazrjnf:hCobYi0zI7whYPlx@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true";
+
 export async function POST(req: NextRequest) {
+  const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
   try {
-    const dbUrl = process.env.DATABASE_URL;
-    console.log("[login] DATABASE_URL set:", !!dbUrl, dbUrl ? dbUrl.substring(0, 30) + "..." : "MISSING");
     const { email, password } = await req.json();
 
-    const admin = await prisma.admin_users.findUnique({ where: { email } });
+    await client.connect();
+    const result = await client.query(
+      "SELECT id, email, password FROM admin_users WHERE email = $1 LIMIT 1",
+      [email]
+    );
+    await client.end();
+
+    const admin = result.rows[0];
     if (!admin) {
       return NextResponse.json(
         { error: "メールアドレスまたはパスワードが正しくありません" },
@@ -38,7 +50,11 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (err) {
+    try { await client.end(); } catch {}
     console.error("login error:", err);
-    return NextResponse.json({ error: "サーバーエラーが発生しました", detail: String(err) }, { status: 500 });
+    return NextResponse.json(
+      { error: "サーバーエラーが発生しました", detail: String(err) },
+      { status: 500 }
+    );
   }
 }
