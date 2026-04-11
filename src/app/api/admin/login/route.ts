@@ -5,6 +5,8 @@ import { signToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
+    const dbUrl = process.env.DATABASE_URL;
+    console.log("[login] DATABASE_URL set:", !!dbUrl, dbUrl ? dbUrl.substring(0, 30) + "..." : "MISSING");
     const { email, password } = await req.json();
 
     const admin = await prisma.admin_users.findUnique({ where: { email } });
