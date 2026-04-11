@@ -2,23 +2,16 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
-export function getPrisma(): PrismaClient {
-  if (!globalForPrisma.prisma) {
-    globalForPrisma.prisma = new PrismaClient({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL,
-        },
-      },
-      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-    });
-  }
-  return globalForPrisma.prisma;
-}
+const DB_URL =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL;
 
-// Keep backwards compatibility
-export const prisma = new Proxy({} as PrismaClient, {
-  get(_target, prop) {
-    return (getPrisma() as any)[prop];
-  },
-});
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    datasources: { db: { url: DB_URL } },
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
