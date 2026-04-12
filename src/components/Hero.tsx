@@ -13,7 +13,7 @@ export default function Hero() {
 
   return (
     <div style={{
-      height: "72vh", minHeight: "500px",
+      height: "80vh", minHeight: "560px",
       position: "relative",
       overflow: "hidden",
       display: "flex",
@@ -29,7 +29,7 @@ export default function Hero() {
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
           objectFit: "cover",
-          objectPosition: "50% 35%",
+          objectPosition: "50% 45%",
         }}
       />
 
