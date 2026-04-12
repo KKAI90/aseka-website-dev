@@ -12,7 +12,7 @@ const ROWS = {
     { label: "本社",          value: "〒101-0025 東京都千代田区神田佐久間町3-27-3\nガーデンパークビル５F" },
     { label: "連絡先",        value: "03-6231-9969", href: "tel:0362319969" },
     { label: "メール",        value: "info@aseka.co.jp", href: "mailto:info@aseka.co.jp" },
-    { label: "事業内容", span: true, value: "有料職業紹介事業（許可番号：13-ユ-313472)\n登録支援機関 (登録番号：22登-007089)" },
+    { label: "事業内容", span: true, value: "外国人人材紹介及び支援業務\n外国人向け日本語教育サービス" },
     { label: "顧問税理士",     value: "大石会計事務所" },
     { label: "許認可・届出", span: true, value: "有料職業紹介事業（許可番号：13-ユ-313472)\n登録支援機関 (登録番号：22登-007089)" },
     { label: "グループ会社",   value: "株式会社クローバーホールディングス" },
