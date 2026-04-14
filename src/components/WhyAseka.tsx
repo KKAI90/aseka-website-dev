@@ -102,9 +102,9 @@ export default function WhyAseka() {
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "12px", letterSpacing: "5px",
-            color: "var(--gold)", fontStyle: "italic", textTransform: "uppercase",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "12px", letterSpacing: "3px",
+            color: "var(--gold)", fontStyle: "normal", textTransform: "uppercase",
           }}>{t.eyebrow}</span>
         </div>
         <h2 style={{
@@ -133,13 +133,14 @@ export default function WhyAseka() {
             borderTop: "3px solid transparent",
             transition: "border-color 0.4s, transform 0.3s",
           }}>
-            {/* Large background number */}
+            {/* Large background number — outlined style */}
             <div style={{
-              position: "absolute", top: "-12px", right: "20px",
+              position: "absolute", top: "-8px", right: "24px",
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "96px", fontWeight: 300,
-              color: "var(--gold)", opacity: 0.055,
-              lineHeight: 1, userSelect: "none",
+              fontSize: "100px", fontWeight: 600,
+              color: "transparent",
+              WebkitTextStroke: "1.5px rgba(184,150,62,0.22)",
+              lineHeight: 1, userSelect: "none", letterSpacing: "-2px",
             }}>{p.num}</div>
 
             {/* Icon */}
@@ -151,10 +152,11 @@ export default function WhyAseka() {
 
             {/* Tag */}
             <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "11px", letterSpacing: "3px",
-              color: "var(--gold)", fontStyle: "italic",
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "11px", letterSpacing: "2px",
+              color: "var(--gold)", fontStyle: "normal",
               marginBottom: "12px", textTransform: "uppercase",
+              fontWeight: 400,
             }}>{p.tag}</div>
 
             {/* Divider */}
