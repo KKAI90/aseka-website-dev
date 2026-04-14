@@ -121,32 +121,38 @@ function PersonBlock({
 }) {
   const photo = (
     <div style={{ position: "relative" }}>
-      <div style={{ position: "relative", background: "var(--dark)", padding: "3px" }}>
-        <div style={{
-          position: "absolute",
-          top: "16px",
-          left: photoLeft ? "16px" : "-16px",
-          right: photoLeft ? "-16px" : "16px",
-          bottom: "-16px",
-          border: "1px solid var(--gold)", opacity: 0.3, zIndex: 0,
-        }} />
+      {/* Decorative gold offset border */}
+      <div style={{
+        position: "absolute",
+        top: "16px",
+        left: photoLeft ? "16px" : "-16px",
+        right: photoLeft ? "-16px" : "16px",
+        bottom: "-16px",
+        border: "1px solid rgba(184,150,62,0.45)", zIndex: 0,
+      }} />
+
+      {/* Photo — no dark frame */}
+      <div style={{ position: "relative", zIndex: 1 }}>
         <Image
           src={photoSrc} alt={photoAlt}
           width={400} height={534}
           style={{
             width: "100%", aspectRatio: "3/4",
             objectFit: "cover", objectPosition: "center top",
-            display: "block", position: "relative", zIndex: 1,
+            display: "block",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
           }}
         />
       </div>
+
+      {/* CEO label badge */}
       <div style={{
         position: "absolute", bottom: "-20px",
         left: photoLeft ? 0 : "auto",
         right: photoLeft ? "auto" : 0,
         background: "var(--gold)", padding: "10px 24px",
         fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "2px",
+        fontSize: "12px", letterSpacing: "1px",
         color: "white", zIndex: 2, fontWeight: 400,
       }}>
         {ceoLabel}
