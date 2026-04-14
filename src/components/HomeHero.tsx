@@ -46,7 +46,7 @@ export default function HomeHero() {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 35%",
+          objectFit: "cover", objectPosition: "72% 25%",
         }}
       />
 
@@ -77,7 +77,7 @@ export default function HomeHero() {
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: "13px", letterSpacing: "1px",
+            fontSize: lang === "JP" ? "15px" : "13px", letterSpacing: "1px",
             color: "rgba(212,175,106,0.95)", fontWeight: 400,
           }}>{t.tag}</span>
         </div>
@@ -159,14 +159,14 @@ export default function HomeHero() {
         <span style={{
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: "10px", letterSpacing: "4px",
-          color: "var(--gold)", opacity: 0.7, fontStyle: "italic",
+          color: "var(--gold)", opacity: 1, fontStyle: "italic",
         }}>SCROLL</span>
       </div>
 
       <style>{`
         @keyframes scrollLine {
           0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
-          50%       { opacity: 0.4; transform: scaleY(0.4); transform-origin: top; }
+          50%       { opacity: 0.6; transform: scaleY(0.5); transform-origin: top; }
         }
         @media (max-width: 600px) {
           .home-hero-content { padding: 0 24px !important; }
