@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -13,6 +12,12 @@ const T = {
       "THAO TOKYOでは試験対策授業というよりもむしろ、日本語での会話の重要性に重きを置いておりますので、生活と仕事の両面で活用できるような指導に注力しております。",
     ],
     schoolLabel: "オンライン日本語スクール",
+    features: [
+      { title: "オンライン完結", desc: "場所を選ばず受講できる完全オンライン形式" },
+      { title: "試験対策コース", desc: "特定技能・JLPT に特化した対策授業" },
+      { title: "会話重視の指導", desc: "実生活・職場で使える実践的な日本語" },
+      { title: "ベトナム語対応", desc: "ネイティブ講師によるきめ細かいサポート" },
+    ],
   },
   EN: {
     sectionLabel: "Training",
@@ -24,6 +29,12 @@ const T = {
       "Rather than focusing solely on exam preparation, THAO TOKYO places great importance on conversational Japanese, providing instruction that can be applied in both daily life and at work.",
     ],
     schoolLabel: "Online Japanese School",
+    features: [
+      { title: "100% Online", desc: "Study from anywhere with fully online classes" },
+      { title: "Exam Preparation", desc: "Specialized courses for Specified Skilled Worker & JLPT" },
+      { title: "Conversation Focus", desc: "Practical Japanese for daily life and the workplace" },
+      { title: "Vietnamese Support", desc: "Native instructors providing detailed guidance" },
+    ],
   },
   VN: {
     sectionLabel: "Đào tạo",
@@ -35,6 +46,12 @@ const T = {
       "THAO TOKYO không chỉ tập trung vào luyện thi mà đặt trọng tâm vào tầm quan trọng của giao tiếp tiếng Nhật, giúp học viên ứng dụng được trong cả cuộc sống lẫn công việc.",
     ],
     schoolLabel: "Trường Tiếng Nhật Trực tuyến",
+    features: [
+      { title: "Học hoàn toàn Online", desc: "Học mọi lúc, mọi nơi qua hình thức trực tuyến" },
+      { title: "Luyện thi chuyên sâu", desc: "Khóa học ôn thi Kỹ năng đặc định & JLPT" },
+      { title: "Trọng tâm giao tiếp", desc: "Tiếng Nhật thực dụng trong cuộc sống và công việc" },
+      { title: "Hỗ trợ tiếng Việt", desc: "Giảng viên bản ngữ hướng dẫn tận tình" },
+    ],
   },
 };
 
@@ -98,66 +115,94 @@ export default function CompanyTraining() {
               {p}
             </p>
           ))}
+        </div>
 
-          {/* THAO TOKYO brand block */}
+        {/* ── Right: THAO TOKYO dark panel ── */}
+        <div style={{
+          background: "#0C1F2E",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "72px 56px",
+          position: "relative",
+          overflow: "hidden",
+        }} className="training-panel">
+
+          {/* Decorative circle */}
           <div style={{
-            marginTop: "44px",
-            padding: "24px 32px",
-            background: "#0C1F2E",
-            borderLeft: "3px solid var(--gold)",
-            display: "flex", alignItems: "center", gap: "20px",
-          }}>
+            position: "absolute", top: "-80px", right: "-80px",
+            width: "280px", height: "280px", borderRadius: "50%",
+            border: "1px solid rgba(184,150,62,0.10)",
+            pointerEvents: "none",
+          }} />
+          <div style={{
+            position: "absolute", bottom: "-60px", left: "-60px",
+            width: "200px", height: "200px", borderRadius: "50%",
+            border: "1px solid rgba(184,150,62,0.07)",
+            pointerEvents: "none",
+          }} />
+
+          {/* THAO TOKYO brand header */}
+          <div style={{ marginBottom: "48px" }}>
             <div style={{
               fontFamily: "'Noto Serif JP', serif",
-              fontSize: "18px", letterSpacing: "3px",
-              color: "var(--gold)", flexShrink: 0, fontWeight: 600,
+              fontSize: "28px", letterSpacing: "4px",
+              color: "var(--gold)", fontWeight: 600,
+              marginBottom: "10px",
             }}>THAO TOKYO</div>
             <div style={{
-              width: "1px", height: "28px",
-              background: "rgba(184,150,62,0.3)", flexShrink: 0,
+              width: "40px", height: "2px",
+              background: "var(--gold)", opacity: 0.5,
+              marginBottom: "10px",
             }} />
             <div style={{
               fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "12px", letterSpacing: "1px",
-              color: "rgba(250,247,242,0.65)",
-            }}>
-              {t.schoolLabel}
-            </div>
+              fontSize: "12px", letterSpacing: "2px",
+              color: "rgba(250,247,242,0.5)",
+              textTransform: "uppercase",
+            }}>{t.schoolLabel}</div>
           </div>
-        </div>
 
-        {/* ── Right: image ── */}
-        <div style={{ position: "relative", minHeight: "520px" }} className="training-image">
-          <Image
-            src="/images/teacher-portrait.jpg"
-            alt="THAO TOKYO Japanese Language Training"
-            fill
-            style={{ objectFit: "cover", objectPosition: "center 20%" }}
-          />
-          {/* Subtle dark overlay for depth */}
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to right, rgba(10,20,35,0.18) 0%, rgba(10,20,35,0.08) 100%)",
-          }} />
-          {/* Gold accent line on left edge */}
-          <div style={{
-            position: "absolute", left: 0, top: "15%", bottom: "15%",
-            width: "3px", background: "var(--gold)", opacity: 0.6,
-          }} />
+          {/* Feature list */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+            {t.features.map((f, i) => (
+              <div key={i} style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+                {/* Gold number */}
+                <div style={{
+                  fontFamily: "'Noto Serif JP', serif",
+                  fontSize: "13px", color: "var(--gold)",
+                  opacity: 0.7, flexShrink: 0,
+                  marginTop: "2px", letterSpacing: "1px",
+                  fontWeight: 600,
+                }}>0{i + 1}</div>
+                <div style={{
+                  borderLeft: "1px solid rgba(184,150,62,0.2)",
+                  paddingLeft: "18px",
+                }}>
+                  <div style={{
+                    fontFamily: "'Noto Sans JP', sans-serif",
+                    fontSize: lang === "JP" ? "14px" : "13px",
+                    fontWeight: 600, letterSpacing: "0.5px",
+                    color: "#FAF7F2", marginBottom: "5px",
+                  }}>{f.title}</div>
+                  <div style={{
+                    fontFamily: "'Noto Sans JP', sans-serif",
+                    fontSize: lang === "JP" ? "13px" : "12px",
+                    lineHeight: 1.8,
+                    color: "rgba(250,247,242,0.52)",
+                  }}>{f.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <style>{`
         @media (max-width: 900px) {
-          .training-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .training-image {
-            min-height: 340px !important;
-          }
-          .training-text {
-            padding: 64px 24px !important;
-          }
+          .training-grid { grid-template-columns: 1fr !important; }
+          .training-panel { padding: 56px 24px !important; }
+          .training-text { padding: 64px 24px !important; }
         }
       `}</style>
     </section>
