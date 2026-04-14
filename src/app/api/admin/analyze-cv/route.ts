@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminAuth";
+import getConfig from "next/config";
+
+const { serverRuntimeConfig } = getConfig() || {};
 
 export const maxDuration = 60;
 
-function db() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
 async function analyzeWithGroq(text: string) {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = serverRuntimeConfig?.GROQ_API_KEY || process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error("GROQ_API_KEY not set");
 
   const prompt = `You are an expert HR data extractor for Aseka株式会社.
@@ -80,33 +76,33 @@ ${text.slice(0, 5000)}`;
   return JSON.parse(match[0]);
 }
 
-async function matchJobs(candidate: Record<string,unknown>) {
-  const { data: jobs } = await db()
-    .from("job_listings")
-    .select("id,company,position_ja,position_vn,industry,jlpt_min,salary,location,status")
-    .not("status","eq","paused");
+async function matchJobs(candidate: Record<string, unknown>) {
+  const jobs = await prisma.job_listings.findMany({
+    where: { NOT: { status: "paused" } },
+    select: { id: true, company: true, position_ja: true, position_vn: true, industry: true, jlpt_min: true, salary: true, location: true, status: true },
+  });
 
-  if (!jobs?.length) return [];
+  if (!jobs.length) return [];
 
-  const JLPT: Record<string,number> = {N1:5,N2:4,N3:3,N4:2,N5:1,"N3相当":3,"N4相当":2,"なし":0,"":0};
-  const candRank = JLPT[(candidate.jlpt as string)||""]||0;
-  const normalizeInd = (s:string) => s?.includes("ホテル")||s?.includes("宿泊") ? "ホテル" : s;
-  const candInd = normalizeInd((candidate.skill||candidate.match_industry) as string);
+  const JLPT: Record<string, number> = { N1: 5, N2: 4, N3: 3, N4: 2, N5: 1, "N3相当": 3, "N4相当": 2, "なし": 0, "": 0 };
+  const candRank = JLPT[(candidate.jlpt as string) || ""] || 0;
+  const normalizeInd = (s: string) => s?.includes("ホテル") || s?.includes("宿泊") ? "ホテル" : s;
+  const candInd = normalizeInd((candidate.skill || candidate.match_industry) as string);
 
-  return jobs.map((job: Record<string,string>) => {
-    let score=0; const reasons:string[]=[];
-    if (normalizeInd(job.industry)===candInd) { score+=40; reasons.push(`業種マッチ · Đúng ngành (${job.industry})`); }
-    const reqRank = JLPT[job.jlpt_min]||0;
-    if (candRank>=reqRank) { score+=30; reasons.push(`日本語OK · ${candidate.jlpt}≥${job.jlpt_min}`); }
-    else if (candRank===reqRank-1) { score+=15; reasons.push(`日本語近似`); }
-    const expCount = (candidate.work_history as unknown[])?.length||0;
-    if (expCount>=3) { score+=20; reasons.push(`経験${expCount}社`); }
-    else if (expCount>=1) { score+=10; reasons.push(`経験あり`); }
-    const pref = (candidate.preferred_job as string||"").toLowerCase();
-    if (pref&&(job.position_ja?.toLowerCase().includes(pref)||(job.position_vn||"").toLowerCase().includes(pref))) { score+=15; reasons.push(`希望職種マッチ`); }
-    if (job.status==="urgent") { score+=10; reasons.push(`緊急募集`); }
-    return { ...job, score, reasons, matchPct: Math.min(score,100) };
-  }).sort((a:{score:number},b:{score:number})=>b.score-a.score).slice(0,3);
+  return jobs.map(job => {
+    let score = 0; const reasons: string[] = [];
+    if (normalizeInd(job.industry ?? "") === candInd) { score += 40; reasons.push(`業種マッチ · Đúng ngành (${job.industry})`); }
+    const reqRank = JLPT[job.jlpt_min ?? ""] || 0;
+    if (candRank >= reqRank) { score += 30; reasons.push(`日本語OK · ${candidate.jlpt}≥${job.jlpt_min}`); }
+    else if (candRank === reqRank - 1) { score += 15; reasons.push(`日本語近似`); }
+    const expCount = (candidate.work_history as unknown[])?.length || 0;
+    if (expCount >= 3) { score += 20; reasons.push(`経験${expCount}社`); }
+    else if (expCount >= 1) { score += 10; reasons.push(`経験あり`); }
+    const pref = (candidate.preferred_job as string || "").toLowerCase();
+    if (pref && (job.position_ja?.toLowerCase().includes(pref) || (job.position_vn || "").toLowerCase().includes(pref))) { score += 15; reasons.push(`希望職種マッチ`); }
+    if (job.status === "urgent") { score += 10; reasons.push(`緊急募集`); }
+    return { ...job, score, reasons, matchPct: Math.min(score, 100) };
+  }).sort((a, b) => b.score - a.score).slice(0, 3);
 }
 
 export async function POST(req: NextRequest) {

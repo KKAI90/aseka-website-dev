@@ -1,28 +1,25 @@
-import { LangProvider } from "@/contexts/LangContext";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import TrustStrip from "@/components/TrustStrip";
-import Services from "@/components/Services";
-import Nenkin from "@/components/Nenkin";
-import Flow from "@/components/Flow";
-import Visa from "@/components/Visa";
-import Contact from "@/components/Contact";
+import HomeHero from "@/components/HomeHero";
+import StatsStrip from "@/components/StatsStrip";
+import HomeInfluencer from "@/components/HomeInfluencer";
+import HomeNetwork from "@/components/HomeNetwork";
+import WhyAseka from "@/components/WhyAseka";
+import HomeStrengths from "@/components/HomeStrengths";
+import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default function TopPage() {
   return (
-    <LangProvider>
-      <main>
-        <Navbar />
-        <Hero />
-        <TrustStrip />
-        <Services />
-        <Nenkin />
-        <Flow />
-        <Visa />
-        <Contact />
-        <Footer />
-      </main>
-    </LangProvider>
+    <main>
+      <Navbar />
+      <HomeHero />
+      <StatsStrip />
+      <HomeInfluencer />
+      <HomeNetwork />
+      <WhyAseka />
+      <HomeStrengths />
+      <ContactCTA />
+      <Footer />
+    </main>
   );
 }

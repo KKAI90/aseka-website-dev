@@ -33,15 +33,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // All hooks must be at the top — before any conditional returns
   useEffect(() => {
-    // Block admin on main website
-    const host = window.location.hostname;
-    const isAdminHost = host.includes("-admin-") || host.includes("-admin.") || host.startsWith("admin.") || host === "localhost";
-    if (!isAdminHost) { window.location.href = "/"; return; }
-
-    // Verify session is still valid
-    fetch("/api/admin/me").then(res => {
-      if (!res.ok) router.replace("/admin/login");
-    });
+    // Verify session is still valid (skip on login page)
+    if (pathname !== "/admin/login") {
+      fetch("/api/admin/me").then(res => {
+        if (!res.ok) router.replace("/admin/login");
+      });
+    }
   }, [pathname, router]);
 
   if (pathname === "/admin/login") return <>{children}</>;

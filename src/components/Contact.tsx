@@ -3,29 +3,94 @@ import { useState } from "react";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
-  JP: { eyebrow: "Contact · お問い合わせ", title: "まずは無料でご相談ください", btn: "送信する · Gửi liên hệ →", sending: "送信中... / Đang gửi..." },
-  VN: { eyebrow: "Liên hệ · Contact",     title: "Tư vấn miễn phí ngay hôm nay", btn: "Gửi liên hệ →", sending: "Đang gửi..." },
+  JP: {
+    eyebrow: "Contact · お問い合わせ",
+    title: "まずは無料でご相談ください",
+    subtitle: "無料相談 · 24時間以内にご返信 · ベトナム語対応可",
+    tabs: [
+      { val: "business",   label: "企業・採用担当者",   sub: "企業・法人のお客様" },
+      { val: "individual", label: "個人・求職者",        sub: "個人のお客様" },
+    ],
+    fields: { name: "お名前", furigana: "ふりがな", company: "会社名", email: "メールアドレス", phone: "電話番号", service: "ご相談内容", message: "メッセージ" },
+    namePh: "山田 太郎", furiganaPh: "やまだ たろう", companyPh: "株式会社〇〇",
+    servicePh: "選択してください",
+    services: [
+      { v: "brochure", l: "まずは資料だけ見てみたい" },
+      { v: "consult",  l: "外国人財の採用について相談したい" },
+      { v: "hire",     l: "今すぐ外国人財を採用したい" },
+      { v: "hr",       l: "人材紹介" },
+      { v: "nenkin",   l: "年金・社会保険" },
+      { v: "visa",     l: "観光ビザ申請" },
+      { v: "zairyu",   l: "在留手続き" },
+      { v: "other",    l: "その他" },
+    ],
+    messagePh: "ご質問・ご要望をご記入ください",
+    submit: "送信する →", sending: "送信中...",
+    privacy: "個人情報は適切に管理し、第三者に提供しません。",
+    successTitle: "送信完了", successBody: "お問い合わせありがとうございます。\n24時間以内にご連絡いたします。",
+    successSub: "担当者より折り返しご連絡いたします。",
+    anotherBtn: "別のお問い合わせ",
+  },
+  EN: {
+    eyebrow: "Contact Us",
+    title: "Free Consultation",
+    subtitle: "Free advice · Response within 24 hours · Vietnamese support available",
+    tabs: [
+      { val: "business",   label: "For Companies",   sub: "Corporate Inquiry" },
+      { val: "individual", label: "For Job Seekers",  sub: "Individual Inquiry" },
+    ],
+    fields: { name: "Full Name", furigana: "Furigana", company: "Company Name", email: "Email Address", phone: "Phone Number", service: "Service of Interest", message: "Message" },
+    namePh: "Yamada Taro / Nguyen Van A", furiganaPh: "やまだ たろう", companyPh: "ASEKA Co., Ltd.",
+    servicePh: "Please select",
+    services: [
+      { v: "brochure", l: "I'd like to see the materials first" },
+      { v: "consult",  l: "I'd like to consult about hiring foreign talent" },
+      { v: "hire",     l: "I want to hire foreign talent right away" },
+      { v: "hr",       l: "HR Placement" },
+      { v: "nenkin",   l: "Pension / Social Insurance" },
+      { v: "visa",     l: "Tourist Visa" },
+      { v: "zairyu",   l: "Residence Procedures" },
+      { v: "other",    l: "Other" },
+    ],
+    messagePh: "Please enter your questions or requests...",
+    submit: "Send Inquiry →", sending: "Sending...",
+    privacy: "Your personal information is handled securely and will not be shared with third parties.",
+    successTitle: "Message Sent", successBody: "Thank you for your inquiry.\nWe will get back to you within 24 hours.",
+    successSub: "Our team will contact you shortly.",
+    anotherBtn: "Send Another Inquiry",
+  },
+  VN: {
+    eyebrow: "Liên hệ với Chúng tôi",
+    title: "Tư vấn Miễn phí Ngay hôm nay",
+    subtitle: "Tư vấn miễn phí · Phản hồi trong 24 giờ · Hỗ trợ tiếng Việt",
+    tabs: [
+      { val: "business",   label: "Doanh nghiệp",    sub: "Tuyển dụng / Nhân sự" },
+      { val: "individual", label: "Cá nhân / Ứng viên", sub: "Tìm việc / Hỏi thăm" },
+    ],
+    fields: { name: "Họ và tên", furigana: "Furigana", company: "Tên công ty", email: "Địa chỉ Email", phone: "Số điện thoại", service: "Dịch vụ quan tâm", message: "Nội dung" },
+    namePh: "Nguyễn Văn A", furiganaPh: "やまだ たろう", companyPh: "Công ty Cổ phần ...",
+    servicePh: "Chọn dịch vụ",
+    services: [
+      { v: "brochure", l: "Xem tài liệu trước" },
+      { v: "consult",  l: "Tư vấn về tuyển dụng nhân tài nước ngoài" },
+      { v: "hire",     l: "Muốn tuyển dụng ngay bây giờ" },
+      { v: "hr",       l: "Giới thiệu Nhân sự" },
+      { v: "nenkin",   l: "Nenkin / Bảo hiểm Xã hội" },
+      { v: "visa",     l: "Visa Du lịch" },
+      { v: "zairyu",   l: "Thủ tục Lưu trú" },
+      { v: "other",    l: "Khác" },
+    ],
+    messagePh: "Nhập câu hỏi hoặc yêu cầu của bạn...",
+    submit: "Gửi Liên hệ →", sending: "Đang gửi...",
+    privacy: "Thông tin của bạn được bảo mật hoàn toàn và không chia sẻ với bên thứ ba.",
+    successTitle: "Đã gửi thành công", successBody: "Cảm ơn bạn đã liên hệ.\nChúng tôi sẽ phản hồi trong vòng 24 giờ.",
+    successSub: "Nhân viên của chúng tôi sẽ liên hệ với bạn sớm nhất.",
+    anotherBtn: "Gửi liên hệ khác",
+  },
 };
 
-type FormState = {
-  type: string;
-  name: string;
-  company: string;
-  email: string;
-  phone: string;
-  service: string;
-  message: string;
-};
-
-const initialForm: FormState = {
-  type: "business",
-  name: "",
-  company: "",
-  email: "",
-  phone: "",
-  service: "",
-  message: "",
-};
+type FormState = { type: string; name: string; furigana: string; company: string; email: string; phone: string; service: string; message: string };
+const initial: FormState = { type: "business", name: "", furigana: "", company: "", email: "", phone: "", service: "", message: "" };
 
 export default function Contact() {
   const { lang } = useLang();
@@ -33,49 +98,50 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState<FormState>(initialForm);
+  const [form, setForm] = useState<FormState>(initial);
 
-  const set = (field: keyof FormState) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "エラーが発生しました");
-      }
+      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || "Error"); }
       setSubmitted(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "エラーが発生しました");
-    } finally {
-      setLoading(false);
-    }
+      setError(err instanceof Error ? err.message : "Error");
+    } finally { setLoading(false); }
+  };
+
+  const Required = () => (
+    <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#C8002A", letterSpacing: "1px", verticalAlign: "middle" }}>必須</span>
+  );
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "14px 16px",
+    fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", color: "var(--dark)",
+    background: "#fff", border: "1px solid rgba(184,150,62,0.25)", borderRadius: "0", outline: "none",
+    transition: "border-color 0.3s", boxSizing: "border-box",
+  };
+  const labelStyle: React.CSSProperties = {
+    display: "block", fontFamily: "'Noto Sans JP', sans-serif",
+    fontSize: "11px", letterSpacing: "1.5px", color: "var(--warm-gray)", marginBottom: "8px",
   };
 
   if (submitted) {
     return (
-      <section id="contact" className="py-16 max-w-6xl mx-auto px-6 text-center">
-        <div className="inline-flex flex-col items-center gap-4 rounded-2xl p-10 max-w-md mx-auto" style={{ border: "0.5px solid var(--border)" }}>
-          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "#EAF3DE" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#27500A" strokeWidth="2">
-              <path d="M9 12l2 2 4-4M12 3a9 9 0 100 18 9 9 0 000-18z" />
-            </svg>
+      <section style={{ padding: "120px 60px", background: "var(--cream)", minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center", maxWidth: "480px", padding: "64px 48px", border: "1px solid rgba(184,150,62,0.25)", background: "#fff" }}>
+          <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(184,150,62,0.1)", border: "1px solid rgba(184,150,62,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 28px" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
           </div>
-          <h3 className="text-lg font-bold" style={{ color: "var(--navy)" }}>送信完了 / Đã gửi thành công</h3>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>
-            24時間以内にご連絡いたします。<br />Chúng tôi sẽ liên hệ trong vòng 24 giờ.
-          </p>
-          <button className="btn-ghost text-sm" onClick={() => { setSubmitted(false); setForm(initialForm); }}>
-            別のお問い合わせ
+          <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "20px", fontWeight: 400, color: "var(--dark)", marginBottom: "12px", letterSpacing: "1px" }}>{t.successTitle}</h3>
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", lineHeight: 1.9, color: "var(--warm-gray)", marginBottom: "8px", whiteSpace: "pre-line" }}>{t.successBody}</p>
+          <p style={{ fontSize: "13px", color: "var(--warm-gray)", opacity: 0.75, marginBottom: "32px" }}>{t.successSub}</p>
+          <button onClick={() => { setSubmitted(false); setForm(initial); }} style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "12px", letterSpacing: "2px", color: "var(--gold)", background: "none", border: "1px solid rgba(184,150,62,0.4)", padding: "10px 28px", cursor: "pointer" }}>
+            {t.anotherBtn}
           </button>
         </div>
       </section>
@@ -83,73 +149,87 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-16" style={{ background: "var(--surface)" }}>
-      <div className="max-w-2xl mx-auto px-6">
-        <div className="text-center mb-8">
-          <div className="section-eyebrow">{t.eyebrow}</div>
-          <div className="section-title">{t.title}</div>
-          <p className="text-sm" style={{ color: "var(--muted)" }}>Tư vấn miễn phí · Phản hồi trong 24 giờ · Hỗ trợ tiếng Việt</p>
+    <section style={{ padding: "100px 60px 120px", background: "var(--cream)" }}>
+      <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: "64px" }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "5px", fontStyle: "italic", marginBottom: "16px" }}>{t.eyebrow}</div>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 400, color: "var(--dark)", letterSpacing: "1px", margin: "0 0 16px" }}>{t.title}</h2>
+          <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5, margin: "0 auto 20px" }} />
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", color: "var(--warm-gray)" }}>{t.subtitle}</p>
         </div>
-        <div className="flex rounded-xl overflow-hidden mb-6" style={{ border: "0.5px solid var(--border)", background: "#fff" }}>
-          {[
-            { val: "business", label: "企業・採用担当者", sub: "Doanh nghiệp" },
-            { val: "individual", label: "個人・求職者", sub: "Cá nhân / ứng viên" },
-          ].map((t) => (
-            <button key={t.val} className="flex-1 py-3 text-sm font-medium border-none cursor-pointer transition-all"
-              style={{ background: form.type === t.val ? "var(--navy)" : "transparent", color: form.type === t.val ? "#fff" : "var(--muted)" }}
-              onClick={() => setForm((f) => ({ ...f, type: t.val }))}>
-              {t.label}
-              <span className="block text-xs mt-0.5" style={{ opacity: 0.65 }}>{t.sub}</span>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", marginBottom: "48px", border: "1px solid rgba(184,150,62,0.25)" }}>
+          {t.tabs.map((tab) => (
+            <button key={tab.val} onClick={() => setForm((f) => ({ ...f, type: tab.val }))} style={{
+              padding: "20px 16px", background: form.type === tab.val ? "var(--dark)" : "#fff",
+              color: form.type === tab.val ? "#FAF7F2" : "var(--warm-gray)",
+              border: "none", cursor: "pointer", fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "14px", fontWeight: 500, letterSpacing: "0.5px", transition: "all 0.3s",
+              borderRight: tab.val === "business" ? "1px solid rgba(184,150,62,0.25)" : "none",
+            }}>
+              {tab.label}
+              <span style={{ display: "block", fontSize: "11px", opacity: 0.6, marginTop: "4px", fontWeight: 400 }}>{tab.sub}</span>
             </button>
           ))}
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-form-grid">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>お名前 / Họ tên *</label>
-              <input required type="text" className="w-full" placeholder="山田 太郎 / Nguyễn Văn A" value={form.name} onChange={set("name")} />
+              <label style={labelStyle}>{t.fields.name}<Required /></label>
+              <input required type="text" placeholder={t.namePh} value={form.name} onChange={set("name")} style={inputStyle} />
             </div>
-            {form.type === "business" && (
-              <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>会社名 / Tên công ty *</label>
-                <input required type="text" className="w-full" placeholder="株式会社〇〇" value={form.company} onChange={set("company")} />
-              </div>
-            )}
+            <div>
+              <label style={labelStyle}>{t.fields.furigana}<Required /></label>
+              <input required type="text" placeholder={t.furiganaPh} value={form.furigana} onChange={set("furigana")} style={inputStyle} />
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {form.type === "business" && (
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>メールアドレス / Email *</label>
-              <input required type="email" className="w-full" placeholder="example@email.com" value={form.email} onChange={set("email")} />
+              <label style={labelStyle}>{t.fields.company}<Required /></label>
+              <input required type="text" placeholder={t.companyPh} value={form.company} onChange={set("company")} style={inputStyle} />
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }} className="contact-form-grid">
+            <div>
+              <label style={labelStyle}>{t.fields.email}<Required /></label>
+              <input required type="email" placeholder="example@email.com" value={form.email} onChange={set("email")} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>電話番号 / Số điện thoại</label>
-              <input type="tel" className="w-full" placeholder="090-0000-0000" value={form.phone} onChange={set("phone")} />
+              <label style={labelStyle}>{t.fields.phone}<Required /></label>
+              <input required type="tel" placeholder="090-0000-0000" value={form.phone} onChange={set("phone")} style={inputStyle} />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>ご相談内容 / Dịch vụ quan tâm</label>
-            <select className="w-full" value={form.service} onChange={set("service")}>
-              <option value="">選択してください / Chọn dịch vụ</option>
-              <option value="hr">人材紹介 / Giới thiệu nhân sự</option>
-              <option value="nenkin">年金・社会保険 / Nenkin</option>
-              <option value="visa">観光ビザ / Visa du lịch</option>
-              <option value="zairyu">在留手続き / Thủ tục lưu trú</option>
-              <option value="other">その他 / Khác</option>
+            <label style={labelStyle}>{t.fields.service}<Required /></label>
+            <select required value={form.service} onChange={set("service")} style={{ ...inputStyle, cursor: "pointer" }}>
+              <option value="">{t.servicePh}</option>
+              {t.services.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--muted)" }}>メッセージ / Nội dung</label>
-            <textarea rows={4} className="w-full" placeholder="ご質問・ご要望をご記入ください / Nhập nội dung..." value={form.message} onChange={set("message")} />
+            <label style={labelStyle}>{t.fields.message}<Required /></label>
+            <textarea required rows={5} placeholder={t.messagePh} value={form.message} onChange={set("message")} style={{ ...inputStyle, resize: "vertical" }} />
           </div>
-          {error && <p className="text-xs text-center" style={{ color: "var(--accent)" }}>{error}</p>}
-          <button type="submit" disabled={loading} className="btn-navy w-full justify-center text-sm py-3" style={{ opacity: loading ? 0.6 : 1 }}>
-            {loading ? t.sending : t.btn}
+          {error && <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", color: "#C8002A", textAlign: "center" }}>{error}</p>}
+          <button type="submit" disabled={loading} style={{
+            width: "100%", padding: "18px",
+            background: loading ? "rgba(12,31,46,0.6)" : "#0C1F2E", color: "#FAF7F2",
+            fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", letterSpacing: "3px",
+            border: "none", cursor: loading ? "not-allowed" : "pointer", transition: "background 0.3s",
+          }}>
+            {loading ? t.sending : t.submit}
           </button>
-          <p className="text-xs text-center" style={{ color: "var(--muted)" }}>
-            個人情報は適切に管理し、第三者に提供しません。<br />Thông tin của bạn được bảo mật hoàn toàn.
-          </p>
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "11px", color: "var(--warm-gray)", textAlign: "center", letterSpacing: "0.5px", whiteSpace: "pre-line" }}>{t.privacy}</p>
         </form>
       </div>
+
+      <style>{`
+        input:focus, textarea:focus, select:focus { border-color: var(--gold) !important; box-shadow: 0 0 0 2px rgba(184,150,62,0.12); }
+        input::placeholder, textarea::placeholder { color: rgba(138,130,120,0.5); }
+        @media (max-width: 700px) { .contact-form-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 600px) { section { padding: 80px 24px 100px !important; } }
+      `}</style>
     </section>
   );
 }

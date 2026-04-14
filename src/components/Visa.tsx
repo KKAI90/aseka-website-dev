@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useLang } from "@/contexts/LangContext";
 
-const steps = {
+const steps: Record<string, { num: string; title: string; sub: string }[]> = {
   JP: [
     { num: "1", title: "招聘状・身元保証書の作成",  sub: "Soạn thảo thư bảo lãnh và giấy tờ mời" },
     { num: "2", title: "必要書類のチェック・翻訳",  sub: "Kiểm tra và dịch thuật hồ sơ cần thiết" },
@@ -17,7 +17,7 @@ const steps = {
   ],
 };
 
-const T = {
+const T: Record<string, { eyebrow: string; h2: string; sub: string; desc: string; btn: string }> = {
   JP: {
     eyebrow: "Visa Support · ビザサポート",
     h2: "ご家族の日本訪問を、\nAsekaが全力支援。",

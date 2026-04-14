@@ -2,11 +2,16 @@
 import Link from "next/link";
 import { useLang } from "@/contexts/LangContext";
 
-const points = {
+const points: Record<string, { title: string; sub: string }[]> = {
   JP: [
     { title: "脱退一時金の申請代行",  sub: "Đại lý hoàn trả một lần khi về nước" },
     { title: "年金受給資格の確認",    sub: "Kiểm tra điều kiện nhận lương hưu" },
     { title: "ベトナム語で全対応",    sub: "Hỗ trợ hoàn toàn bằng tiếng Việt" },
+  ],
+  EN: [
+    { title: "Lump-Sum Withdrawal Application", sub: "We handle the application process" },
+    { title: "Pension Eligibility Check",        sub: "Verify your pension entitlement" },
+    { title: "Full Vietnamese Support",          sub: "All services available in Vietnamese" },
   ],
   VN: [
     { title: "Đại lý hoàn trả nenkin một lần", sub: "申請代行で確実に受給" },
@@ -21,7 +26,7 @@ const icons = [
   (<svg key="3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>),
 ];
 
-const T = {
+const T: Record<string, { eyebrow: string; h2: string; sub: string; desc: string; btn: string }> = {
   JP: {
     eyebrow: "Nenkin Support · 年金サポート",
     h2: "帰国前に、\n年金を取り戻そう。",

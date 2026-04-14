@@ -1,47 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin, apiError } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("sb-access-token")?.value;
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
 
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const data = await prisma.contact_submissions.findMany({
+      orderBy: { created_at: "desc" },
+    });
+    return NextResponse.json({ data });
+  } catch {
+    return apiError("データの取得に失敗しました", 500);
   }
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { data, error } = await supabase
-    .from("contact_submissions")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return NextResponse.json({ error: "データの取得に失敗しました" }, { status: 500 });
-  }
-
-  return NextResponse.json({ data });
 }
 
 export async function PATCH(req: NextRequest) {
-  const token = req.cookies.get("sb-access-token")?.value;
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
 
-  const { id, status } = await req.json();
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { error } = await supabase
-    .from("contact_submissions")
-    .update({ status })
-    .eq("id", id);
-
-  if (error) return NextResponse.json({ error: "データの取得に失敗しました" }, { status: 500 });
-
-  return NextResponse.json({ success: true });
+  try {
+    const { id, status } = await req.json();
+    if (!id) return apiError("IDが必要です", 400);
+    await prisma.contact_submissions.update({
+      where: { id },
+      data: { status },
+    });
+    return NextResponse.json({ success: true });
+  } catch {
+    return apiError("データの取得に失敗しました", 500);
+  }
 }

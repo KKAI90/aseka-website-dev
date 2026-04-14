@@ -1,0 +1,95 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model candidates {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String?
+  name_kana      String?
+  email          String?
+  phone          String?
+  gender         String?
+  date_of_birth  String?
+  nationality    String?
+  address        String?
+  visa_type      String?
+  visa_expiry    String?
+  jlpt           String?
+  jlpt_actual    String?
+  height_cm      Float?
+  weight_kg      Float?
+  skill          String?
+  preferred_job  String?
+  work_hours     String?
+  availability   String?
+  marital_status String?
+  dependents     String?
+  education      Json?
+  work_history   Json?
+  certifications Json?
+  motivation     String?
+  self_pr        String?
+  status         String?  @default("新規")
+  match_job_id   String?
+  match_job_name String?
+  note           String?
+  cv_filename    String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+}
+
+model job_listings {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company           String?
+  position_ja       String?
+  position_vn       String?
+  industry          String?
+  location          String?
+  jlpt_min          String?
+  salary            String?
+  count             Int?     @default(1)
+  status            String?  @default("募集中")
+  job_description   String?
+  requirements      String?
+  qualifications    String?
+  language_skills   String?
+  education_req     String?
+  selection_process String?
+  work_environment  String?
+  salary_type       String?
+  employment_type   String?
+  work_hours        String?
+  trial_period      String?
+  insurance         String?
+  holidays          String?
+  remarks           String?
+  reference_url     String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+}
+
+model contact_submissions {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type       String?
+  name       String?
+  company    String?
+  email      String?
+  phone      String?
+  service    String?
+  message    String?
+  status     String?  @default("new")
+  created_at DateTime @default(now())
+}
+
+model admin_users {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+}

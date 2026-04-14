@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState } from "react";
 
-type Lang = "JP" | "VN";
+export type Lang = "JP" | "EN" | "VN";
 
 const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
   lang: "JP",

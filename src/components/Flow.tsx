@@ -1,12 +1,18 @@
 "use client";
 import { useLang } from "@/contexts/LangContext";
 
-const steps = {
+const steps: Record<string, { num: string; title: string; sub: string }[]> = {
   JP: [
     { num: "1", title: "お問い合わせ", sub: "Liên hệ tư vấn" },
     { num: "2", title: "ヒアリング",   sub: "Trao đổi yêu cầu" },
     { num: "3", title: "候補者提案",   sub: "Giới thiệu ứng viên" },
     { num: "4", title: "着任・フォロー", sub: "Onboarding & hỗ trợ" },
+  ],
+  EN: [
+    { num: "1", title: "Inquiry",         sub: "Contact us" },
+    { num: "2", title: "Consultation",    sub: "Discuss requirements" },
+    { num: "3", title: "Candidate Match", sub: "Introduce candidates" },
+    { num: "4", title: "Onboarding",      sub: "Support & follow-up" },
   ],
   VN: [
     { num: "1", title: "Liên hệ tư vấn",      sub: "お問い合わせ" },
@@ -16,8 +22,9 @@ const steps = {
   ],
 };
 
-const T = {
+const T: Record<string, { eyebrow: string; title: string; sub: string }> = {
   JP: { eyebrow: "Flow · ご利用の流れ", title: "最短2週間でスタッフが着任", sub: "Quy trình từ liên hệ đến onboarding trong 2 tuần" },
+  EN: { eyebrow: "Flow · How it works",  title: "Staff onboarded in as little as 2 weeks", sub: "From first contact to onboarding in 2 weeks" },
   VN: { eyebrow: "Quy trình · Flow",    title: "Nhân sự có mặt trong tối đa 2 tuần", sub: "最短2週間でスタッフが着任します" },
 };
 
