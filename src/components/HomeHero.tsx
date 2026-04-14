@@ -76,10 +76,9 @@ export default function HomeHero() {
         }}>
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "11px", letterSpacing: "3px",
-            color: "rgba(212,175,106,0.85)", fontStyle: "italic",
-            textTransform: "uppercase",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "13px", letterSpacing: "1px",
+            color: "rgba(212,175,106,0.95)", fontWeight: 400,
           }}>{t.tag}</span>
         </div>
 
