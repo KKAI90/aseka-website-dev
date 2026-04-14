@@ -107,9 +107,10 @@ export default function ContactCTA() {
             display: "inline-flex", alignItems: "center", gap: "8px",
             padding: "18px 36px",
             border: "1px solid rgba(184,150,62,0.4)",
-            color: "rgba(250,247,242,0.8)",
+            color: "rgba(250,247,242,0.92)",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: lang === "JP" ? "15px" : "14px", letterSpacing: "0.5px",
+            fontSize: lang === "JP" ? "15px" : "13px",
+            fontWeight: 500, letterSpacing: "1px",
             textDecoration: "none",
             transition: "border-color 0.3s",
           }}
