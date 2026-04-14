@@ -120,7 +120,7 @@ export default function HomeHero() {
             background: "var(--gold)",
             color: "#0C1F2E",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: "13px", fontWeight: 600, letterSpacing: "1px",
+            fontSize: lang === "JP" ? "15px" : "13px", fontWeight: 400, letterSpacing: "1px",
             textDecoration: "none",
             transition: "opacity 0.3s",
           }}
@@ -136,7 +136,7 @@ export default function HomeHero() {
             color: "#FAF7F2",
             border: "1px solid rgba(250,247,242,0.4)",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: "13px", fontWeight: 400, letterSpacing: "1px",
+            fontSize: lang === "JP" ? "15px" : "13px", fontWeight: 400, letterSpacing: "1px",
             textDecoration: "none",
             transition: "border-color 0.3s",
           }}
