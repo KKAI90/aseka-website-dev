@@ -1,5 +1,50 @@
 "use client";
 import { useLang } from "@/contexts/LangContext";
+import { useEffect, useRef, useState } from "react";
+
+function useCountUp(target: number, duration = 1600, start = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (ts: number) => {
+      if (!startTime) startTime = ts;
+      const p = Math.min((ts - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 4);
+      setCount(Math.floor(ease * target));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [start, target, duration]);
+  return count;
+}
+
+const PLATFORMS = [
+  {
+    name: "Facebook",
+    color: "#1877F2",
+    stat: 150000,
+    suffix: "+",
+    statLabel: { JP: "フォロワー", EN: "Followers", VN: "Người theo dõi" },
+    href: "#", // TODO: replace with real URL
+  },
+  {
+    name: "YouTube",
+    color: "#FF0000",
+    stat: 35000,
+    suffix: "+",
+    statLabel: { JP: "チャンネル登録者", EN: "Subscribers", VN: "Đăng ký kênh" },
+    href: "#", // TODO: replace with real URL
+  },
+  {
+    name: "TikTok",
+    color: "#000000",
+    stat: 20000,
+    suffix: "+",
+    statLabel: { JP: "フォロワー", EN: "Followers", VN: "Người theo dõi" },
+    href: "#", // TODO: replace with real URL
+  },
+];
 
 const T = {
   JP: {
@@ -12,11 +57,10 @@ const T = {
       "こうした独自ネットワークにより、質・量ともに安定した人材確保を実現しています。",
     ],
     stats: [
-      { value: "200,000+", label: "累計フォロワー" },
-      { value: "70%", label: "日本在住" },
-      { value: "90%", label: "18〜34歳" },
+      { value: 200000, suffix: "+", label: "累計フォロワー" },
+      { value: 70, suffix: "%", label: "日本在住" },
+      { value: 90, suffix: "%", label: "18〜34歳" },
     ],
-    platforms: ["Facebook", "YouTube", "TikTok"],
   },
   EN: {
     eyebrow: "NETWORK",
@@ -28,11 +72,10 @@ const T = {
       "This unique network enables us to provide a stable supply of quality candidates.",
     ],
     stats: [
-      { value: "200,000+", label: "Total Followers" },
-      { value: "70%", label: "Based in Japan" },
-      { value: "90%", label: "Aged 18–34" },
+      { value: 200000, suffix: "+", label: "Total Followers" },
+      { value: 70, suffix: "%", label: "Based in Japan" },
+      { value: 90, suffix: "%", label: "Aged 18–34" },
     ],
-    platforms: ["Facebook", "YouTube", "TikTok"],
   },
   VN: {
     eyebrow: "NETWORK",
@@ -44,67 +87,121 @@ const T = {
       "Mạng lưới độc đáo này cho phép chúng tôi cung cấp nguồn ứng viên chất lượng ổn định.",
     ],
     stats: [
-      { value: "200,000+", label: "Tổng người theo dõi" },
-      { value: "70%", label: "Sống tại Nhật" },
-      { value: "90%", label: "Tuổi 18–34" },
+      { value: 200000, suffix: "+", label: "Tổng người theo dõi" },
+      { value: 70, suffix: "%", label: "Sống tại Nhật" },
+      { value: 90, suffix: "%", label: "Tuổi 18–34" },
     ],
-    platforms: ["Facebook", "YouTube", "TikTok"],
   },
 };
 
-function NetworkIllustration() {
+function StatCard({ value, suffix, label, started }: {
+  value: number; suffix: string; label: string; started: boolean;
+}) {
+  const count = useCountUp(value, value > 1000 ? 1800 : 1000, started);
+  const formatted = count.toLocaleString("en-US");
   return (
-    <svg viewBox="0 0 480 260" width="100%" style={{ display: "block", maxWidth: "480px", margin: "0 auto" }}>
-      {/* Background circles */}
-      <circle cx="240" cy="130" r="100" fill="none" stroke="rgba(184,150,62,0.08)" strokeWidth="1"/>
-      <circle cx="240" cy="130" r="68" fill="none" stroke="rgba(184,150,62,0.12)" strokeWidth="1"/>
-      <circle cx="240" cy="130" r="36" fill="none" stroke="rgba(184,150,62,0.18)" strokeWidth="1"/>
+    <div style={{ background: "white", padding: "28px 16px", textAlign: "center" }}>
+      <div style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: "clamp(24px, 2.8vw, 38px)", fontWeight: 400,
+        color: "var(--gold)", lineHeight: 1, marginBottom: "8px",
+      }}>
+        {formatted}{suffix}
+      </div>
+      <div style={{
+        fontFamily: "'Noto Sans JP', sans-serif",
+        fontSize: "12px", letterSpacing: "0.5px",
+        color: "#3d3833", opacity: 0.85,
+      }}>
+        {label}
+      </div>
+    </div>
+  );
+}
 
-      {/* Connection lines */}
-      <line x1="240" y1="130" x2="100" y2="60" stroke="rgba(184,150,62,0.25)" strokeWidth="1" strokeDasharray="4 3"/>
-      <line x1="240" y1="130" x2="380" y2="60" stroke="rgba(184,150,62,0.25)" strokeWidth="1" strokeDasharray="4 3"/>
-      <line x1="240" y1="130" x2="80" y2="190" stroke="rgba(184,150,62,0.25)" strokeWidth="1" strokeDasharray="4 3"/>
-      <line x1="240" y1="130" x2="400" y2="190" stroke="rgba(184,150,62,0.25)" strokeWidth="1" strokeDasharray="4 3"/>
-      <line x1="240" y1="130" x2="240" y2="30" stroke="rgba(184,150,62,0.25)" strokeWidth="1" strokeDasharray="4 3"/>
-      <line x1="100" y1="60" x2="80" y2="190" stroke="rgba(184,150,62,0.12)" strokeWidth="1"/>
-      <line x1="380" y1="60" x2="400" y2="190" stroke="rgba(184,150,62,0.12)" strokeWidth="1"/>
-      <line x1="100" y1="60" x2="240" y2="30" stroke="rgba(184,150,62,0.12)" strokeWidth="1"/>
-      <line x1="380" y1="60" x2="240" y2="30" stroke="rgba(184,150,62,0.12)" strokeWidth="1"/>
+type Platform = typeof PLATFORMS[number];
 
-      {/* Center node */}
-      <circle cx="240" cy="130" r="22" fill="rgba(12,31,46,0.9)" stroke="rgba(184,150,62,0.6)" strokeWidth="1.5"/>
-      <text x="240" y="127" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="9" fill="rgba(212,175,106,0.9)" letterSpacing="1">THAO</text>
-      <text x="240" y="138" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="9" fill="rgba(212,175,106,0.9)" letterSpacing="1">TOKYO</text>
+function PlatformCard({ p, lang, started }: { p: Platform; lang: "JP" | "EN" | "VN"; started: boolean }) {
+  const count = useCountUp(p.stat, 1600, started);
+  return (
+    <a
+      href={p.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "flex", alignItems: "center", gap: "20px",
+        padding: "24px 28px",
+        background: "white",
+        border: "1px solid rgba(184,150,62,0.18)",
+        textDecoration: "none",
+        transition: "box-shadow 0.25s, transform 0.25s",
+        borderLeft: `4px solid ${p.color}`,
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)";
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+      }}
+    >
+      <div style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "16px", fontWeight: 600, color: "#1B3A5C", minWidth: "90px" }}>
+        {p.name}
+      </div>
+      <div style={{ width: "1px", height: "36px", background: "rgba(184,150,62,0.25)", flexShrink: 0 }} />
+      <div>
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "28px", fontWeight: 400, color: "var(--gold)", lineHeight: 1 }}>
+          {count.toLocaleString("en-US")}{p.suffix}
+        </div>
+        <div style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "11px", color: "#8A8278", marginTop: "3px" }}>
+          {p.statLabel[lang]}
+        </div>
+      </div>
+      <div style={{ marginLeft: "auto", color: "rgba(184,150,62,0.6)", fontSize: "18px" }}>→</div>
+    </a>
+  );
+}
 
-      {/* Outer nodes */}
-      <circle cx="100" cy="60" r="16" fill="rgba(12,31,46,0.85)" stroke="rgba(184,150,62,0.4)" strokeWidth="1.2"/>
-      <text x="100" y="64" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="8" fill="rgba(212,175,106,0.8)">FB</text>
+function PlatformCards({ lang }: { lang: "JP" | "EN" | "VN" }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-      <circle cx="380" cy="60" r="16" fill="rgba(12,31,46,0.85)" stroke="rgba(184,150,62,0.4)" strokeWidth="1.2"/>
-      <text x="380" y="64" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="8" fill="rgba(212,175,106,0.8)">YT</text>
-
-      <circle cx="80" cy="190" r="16" fill="rgba(12,31,46,0.85)" stroke="rgba(184,150,62,0.4)" strokeWidth="1.2"/>
-      <text x="80" y="194" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="7.5" fill="rgba(212,175,106,0.8)">TikTok</text>
-
-      <circle cx="400" cy="190" r="14" fill="rgba(184,150,62,0.15)" stroke="rgba(184,150,62,0.35)" strokeWidth="1"/>
-      <text x="400" y="194" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="9" fill="rgba(184,150,62,0.9)">200K+</text>
-
-      <circle cx="240" cy="30" r="13" fill="rgba(184,150,62,0.12)" stroke="rgba(184,150,62,0.3)" strokeWidth="1"/>
-      <text x="240" y="34" textAnchor="middle" fontFamily="Cormorant Garamond, serif" fontSize="8" fill="rgba(184,150,62,0.8)">SNS</text>
-
-      {/* Small satellite nodes */}
-      {[
-        [148, 42], [320, 45], [430, 120], [52, 130], [160, 215], [330, 220],
-      ].map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="4" fill="rgba(184,150,62,0.3)" stroke="rgba(184,150,62,0.5)" strokeWidth="0.8"/>
+  return (
+    <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {PLATFORMS.map((p) => (
+        <PlatformCard key={p.name} p={p} lang={lang} started={started} />
       ))}
-    </svg>
+    </div>
   );
 }
 
 export default function HomeNetwork() {
   const { lang } = useLang();
   const t = T[lang];
+
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [statsStarted, setStatsStarted] = useState(false);
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStatsStarted(true); observer.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section style={{ background: "var(--cream)", overflow: "hidden", padding: "100px 60px" }}>
@@ -115,16 +212,16 @@ export default function HomeNetwork() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", marginBottom: "20px" }}>
             <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
             <span style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "12px", letterSpacing: "6px",
-              color: "var(--gold)", fontStyle: "italic",
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "12px", letterSpacing: "3px",
+              color: "var(--gold)", fontStyle: "normal", fontWeight: 400,
             }}>{t.eyebrow}</span>
             <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
           </div>
           <h2 style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
-            color: "var(--dark)", letterSpacing: "2px", marginBottom: "16px",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "clamp(24px, 3.2vw, 40px)", fontWeight: 500,
+            color: "var(--dark)", letterSpacing: "1px", marginBottom: "16px",
           }}>
             {t.title}
           </h2>
@@ -132,52 +229,22 @@ export default function HomeNetwork() {
         </div>
 
         {/* Two-column layout */}
-        <div className="network-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
+        <div className="network-inner" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "72px", alignItems: "start" }}>
 
-          {/* Left: Illustration */}
-          <div style={{
-            background: "white",
-            border: "1px solid rgba(184,150,62,0.18)",
-            padding: "48px 32px",
-            position: "relative",
-          }}>
-            <div style={{
-              position: "absolute", top: "12px", left: "12px", right: "-12px", bottom: "-12px",
-              border: "1px solid rgba(184,150,62,0.12)", zIndex: 0,
-            }} />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <NetworkIllustration />
-              {/* Platform tags */}
-              <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "24px" }}>
-                {t.platforms.map((p) => (
-                  <span key={p} style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "11px", letterSpacing: "2px",
-                    color: "var(--gold)", border: "1px solid rgba(184,150,62,0.3)",
-                    padding: "4px 12px",
-                  }}>{p}</span>
-                ))}
-              </div>
-            </div>
+          {/* Left: Platform cards */}
+          <div>
+            <PlatformCards lang={lang} />
           </div>
 
           {/* Right: Stats + Text */}
           <div>
-            {/* Stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1px", background: "rgba(184,150,62,0.15)", marginBottom: "48px" }}>
+            {/* Stats count-up */}
+            <div ref={statsRef} style={{
+              display: "grid", gridTemplateColumns: "repeat(3,1fr)",
+              gap: "1px", background: "rgba(184,150,62,0.15)", marginBottom: "48px",
+            }}>
               {t.stats.map((s, i) => (
-                <div key={i} style={{ background: "white", padding: "28px 16px", textAlign: "center" }}>
-                  <div style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "clamp(22px, 2.8vw, 36px)", fontWeight: 300,
-                    color: "var(--gold)", lineHeight: 1, marginBottom: "8px",
-                  }}>{s.value}</div>
-                  <div style={{
-                    fontFamily: "'Noto Sans JP', sans-serif",
-                    fontSize: "10px", letterSpacing: "1.5px",
-                    color: "var(--dark)", opacity: 0.7,
-                  }}>{s.label}</div>
-                </div>
+                <StatCard key={i} value={s.value} suffix={s.suffix} label={s.label} started={statsStarted} />
               ))}
             </div>
 
