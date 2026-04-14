@@ -116,18 +116,18 @@ export default function Contact() {
   };
 
   const Required = () => (
-    <span style={{ marginLeft: "6px", fontSize: "10px", fontWeight: 700, color: "#C8002A", letterSpacing: "1px", verticalAlign: "middle" }}>必須</span>
+    <span style={{ marginLeft: "6px", fontSize: "11px", fontWeight: 700, color: "#C8002A", letterSpacing: "0.5px", verticalAlign: "middle" }}>必須</span>
   );
 
   const inputStyle: React.CSSProperties = {
     width: "100%", padding: "14px 16px",
-    fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", color: "var(--dark)",
+    fontFamily: "'Noto Sans JP', sans-serif", fontSize: "15px", color: "var(--dark)",
     background: "#fff", border: "1px solid rgba(184,150,62,0.25)", borderRadius: "0", outline: "none",
     transition: "border-color 0.3s", boxSizing: "border-box",
   };
   const labelStyle: React.CSSProperties = {
     display: "block", fontFamily: "'Noto Sans JP', sans-serif",
-    fontSize: "11px", letterSpacing: "1.5px", color: "var(--warm-gray)", marginBottom: "8px",
+    fontSize: "13px", letterSpacing: "0.5px", color: "var(--warm-gray)", marginBottom: "8px",
   };
 
   if (submitted) {
@@ -152,10 +152,10 @@ export default function Contact() {
     <section style={{ padding: "100px 60px 120px", background: "var(--cream)" }}>
       <div style={{ maxWidth: "760px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "5px", fontStyle: "italic", marginBottom: "16px" }}>{t.eyebrow}</div>
-          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 400, color: "var(--dark)", letterSpacing: "1px", margin: "0 0 16px" }}>{t.title}</h2>
+          <div style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "4px", marginBottom: "16px", textTransform: "uppercase" }}>{t.eyebrow}</div>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 500, color: "var(--dark)", letterSpacing: "1px", margin: "0 0 16px" }}>{t.title}</h2>
           <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5, margin: "0 auto 20px" }} />
-          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", color: "var(--warm-gray)" }}>{t.subtitle}</p>
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", color: "var(--warm-gray)", lineHeight: 1.8 }}>{t.subtitle}</p>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", marginBottom: "48px", border: "1px solid rgba(184,150,62,0.25)" }}>
@@ -164,11 +164,11 @@ export default function Contact() {
               padding: "20px 16px", background: form.type === tab.val ? "var(--dark)" : "#fff",
               color: form.type === tab.val ? "#FAF7F2" : "var(--warm-gray)",
               border: "none", cursor: "pointer", fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "14px", fontWeight: 500, letterSpacing: "0.5px", transition: "all 0.3s",
+              fontSize: "15px", fontWeight: 500, letterSpacing: "0.5px", transition: "all 0.3s",
               borderRight: tab.val === "business" ? "1px solid rgba(184,150,62,0.25)" : "none",
             }}>
               {tab.label}
-              <span style={{ display: "block", fontSize: "11px", opacity: 0.6, marginTop: "4px", fontWeight: 400 }}>{tab.sub}</span>
+              <span style={{ display: "block", fontSize: "12px", opacity: 0.65, marginTop: "4px", fontWeight: 400 }}>{tab.sub}</span>
             </button>
           ))}
         </div>
@@ -215,18 +215,18 @@ export default function Contact() {
           <button type="submit" disabled={loading} style={{
             width: "100%", padding: "18px",
             background: loading ? "rgba(12,31,46,0.6)" : "#0C1F2E", color: "#FAF7F2",
-            fontFamily: "'Noto Sans JP', sans-serif", fontSize: "14px", letterSpacing: "3px",
+            fontFamily: "'Noto Sans JP', sans-serif", fontSize: "15px", letterSpacing: "2px",
             border: "none", cursor: loading ? "not-allowed" : "pointer", transition: "background 0.3s",
           }}>
             {loading ? t.sending : t.submit}
           </button>
-          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "11px", color: "var(--warm-gray)", textAlign: "center", letterSpacing: "0.5px", whiteSpace: "pre-line" }}>{t.privacy}</p>
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "12px", color: "var(--warm-gray)", textAlign: "center", letterSpacing: "0.3px", whiteSpace: "pre-line", lineHeight: 1.8 }}>{t.privacy}</p>
         </form>
       </div>
 
       <style>{`
         input:focus, textarea:focus, select:focus { border-color: var(--gold) !important; box-shadow: 0 0 0 2px rgba(184,150,62,0.12); }
-        input::placeholder, textarea::placeholder { color: rgba(138,130,120,0.5); }
+        input::placeholder, textarea::placeholder { color: rgba(138,130,120,0.65); }
         @media (max-width: 700px) { .contact-form-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 600px) { section { padding: 80px 24px 100px !important; } }
       `}</style>
