@@ -94,8 +94,8 @@ const T = {
   },
 };
 
-function StatCard({ value, suffix, label, started }: {
-  value: number; suffix: string; label: string; started: boolean;
+function StatCard({ value, suffix, label, started, lang }: {
+  value: number; suffix: string; label: string; started: boolean; lang: "JP" | "EN" | "VN";
 }) {
   const count = useCountUp(value, value > 1000 ? 1800 : 1000, started);
   const formatted = count.toLocaleString("en-US");
@@ -103,15 +103,17 @@ function StatCard({ value, suffix, label, started }: {
     <div style={{ background: "white", padding: "28px 16px", textAlign: "center" }}>
       <div style={{
         fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "clamp(24px, 2.8vw, 38px)", fontWeight: 400,
-        color: "var(--gold)", lineHeight: 1, marginBottom: "8px",
+        fontSize: "clamp(26px, 2.8vw, 40px)", fontWeight: 500,
+        color: "var(--gold)", lineHeight: 1, marginBottom: "10px",
       }}>
         {formatted}{suffix}
       </div>
       <div style={{
         fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "0.5px",
-        color: "#3d3833", opacity: 0.85,
+        fontSize: lang === "JP" ? "14px" : "13px",
+        letterSpacing: "0.3px",
+        color: "#3d3833",
+        fontWeight: 400,
       }}>
         {label}
       </div>
@@ -244,7 +246,7 @@ export default function HomeNetwork() {
               gap: "1px", background: "rgba(184,150,62,0.15)", marginBottom: "48px",
             }}>
               {t.stats.map((s, i) => (
-                <StatCard key={i} value={s.value} suffix={s.suffix} label={s.label} started={statsStarted} />
+                <StatCard key={i} value={s.value} suffix={s.suffix} label={s.label} started={statsStarted} lang={lang} />
               ))}
             </div>
 
