@@ -1,5 +1,75 @@
 "use client";
 import { useLang } from "@/contexts/LangContext";
+import { useEffect, useRef, useState } from "react";
+
+function useCountUp(target: number, duration = 1800, start = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // easeOutQuart
+      const ease = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(ease * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [start, target, duration]);
+  return count;
+}
+
+function StatCard({ rawValue, label }: { rawValue: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [started, setStarted] = useState(false);
+
+  // Parse number and suffix from value like "200,000+" or "2019"
+  const numericStr = rawValue.replace(/,/g, "").replace(/[^0-9]/g, "");
+  const target = parseInt(numericStr, 10);
+  const suffix = rawValue.replace(/[0-9,]/g, "");
+
+  const count = useCountUp(target, target > 1000 ? 2000 : 1200, started);
+
+  // Format with commas
+  const formatted = count.toLocaleString("en-US");
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{
+      flex: 1, padding: "32px 40px",
+      background: "#0C1F2E",
+      textAlign: "center",
+    }}>
+      <div style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: "clamp(32px, 3.5vw, 48px)",
+        fontWeight: 300, color: "var(--gold)",
+        letterSpacing: "-1px", lineHeight: 1,
+        marginBottom: "10px",
+      }}>
+        {formatted}{suffix}
+      </div>
+      <div style={{
+        fontFamily: "'Noto Sans JP', sans-serif",
+        fontSize: "13px", letterSpacing: "0.5px",
+        color: "rgba(250,247,242,0.9)",
+      }}>
+        {label}
+      </div>
+    </div>
+  );
+}
 
 const T = {
   JP: {
@@ -97,27 +167,10 @@ export default function HomeInfluencer() {
         }}>
           {t.stats.map((s, i) => (
             <div key={i} style={{
-              flex: 1, padding: "32px 40px",
-              background: "#0C1F2E",
+              flex: 1,
               borderRight: i < t.stats.length - 1 ? "1px solid rgba(184,150,62,0.15)" : "none",
-              textAlign: "center",
             }}>
-              <div style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "clamp(32px, 3.5vw, 48px)",
-                fontWeight: 300, color: "var(--gold)",
-                letterSpacing: "-1px", lineHeight: 1,
-                marginBottom: "10px",
-              }}>
-                {s.value}
-              </div>
-              <div style={{
-                fontFamily: "'Noto Sans JP', sans-serif",
-                fontSize: "13px", letterSpacing: "0.5px",
-                color: "rgba(250,247,242,0.9)",
-              }}>
-                {s.label}
-              </div>
+              <StatCard rawValue={s.value} label={s.label} />
             </div>
           ))}
         </div>
