@@ -35,11 +35,11 @@ export default function Navbar() {
       {/* Logo */}
       <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
         <Image
-          src="/images/aseka-logo.png"
+          src="/images/aseka-logo-icon.png"
           alt="ASEKA"
-          width={587}
-          height={117}
-          style={{ objectFit: "contain", height: "40px", width: "auto" }}
+          width={120}
+          height={120}
+          style={{ objectFit: "contain", height: "48px", width: "auto" }}
           priority
         />
       </Link>
