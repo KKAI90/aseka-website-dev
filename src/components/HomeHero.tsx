@@ -77,10 +77,10 @@ export default function HomeHero() {
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: lang === "JP" ? "15px" : "13px",
-            letterSpacing: "0.5px",
-            color: "rgba(212,175,106,0.95)", fontWeight: 400,
-            textTransform: "none",
+            fontSize: lang === "JP" ? "14px" : "12px",
+            letterSpacing: "1.5px",
+            color: "rgba(255,232,190,0.85)", fontWeight: 400,
+            textTransform: "uppercase",
             fontStyle: "normal",
           }}>{t.tag}</span>
         </div>
