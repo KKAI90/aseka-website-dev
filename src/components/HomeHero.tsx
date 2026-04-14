@@ -91,8 +91,8 @@ export default function HomeHero() {
           fontWeight: 600,
           color: "#FAF7F2",
           lineHeight: 1.2,
-          letterSpacing: lang === "EN" ? "0.04em" : "0.02em",
-          textTransform: lang === "EN" ? "uppercase" : "none",
+          letterSpacing: lang !== "JP" ? "0.04em" : "0.02em",
+          textTransform: lang !== "JP" ? "uppercase" : "none",
           margin: "0 0 24px",
           whiteSpace: "nowrap",
         }}>
