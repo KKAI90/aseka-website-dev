@@ -33,21 +33,13 @@ export default function Navbar() {
       borderBottom: "1px solid rgba(184,150,62,0.28)",
     }}>
       {/* Logo */}
-      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
         <Image
-          src="/images/aseka-logo-icon.png"
-          alt=""
-          width={48}
-          height={48}
-          style={{ objectFit: "contain", height: "44px", width: "auto" }}
-          priority
-        />
-        <Image
-          src="/images/aseka-logo-text.png"
+          src="/images/aseka-logo.png"
           alt="ASEKA"
-          width={120}
-          height={36}
-          style={{ objectFit: "contain", height: "26px", width: "auto" }}
+          width={587}
+          height={117}
+          style={{ objectFit: "contain", height: "40px", width: "auto" }}
           priority
         />
       </Link>
