@@ -184,44 +184,42 @@ export default function WhyAseka() {
       {/* Quote band */}
       <div style={{
         marginTop: "64px",
-        display: "grid",
-        gridTemplateColumns: "auto 1fr",
-        gap: "0",
         background: "#0C1F2E",
+        padding: "64px 80px",
+        position: "relative",
         overflow: "hidden",
       }}>
-        {/* Left photo */}
-        <div style={{ width: "320px", flexShrink: 0, position: "relative", overflow: "hidden" }} className="why-photo">
-          <img
-            src="/images/836A0134.JPG"
-            alt="ASEKA support"
-            style={{
-              width: "100%", height: "100%",
-              objectFit: "cover", objectPosition: "center top",
-              display: "block",
-            }}
-          />
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to right, transparent 60%, rgba(12,31,46,0.9) 100%)",
-          }} />
-        </div>
-
-        {/* Right text */}
+        {/* Decorative left gold bar */}
         <div style={{
-          padding: "56px 64px",
-          display: "flex", flexDirection: "column", justifyContent: "center",
-        }}>
+          position: "absolute", left: 0, top: 0, bottom: 0,
+          width: "4px",
+          background: "linear-gradient(to bottom, transparent, var(--gold), transparent)",
+        }} />
+
+        {/* Decorative quote mark */}
+        <div style={{
+          position: "absolute", right: "48px", top: "20px",
+          fontFamily: "'Cormorant Garamond', serif",
+          fontSize: "160px", lineHeight: 1,
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(184,150,62,0.12)",
+          userSelect: "none", pointerEvents: "none",
+        }}>"</div>
+
+        {/* Content */}
+        <div style={{ maxWidth: "860px", position: "relative", zIndex: 1 }}>
+          {/* Gold accent line */}
           <div style={{
-            width: "32px", height: "2px",
-            background: "var(--gold)", opacity: 0.6,
-            marginBottom: "28px",
+            width: "40px", height: "2px",
+            background: "var(--gold)",
+            marginBottom: "32px",
           }} />
+
           <p style={{
             fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(14px, 1.4vw, 16px)",
-            lineHeight: 2.2,
-            color: "rgba(250,247,242,0.85)",
+            fontSize: "clamp(15px, 1.5vw, 17px)",
+            lineHeight: 2.3,
+            color: "rgba(250,247,242,0.92)",
             letterSpacing: "0.04em",
             margin: 0,
           }}>
@@ -234,13 +232,11 @@ export default function WhyAseka() {
         .why-card:hover { border-top-color: var(--gold) !important; transform: translateY(-4px); }
         @media (max-width: 900px) {
           .why-grid { grid-template-columns: 1fr !important; }
-          .why-photo { width: 200px !important; }
         }
-        @media (max-width: 700px) {
-          .why-photo { display: none !important; }
-          div[style*="grid-template-columns: auto 1fr"] { grid-template-columns: 1fr !important; }
+        @media (max-width: 600px) {
+          section { padding: 80px 24px !important; }
+          .why-quote { padding: 48px 32px !important; }
         }
-        @media (max-width: 600px) { section { padding: 80px 24px !important; } }
       `}</style>
     </section>
   );
