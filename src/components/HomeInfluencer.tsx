@@ -58,17 +58,18 @@ export default function HomeInfluencer() {
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
           <div style={{ width: "40px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "12px", letterSpacing: "5px",
-            color: "var(--gold)", fontStyle: "italic",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "12px", letterSpacing: "3px",
+            color: "var(--gold)", fontStyle: "normal",
+            fontWeight: 400,
           }}>{t.eyebrow}</span>
         </div>
 
         {/* Title */}
         <h2 style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
-          color: "var(--dark)", letterSpacing: "2px",
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 500,
+          color: "var(--dark)", letterSpacing: "1px",
           marginBottom: "0",
         }}>
           {t.title}
@@ -112,8 +113,8 @@ export default function HomeInfluencer() {
               </div>
               <div style={{
                 fontFamily: "'Noto Sans JP', sans-serif",
-                fontSize: "11px", letterSpacing: "2px",
-                color: "rgba(250,247,242,0.7)",
+                fontSize: "13px", letterSpacing: "0.5px",
+                color: "rgba(250,247,242,0.9)",
               }}>
                 {s.label}
               </div>
