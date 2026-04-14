@@ -26,7 +26,7 @@ export default function Navbar() {
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "18px 64px",
+      padding: "14px 64px",
       background: "rgba(250,247,242,0.95)",
       backdropFilter: "blur(16px)",
       WebkitBackdropFilter: "blur(16px)",
@@ -39,7 +39,7 @@ export default function Navbar() {
           alt="ASEKA"
           width={120}
           height={120}
-          style={{ objectFit: "contain", height: "48px", width: "auto" }}
+          style={{ objectFit: "contain", height: "56px", width: "auto" }}
           priority
         />
       </Link>

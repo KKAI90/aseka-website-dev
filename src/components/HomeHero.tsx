@@ -46,7 +46,7 @@ export default function HomeHero() {
         alt="ASEKA"
         fill
         priority
-        style={{ objectFit: "cover", objectPosition: "72% 25%" }}
+        style={{ objectFit: "cover", objectPosition: "72% 38%" }}
       />
 
       {/* Dark overlay — stronger on left */}
@@ -76,9 +76,9 @@ export default function HomeHero() {
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: lang === "JP" ? "14px" : "12px",
-            letterSpacing: "1.5px",
-            color: "rgba(255,232,190,0.85)", fontWeight: 400,
+            fontSize: lang === "JP" ? "14px" : "13px",
+            letterSpacing: lang === "JP" ? "1.5px" : "0.8px",
+            color: "rgba(255,232,190,0.90)", fontWeight: 400,
             textTransform: "uppercase",
             fontStyle: "normal",
           }}>{t.tag}</span>
@@ -87,7 +87,7 @@ export default function HomeHero() {
         {/* Headline */}
         <h1 style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(28px, 3.8vw, 56px)",
+          fontSize: lang === "JP" ? "clamp(30px, 4vw, 58px)" : "clamp(32px, 4vw, 58px)",
           fontWeight: 600,
           color: "#FAF7F2",
           lineHeight: 1.2,
@@ -102,8 +102,8 @@ export default function HomeHero() {
         {/* Description */}
         <p style={{
           fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "15px", lineHeight: 1.9,
-          color: "rgba(250,247,242,0.72)",
+          fontSize: lang === "JP" ? "16px" : "15px", lineHeight: 1.9,
+          color: "rgba(250,247,242,0.85)",
           maxWidth: "560px",
           marginBottom: "48px",
           letterSpacing: "0.02em",
@@ -119,7 +119,7 @@ export default function HomeHero() {
             background: "var(--gold)",
             color: "#0C1F2E",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: lang === "JP" ? "15px" : "13px", fontWeight: 400, letterSpacing: "1px",
+            fontSize: lang === "JP" ? "15px" : "14px", fontWeight: 400, letterSpacing: "0.8px",
             textDecoration: "none",
             transition: "opacity 0.3s",
           }}
@@ -135,7 +135,7 @@ export default function HomeHero() {
             color: "#FAF7F2",
             border: "1px solid rgba(250,247,242,0.4)",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: lang === "JP" ? "15px" : "13px", fontWeight: 400, letterSpacing: "1px",
+            fontSize: lang === "JP" ? "15px" : "14px", fontWeight: 400, letterSpacing: "0.8px",
             textDecoration: "none",
             transition: "border-color 0.3s",
           }}
@@ -159,16 +159,16 @@ export default function HomeHero() {
           animation: "scrollLine 2s ease-in-out infinite",
         }} />
         <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Noto Sans JP', sans-serif",
           fontSize: "10px", letterSpacing: "4px",
-          color: "var(--gold)", opacity: 1, fontStyle: "italic",
+          color: "var(--gold)", opacity: 1,
         }}>SCROLL</span>
       </div>
 
       <style>{`
         @keyframes scrollLine {
           0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
-          50%       { opacity: 0.6; transform: scaleY(0.5); transform-origin: top; }
+          50%       { opacity: 0.7; transform: scaleY(0.6); transform-origin: top; }
         }
         @media (max-width: 600px) {
           .home-hero-content { padding: 0 24px !important; }

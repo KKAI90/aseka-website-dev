@@ -3,19 +3,19 @@ import { useLang } from "@/contexts/LangContext";
 
 const STATS = {
   JP: [
-    { num: "200,000", suffix: "+",   label: "SNSフォロワー",  sub: "Mạng lưới SNS" },
-    { num: "700",     suffix: "名",   label: "累計紹介実績",   sub: "Tổng hồ sơ giới thiệu" },
-    { num: "3",       suffix: "日間", prefix: "最短", label: "最短着任期間", sub: "Thời gian onboarding" },
+    { num: "200,000", suffix: "+",   label: "SNSフォロワー" },
+    { num: "700",     suffix: "名",   label: "累計紹介実績" },
+    { num: "3",       suffix: "日間", prefix: "最短", label: "最短着任期間" },
   ],
   EN: [
-    { num: "200,000", suffix: "+",      label: "SNS Followers",     sub: "Social media network" },
-    { num: "700",     suffix: "+",      label: "Placements",        sub: "Cumulative introductions" },
-    { num: "3",       suffix: " Days",  label: "Fastest Onboarding",sub: "Min. placement period" },
+    { num: "200,000", suffix: "+",      label: "SNS Followers" },
+    { num: "700",     suffix: "+",      label: "Placements" },
+    { num: "3",       suffix: " Days",  label: "Fastest Onboarding" },
   ],
   VN: [
-    { num: "200,000", suffix: "+",      label: "Người theo dõi SNS",   sub: "Mạng lưới mạng xã hội" },
-    { num: "700",     suffix: "+",      label: "Hồ sơ đã Giới thiệu",  sub: "Tổng cộng" },
-    { num: "3",       suffix: " ngày",  label: "Nhanh nhất",           sub: "Thời gian onboarding tối thiểu" },
+    { num: "200,000", suffix: "+",      label: "Người theo dõi SNS" },
+    { num: "700",     suffix: "+",      label: "Hồ sơ đã Giới thiệu" },
+    { num: "3",       suffix: " ngày",  label: "Nhanh nhất" },
   ],
 };
 
@@ -79,14 +79,6 @@ export default function StatsStrip() {
               marginBottom: "6px",
             }}>
               {s.label}
-            </div>
-            <div style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "12px", letterSpacing: "0.3px",
-              color: "rgba(212,175,106,0.8)",
-              fontStyle: "normal",
-            }}>
-              {s.sub}
             </div>
           </div>
         ))}
