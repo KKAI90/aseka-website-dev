@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -16,14 +17,12 @@ export default function CompanyHero() {
       height: "72vh", minHeight: "500px", position: "relative", overflow: "hidden",
       display: "flex", alignItems: "center", justifyContent: "flex-end",
     }}>
-      <img
+      <Image
         src="/images/hero-vietnam.jpg"
         alt="ASEKA Company"
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 22%",
-        }}
+        fill
+        priority
+        style={{ objectFit: "cover", objectPosition: "center 22%" }}
       />
       {/* Dark overall tint for depth */}
       <div style={{ position: "absolute", inset: 0, background: "rgba(10,20,35,0.32)" }} />

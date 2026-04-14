@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -40,14 +41,12 @@ export default function HomeHero() {
       display: "flex", alignItems: "center",
     }}>
       {/* Background */}
-      <img
+      <Image
         src="/images/836A0134.JPG"
         alt="ASEKA"
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "72% 25%",
-        }}
+        fill
+        priority
+        style={{ objectFit: "cover", objectPosition: "72% 25%" }}
       />
 
       {/* Dark overlay — stronger on left */}

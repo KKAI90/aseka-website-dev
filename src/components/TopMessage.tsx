@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -129,8 +130,9 @@ function PersonBlock({
           bottom: "-16px",
           border: "1px solid var(--gold)", opacity: 0.3, zIndex: 0,
         }} />
-        <img
+        <Image
           src={photoSrc} alt={photoAlt}
+          width={400} height={534}
           style={{
             width: "100%", aspectRatio: "3/4",
             objectFit: "cover", objectPosition: "center top",

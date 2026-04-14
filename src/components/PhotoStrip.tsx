@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const PHOTOS = [
@@ -76,13 +77,11 @@ export default function PhotoStrip() {
                 cursor: "default",
               }}
             >
-              <img
+              <Image
                 src={p.src}
                 alt={p.alt}
-                style={{
-                  width: "100%", height: "100%", objectFit: "cover",
-                  transition: "transform 0.8s ease",
-                }}
+                fill
+                style={{ objectFit: "cover", transition: "transform 0.8s ease" }}
                 className="photo-strip-img"
               />
               {/* Gradient overlay */}
