@@ -158,10 +158,10 @@ function PersonBlock({
     <div style={{ paddingTop: "8px" }}>
       {/* Eyebrow */}
       <div style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "12px", letterSpacing: "4px",
-        color: "var(--gold)", fontStyle: "italic",
-        textTransform: "uppercase", marginBottom: "12px",
+        fontFamily: "'Noto Sans JP', sans-serif",
+        fontSize: "12px", letterSpacing: "2px",
+        color: "var(--gold)", fontStyle: "normal",
+        fontWeight: 400, marginBottom: "12px",
       }}>
         {eyebrow}
       </div>
@@ -236,9 +236,9 @@ export default function TopMessage() {
     <section style={{ padding: "120px 60px", background: "white" }}>
       {/* Section header */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "80px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>01</span>
-        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", color: "var(--gold)", letterSpacing: "2px", fontStyle: "normal", fontWeight: 500 }}>01</span>
+        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
+        <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", letterSpacing: "3px", color: "#3d3833", textTransform: "uppercase", fontWeight: 400 }}>{t.sectionLabel}</span>
       </div>
 
       {/* Uchida — photo left, text right (FIRST) */}
