@@ -22,20 +22,23 @@ export default function CompanyHero() {
         alt="ASEKA Company"
         fill
         priority
-        style={{ objectFit: "cover", objectPosition: "center 22%" }}
+        style={{ objectFit: "cover", objectPosition: "center 62%" }}
       />
-      {/* Dark overall tint for depth */}
-      <div style={{ position: "absolute", inset: 0, background: "rgba(10,20,35,0.32)" }} />
-      {/* Right gradient for text readability */}
+      {/* Dark base overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to left, rgba(250,247,242,0.82) 0%, rgba(250,247,242,0.25) 50%, transparent 100%)",
+        background: "linear-gradient(to right, rgba(10,20,35,0.55) 0%, rgba(10,20,35,0.28) 50%, rgba(10,20,35,0.70) 100%)",
+      }} />
+      {/* Right gradient to frame text */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(to left, rgba(10,20,35,0.80) 0%, rgba(10,20,35,0.28) 45%, transparent 100%)",
       }} />
       <div style={{ position: "relative", zIndex: 2, padding: "0 72px 0 0", maxWidth: "540px", textAlign: "right" }}>
         <h1 style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "clamp(52px, 7.5vw, 96px)", fontWeight: 700,
-          color: "#1B3A5C", letterSpacing: "-1px", lineHeight: 1,
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "clamp(52px, 7.5vw, 96px)", fontWeight: 600,
+          color: "#FAF7F2", letterSpacing: "2px", lineHeight: 1,
           margin: 0, whiteSpace: "nowrap",
         }}>
           {t.title}
@@ -46,8 +49,8 @@ export default function CompanyHero() {
           margin: "20px 0 18px", borderRadius: "2px",
         }} />
         <p style={{
-          fontFamily: "'Noto Serif JP', serif", fontSize: "17px",
-          fontWeight: 400, color: "#1B3A5C",
+          fontFamily: "'Noto Serif JP', serif", fontSize: lang === "JP" ? "18px" : "16px",
+          fontWeight: 400, color: "rgba(250,247,242,0.88)",
           letterSpacing: lang === "JP" ? "5px" : "2px",
         }}>
           {t.subtitle}
@@ -64,9 +67,9 @@ export default function CompanyHero() {
           animation: "scrollLine 2s ease-in-out infinite",
         }} />
         <span style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Noto Sans JP', sans-serif",
           fontSize: "10px", letterSpacing: "4px",
-          color: "var(--gold)", opacity: 0.7, fontStyle: "italic",
+          color: "var(--gold)", opacity: 1,
         }}>SCROLL</span>
       </div>
       <style>{`

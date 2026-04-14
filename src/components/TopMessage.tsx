@@ -121,32 +121,38 @@ function PersonBlock({
 }) {
   const photo = (
     <div style={{ position: "relative" }}>
-      <div style={{ position: "relative", background: "var(--dark)", padding: "3px" }}>
-        <div style={{
-          position: "absolute",
-          top: "16px",
-          left: photoLeft ? "16px" : "-16px",
-          right: photoLeft ? "-16px" : "16px",
-          bottom: "-16px",
-          border: "1px solid var(--gold)", opacity: 0.3, zIndex: 0,
-        }} />
+      {/* Decorative gold offset border */}
+      <div style={{
+        position: "absolute",
+        top: "16px",
+        left: photoLeft ? "16px" : "-16px",
+        right: photoLeft ? "-16px" : "16px",
+        bottom: "-16px",
+        border: "1px solid rgba(184,150,62,0.45)", zIndex: 0,
+      }} />
+
+      {/* Photo — no dark frame */}
+      <div style={{ position: "relative", zIndex: 1 }}>
         <Image
           src={photoSrc} alt={photoAlt}
           width={400} height={534}
           style={{
             width: "100%", aspectRatio: "3/4",
             objectFit: "cover", objectPosition: "center top",
-            display: "block", position: "relative", zIndex: 1,
+            display: "block",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
           }}
         />
       </div>
+
+      {/* CEO label badge */}
       <div style={{
         position: "absolute", bottom: "-20px",
         left: photoLeft ? 0 : "auto",
         right: photoLeft ? "auto" : 0,
         background: "var(--gold)", padding: "10px 24px",
         fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "2px",
+        fontSize: "12px", letterSpacing: "1px",
         color: "white", zIndex: 2, fontWeight: 400,
       }}>
         {ceoLabel}
@@ -158,10 +164,10 @@ function PersonBlock({
     <div style={{ paddingTop: "8px" }}>
       {/* Eyebrow */}
       <div style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: "12px", letterSpacing: "4px",
-        color: "var(--gold)", fontStyle: "italic",
-        textTransform: "uppercase", marginBottom: "12px",
+        fontFamily: "'Noto Sans JP', sans-serif",
+        fontSize: "12px", letterSpacing: "2px",
+        color: "var(--gold)", fontStyle: "normal",
+        fontWeight: 400, marginBottom: "12px",
       }}>
         {eyebrow}
       </div>
@@ -236,9 +242,9 @@ export default function TopMessage() {
     <section style={{ padding: "120px 60px", background: "white" }}>
       {/* Section header */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "80px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", color: "var(--gold)", letterSpacing: "3px", fontStyle: "italic" }}>01</span>
-        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.45, flexShrink: 0 }} />
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "12px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", color: "var(--gold)", letterSpacing: "2px", fontStyle: "normal", fontWeight: 500 }}>01</span>
+        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
+        <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", letterSpacing: "3px", color: "#3d3833", textTransform: "uppercase", fontWeight: 400 }}>{t.sectionLabel}</span>
       </div>
 
       {/* Uchida — photo left, text right (FIRST) */}

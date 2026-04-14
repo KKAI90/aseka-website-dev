@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -21,28 +22,25 @@ export default function Hero() {
       justifyContent: "flex-end",
     }}>
 
-      {/* Background photo */}
-      <img
-        src="/images/HOME01.JPG"
+      {/* Background photo — no Vietnamese text */}
+      <Image
+        src="/images/office-meeting.jpg"
         alt="ASEKA Office"
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover",
-          objectPosition: "50% 45%",
-        }}
+        fill
+        priority
+        style={{ objectFit: "cover", objectPosition: "center 30%" }}
       />
 
-      {/* Subtle dark overlay on edges — keeps scene visible */}
+      {/* Dark overlay — consistent with homepage tone */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to right, rgba(15,25,40,0.30) 0%, transparent 40%, transparent 60%, rgba(15,25,40,0.10) 100%)",
+        background: "linear-gradient(to right, rgba(10,20,35,0.60) 0%, rgba(10,20,35,0.30) 50%, rgba(10,20,35,0.72) 100%)",
       }} />
 
-      {/* Right-side light gradient so text stays readable */}
+      {/* Right-side gradient to frame text */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to left, rgba(250,247,242,0.78) 0%, rgba(250,247,242,0.15) 50%, transparent 100%)",
+        background: "linear-gradient(to left, rgba(10,20,35,0.82) 0%, rgba(10,20,35,0.30) 45%, transparent 100%)",
       }} />
 
       {/* Main text — right side */}
@@ -54,11 +52,11 @@ export default function Hero() {
       }}>
 
         <h1 style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
+          fontFamily: "'Noto Serif JP', serif",
           fontSize: "clamp(52px, 7.5vw, 96px)",
-          fontWeight: 700,
-          color: "#1B3A5C",
-          letterSpacing: "-1px",
+          fontWeight: 600,
+          color: "#FAF7F2",
+          letterSpacing: "2px",
           lineHeight: 1,
           margin: 0,
           whiteSpace: "nowrap",
@@ -76,16 +74,16 @@ export default function Hero() {
 
         <p style={{
           fontFamily: "'Noto Serif JP', serif",
-          fontSize: "17px",
+          fontSize: lang === "JP" ? "18px" : "16px",
           fontWeight: 400,
-          color: "#1B3A5C",
+          color: "rgba(250,247,242,0.88)",
           letterSpacing: lang === "JP" ? "5px" : "2px",
         }}>
           {t.subtitle}
         </p>
       </div>
 
-      {/* Scroll indicator — bottom center */}
+      {/* Scroll indicator */}
       <div style={{
         position: "absolute", bottom: "36px", left: "50%",
         transform: "translateX(-50%)", zIndex: 3,
@@ -100,7 +98,7 @@ export default function Hero() {
         <span style={{
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: "10px", letterSpacing: "4px",
-          color: "var(--gold)", opacity: 0.7,
+          color: "var(--gold)", opacity: 1,
           fontStyle: "italic",
         }}>SCROLL</span>
       </div>
@@ -108,7 +106,7 @@ export default function Hero() {
       <style>{`
         @keyframes scrollLine {
           0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
-          50%       { opacity: 0.4; transform: scaleY(0.4); transform-origin: top; }
+          50%       { opacity: 0.6; transform: scaleY(0.5); transform-origin: top; }
         }
         @media (max-width: 900px) {
           .hero-text { padding: 0 32px 0 0 !important; max-width: 100% !important; }

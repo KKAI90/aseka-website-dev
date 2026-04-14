@@ -97,9 +97,9 @@ export default function PhotoStrip() {
                   color: "rgba(250,247,242,0.95)", marginBottom: "4px", fontWeight: 400,
                 }}>{labels[idx].label}</div>
                 <div style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "12px", letterSpacing: "2px",
-                  color: "rgba(184,150,62,0.85)", fontStyle: "italic",
+                  fontFamily: "'Noto Sans JP', sans-serif",
+                  fontSize: "11px", letterSpacing: "1px",
+                  color: "rgba(184,150,62,0.9)", fontStyle: "normal",
                 }}>{labels[idx].sub}</div>
               </div>
             </div>
