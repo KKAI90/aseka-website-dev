@@ -53,8 +53,8 @@ export default function StatsStrip() {
                 <span style={{
                   fontFamily: "'Noto Serif JP', serif",
                   fontSize: "clamp(14px, 1.4vw, 20px)",
-                  fontWeight: 300, color: "var(--gold)",
-                  letterSpacing: "2px", marginRight: "4px",
+                  fontWeight: 400, color: "var(--gold)",
+                  letterSpacing: "1px", marginRight: "4px",
                 }}>{s.prefix}</span>
               )}
               <span style={{
@@ -72,17 +72,19 @@ export default function StatsStrip() {
             </div>
             <div style={{
               fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "12px", letterSpacing: "2px",
-              color: "rgba(250,247,242,0.85)",
+              fontSize: lang === "JP" ? "14px" : "13px",
+              letterSpacing: "0.5px",
+              color: "rgba(250,247,242,1)",
+              fontWeight: 400,
               marginBottom: "6px",
             }}>
               {s.label}
             </div>
             <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "11px", letterSpacing: "1.5px",
-              color: "rgba(184,150,62,0.55)",
-              fontStyle: "italic",
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "12px", letterSpacing: "0.3px",
+              color: "rgba(212,175,106,0.8)",
+              fontStyle: "normal",
             }}>
               {s.sub}
             </div>
