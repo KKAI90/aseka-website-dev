@@ -204,7 +204,7 @@ export default function WhyAseka() {
           color: "transparent",
           WebkitTextStroke: "1px rgba(184,150,62,0.12)",
           userSelect: "none", pointerEvents: "none",
-        }}>"</div>
+}}>&ldquo;</div>
 
         {/* Content */}
         <div style={{ maxWidth: "860px", position: "relative", zIndex: 1 }}>
