@@ -60,28 +60,30 @@ export default function ContactCTA() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", marginBottom: "28px" }}>
           <div style={{ width: "40px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
           <span style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "12px", letterSpacing: "5px",
-            color: "var(--gold)", fontStyle: "italic", textTransform: "uppercase",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: "12px", letterSpacing: "3px",
+            color: "var(--gold)", fontStyle: "normal", textTransform: "uppercase",
           }}>{t.eyebrow}</span>
           <div style={{ width: "40px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
         </div>
 
         {/* Title */}
         <h2 style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(24px, 3.5vw, 42px)", fontWeight: 400,
-          color: "#FAF7F2", letterSpacing: "1px",
-          marginBottom: "24px",
+          fontFamily: "'Noto Sans JP', sans-serif",
+          fontSize: "clamp(22px, 3.2vw, 40px)", fontWeight: 500,
+          color: "#FAF7F2", letterSpacing: "2px",
+          lineHeight: 1.5,
+          marginBottom: "28px",
         }}>{t.title}</h2>
 
         {/* Description */}
         <p style={{
           fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "14px", lineHeight: 1.9,
-          color: "rgba(250,247,242,0.55)",
+          fontSize: lang === "JP" ? "15px" : "14px", lineHeight: 2.1,
+          color: "rgba(250,247,242,0.78)",
           marginBottom: "52px",
           whiteSpace: "pre-line",
+          letterSpacing: "0.3px",
         }}>{t.desc}</p>
 
         {/* Buttons */}
@@ -92,7 +94,7 @@ export default function ContactCTA() {
             background: "var(--gold)",
             color: "#0C1F2E",
             fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: "13px", fontWeight: 600, letterSpacing: "2px",
+            fontSize: lang === "JP" ? "15px" : "13px", fontWeight: 500, letterSpacing: "1px",
             textDecoration: "none",
             transition: "opacity 0.3s",
           }}
@@ -106,8 +108,8 @@ export default function ContactCTA() {
             padding: "18px 36px",
             border: "1px solid rgba(184,150,62,0.4)",
             color: "rgba(250,247,242,0.8)",
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "17px", letterSpacing: "2px",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: lang === "JP" ? "15px" : "14px", letterSpacing: "0.5px",
             textDecoration: "none",
             transition: "border-color 0.3s",
           }}

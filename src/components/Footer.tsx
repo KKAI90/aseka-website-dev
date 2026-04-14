@@ -45,8 +45,8 @@ export default function Footer() {
           <Image
             src="/images/aseka-logo-icon.png"
             alt="ASEKA"
-            width={48} height={48}
-            style={{ objectFit: "contain", width: "48px", height: "48px" }}
+            width={100} height={100}
+            style={{ objectFit: "contain", width: "100px", height: "100px" }}
           />
         </div>
         <div style={{ display: "flex", gap: "32px" }} className="footer-links">
