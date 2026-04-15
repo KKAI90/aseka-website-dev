@@ -175,25 +175,24 @@ export default function HomeHero() {
         @media (max-width: 768px) {
           .home-hero-section {
             height: auto !important;
-            min-height: unset !important;
-            aspect-ratio: 4/3;
-            align-items: flex-end !important;
+            min-height: 100svh !important;
+            align-items: center !important;
           }
           .home-hero-content {
-            padding: 0 24px 40px !important;
+            padding: 100px 24px 48px !important;
             max-width: 100% !important;
           }
           .home-hero-content h1 {
-            font-size: clamp(24px, 7vw, 36px) !important;
-            margin-bottom: 14px !important;
+            font-size: clamp(26px, 7.5vw, 38px) !important;
+            margin-bottom: 16px !important;
           }
           .home-hero-content p {
             font-size: 13px !important;
-            margin-bottom: 24px !important;
+            margin-bottom: 28px !important;
             line-height: 1.8 !important;
           }
           .home-hero-content > div:first-child {
-            margin-bottom: 18px !important;
+            margin-bottom: 20px !important;
           }
           .home-hero-btns { flex-direction: column !important; gap: 10px !important; }
           .home-hero-btns a { width: 100% !important; justify-content: center !important; padding: 14px 24px !important; }
