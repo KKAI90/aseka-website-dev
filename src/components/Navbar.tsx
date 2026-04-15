@@ -26,7 +26,7 @@ export default function Navbar() {
     <nav style={{
       position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "14px 64px",
+      padding: "12px 24px",
       background: "rgba(250,247,242,0.95)",
       backdropFilter: "blur(16px)",
       WebkitBackdropFilter: "blur(16px)",
@@ -45,7 +45,7 @@ export default function Navbar() {
       </Link>
 
       {/* Desktop: nav links + lang switcher */}
-      <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "40px" }}>
+      <div className="lux-nav-desktop" style={{ display: "flex", alignItems: "center", gap: "40px" }}>
         <ul style={{ display: "flex", gap: "40px", listStyle: "none", margin: 0, padding: 0 }}>
           {links.map((item) => (
             <li key={item.href}>
@@ -93,7 +93,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile burger */}
-      <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}
+      <button className="lux-nav-burger" onClick={() => setMobileOpen(!mobileOpen)}
         style={{ background: "none", border: "none", cursor: "pointer", padding: "8px" }}
         aria-label="メニュー">
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -105,7 +105,7 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="md:hidden" style={{
+        <div style={{
           position: "absolute", top: "100%", left: 0, right: 0,
           background: "rgba(250,247,242,0.97)",
           backdropFilter: "blur(12px)",
@@ -145,7 +145,19 @@ export default function Navbar() {
         </div>
       )}
 
-      <style>{`.lux-nav-link:hover { color: var(--gold) !important; }`}</style>
+      <style>{`
+        .lux-nav-link:hover { color: var(--gold) !important; }
+        .lux-nav-desktop { display: flex; }
+        .lux-nav-burger { display: none; }
+        @media (max-width: 768px) {
+          .lux-nav-desktop { display: none !important; }
+          .lux-nav-burger { display: block !important; }
+        }
+        nav { padding: 12px 48px !important; }
+        @media (max-width: 768px) {
+          nav { padding: 12px 20px !important; }
+        }
+      `}</style>
     </nav>
   );
 }

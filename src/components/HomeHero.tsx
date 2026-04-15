@@ -67,7 +67,8 @@ export default function HomeHero() {
         position: "relative", zIndex: 2,
         padding: "0 60px",
         maxWidth: "780px",
-      }}>
+        width: "100%",
+      }} className="home-hero-content">
         {/* Tag */}
         <div style={{
           display: "inline-flex", alignItems: "center", gap: "10px",
@@ -90,11 +91,11 @@ export default function HomeHero() {
           fontSize: lang === "JP" ? "clamp(30px, 4vw, 58px)" : "clamp(32px, 4vw, 58px)",
           fontWeight: 600,
           color: "#FAF7F2",
-          lineHeight: 1.2,
+          lineHeight: 1.25,
           letterSpacing: lang !== "JP" ? "0.04em" : "0.02em",
           textTransform: lang !== "JP" ? "uppercase" : "none",
           margin: "0 0 24px",
-          whiteSpace: "nowrap",
+          whiteSpace: "normal",
         }}>
           {t.title1}<br />
           <span style={{ color: "var(--gold-light)" }}>{t.title2}</span>
@@ -113,7 +114,7 @@ export default function HomeHero() {
         </p>
 
         {/* CTAs */}
-        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }} className="home-hero-btns">
           <Link href="/company" style={{
             display: "inline-flex", alignItems: "center", gap: "8px",
             padding: "16px 32px",
@@ -171,8 +172,12 @@ export default function HomeHero() {
           0%, 100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
           50%       { opacity: 0.7; transform: scaleY(0.6); transform-origin: top; }
         }
-        @media (max-width: 600px) {
-          .home-hero-content { padding: 0 24px !important; }
+        @media (max-width: 768px) {
+          .home-hero-content { padding: 0 28px !important; max-width: 100% !important; }
+        }
+        @media (max-width: 768px) {
+          .home-hero-btns { flex-direction: column !important; }
+          .home-hero-btns a { width: 100% !important; justify-content: center !important; }
         }
       `}</style>
     </div>
