@@ -14,7 +14,7 @@ const T = {
     schoolLabel: "オンライン日本語スクール",
     features: [
       { title: "オンライン完結", desc: "場所を選ばず受講できる完全オンライン形式" },
-      { title: "試験対策コース", desc: "特定技能・JLPT に特化した対策授業" },
+      { title: "試験対策コース", desc: "特定技能に特化した対策授業" },
       { title: "会話重視の指導", desc: "実生活・職場で使える実践的な日本語" },
       { title: "ベトナム語対応", desc: "ネイティブ講師によるきめ細かいサポート" },
     ],
@@ -31,7 +31,7 @@ const T = {
     schoolLabel: "Online Japanese School",
     features: [
       { title: "100% Online", desc: "Study from anywhere with fully online classes" },
-      { title: "Exam Preparation", desc: "Specialized courses for Specified Skilled Worker & JLPT" },
+      { title: "Exam Preparation", desc: "Specialized courses for Specified Skilled Worker" },
       { title: "Conversation Focus", desc: "Practical Japanese for daily life and the workplace" },
       { title: "Vietnamese Support", desc: "Native instructors providing detailed guidance" },
     ],
@@ -48,7 +48,7 @@ const T = {
     schoolLabel: "Trường Tiếng Nhật Trực tuyến",
     features: [
       { title: "Học hoàn toàn Online", desc: "Học mọi lúc, mọi nơi qua hình thức trực tuyến" },
-      { title: "Luyện thi chuyên sâu", desc: "Khóa học ôn thi Kỹ năng đặc định & JLPT" },
+      { title: "Luyện thi chuyên sâu", desc: "Khóa học ôn thi Kỹ năng đặc định" },
       { title: "Trọng tâm giao tiếp", desc: "Tiếng Nhật thực dụng trong cuộc sống và công việc" },
       { title: "Hỗ trợ tiếng Việt", desc: "Giảng viên bản ngữ hướng dẫn tận tình" },
     ],
