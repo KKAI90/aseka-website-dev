@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { useLang } from "@/contexts/LangContext";
 
 const PHOTOS = [
   { src: "/images/teamwork.jpg",      alt: "チーム作業風景" },
@@ -9,30 +8,7 @@ const PHOTOS = [
   { src: "/images/Professional.jpg",  alt: "オフィス作業" },
 ];
 
-const LABELS = {
-  JP: [
-    { label: "チームワーク",       sub: "Team Work" },
-    { label: "きめ細かいサポート",  sub: "Dedicated Support" },
-    { label: "日越連携",           sub: "Japan × Vietnam" },
-    { label: "プロフェッショナル",  sub: "Professional" },
-  ],
-  EN: [
-    { label: "Teamwork",          sub: "Team Work" },
-    { label: "Dedicated Support", sub: "Dedicated Support" },
-    { label: "Japan × Vietnam",   sub: "Bilateral Partnership" },
-    { label: "Professional",      sub: "Professional" },
-  ],
-  VN: [
-    { label: "Làm việc Nhóm",    sub: "Team Work" },
-    { label: "Hỗ trợ Tận tâm",   sub: "Dedicated Support" },
-    { label: "Nhật × Việt",      sub: "Japan × Vietnam" },
-    { label: "Chuyên nghiệp",    sub: "Professional" },
-  ],
-};
-
 export default function PhotoStrip() {
-  const { lang } = useLang();
-  const labels = LABELS[lang];
 
   /* Duplicate for seamless infinite loop */
   const doubled = [...PHOTOS, ...PHOTOS];
@@ -63,7 +39,6 @@ export default function PhotoStrip() {
         }}
       >
         {doubled.map((p, i) => {
-          const idx = i % PHOTOS.length;
           return (
             <div
               key={i}
@@ -89,19 +64,6 @@ export default function PhotoStrip() {
                 position: "absolute", inset: 0,
                 background: "linear-gradient(to top, rgba(20,15,10,0.80) 0%, rgba(20,15,10,0.10) 55%, transparent 100%)",
               }} />
-              {/* Label */}
-              <div style={{ position: "absolute", bottom: "22px", left: "24px" }}>
-                <div style={{
-                  fontFamily: "'Noto Serif JP', serif",
-                  fontSize: "14px", letterSpacing: "1.5px",
-                  color: "rgba(250,247,242,0.95)", marginBottom: "4px", fontWeight: 400,
-                }}>{labels[idx].label}</div>
-                <div style={{
-                  fontFamily: "'Noto Sans JP', sans-serif",
-                  fontSize: "11px", letterSpacing: "1px",
-                  color: "rgba(184,150,62,0.9)", fontStyle: "normal",
-                }}>{labels[idx].sub}</div>
-              </div>
             </div>
           );
         })}

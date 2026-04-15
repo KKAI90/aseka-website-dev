@@ -24,7 +24,7 @@ export default function Hero() {
 
       {/* Background photo — no Vietnamese text */}
       <Image
-        src="/images/office-meeting.jpg"
+        src="/images/Professional.jpg"
         alt="ASEKA Office"
         fill
         priority

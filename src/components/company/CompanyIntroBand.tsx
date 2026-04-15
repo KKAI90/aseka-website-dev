@@ -3,9 +3,18 @@ import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
-  JP: { text: "企業様に必要とされている、", strong: "優秀な高度人材と特定技能者を紹介" },
-  EN: { text: "We introduce ", strong: "highly skilled professionals and specified skilled workers" },
-  VN: { text: "Chúng tôi giới thiệu ", strong: "nhân tài trình độ cao và lao động kỹ năng đặc định" },
+  JP: {
+    text: "SNS21万人の独自ネットワークと日本語教育を強みに、「集まらない」「定着しない」といった採用課題を解決します。",
+    strong: "即戦力人材のご紹介から入社後の定着支援まで、一貫してサポートいたします。",
+  },
+  EN: {
+    text: "Leveraging our 210,000-strong SNS network and Japanese language education, we solve the hiring challenges of 'can't attract' and 'can't retain' foreign talent.",
+    strong: "From introducing ready-to-work candidates to post-hire retention support — we provide end-to-end service.",
+  },
+  VN: {
+    text: "Với mạng lưới SNS 210.000 người và thế mạnh giáo dục tiếng Nhật, chúng tôi giải quyết bài toán \"không tuyển được\" và \"không giữ chân được\" nhân tài nước ngoài.",
+    strong: "Từ giới thiệu ứng viên sẵn sàng làm việc đến hỗ trợ gắn bó sau tuyển dụng — chúng tôi đồng hành toàn diện.",
+  },
 };
 
 export default function CompanyIntroBand() {
