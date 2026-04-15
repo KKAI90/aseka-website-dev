@@ -6,7 +6,7 @@ const T = {
     sectionLabel: "Process",
     intro: "紹介の流れはこのようになっております。",
     steps: [
-      { num: "01", title: "求人のご依頼",    body: "お問い合わせフォームまたはお電話でご依頼ください。" },
+      { num: "01", title: "無料相談・お問い合わせ", body: "お問い合わせください。" },
       { num: "02", title: "打ち合わせ",      body: "採用要件・計画のヒアリングをします。" },
       { num: "03", title: "契約締結",        body: "契約を締結し、本格的に人材を紹介する流れに入ります。" },
       { num: "04", title: "人材を紹介",      body: "採用候補者の人選、応募書類を提出します。" },
@@ -18,7 +18,7 @@ const T = {
     sectionLabel: "Process",
     intro: "Here is how our placement process works.",
     steps: [
-      { num: "01", title: "Request",               body: "Contact us via the inquiry form or by phone." },
+      { num: "01", title: "Free Consultation / Inquiry", body: "Please contact us." },
       { num: "02", title: "Consultation",          body: "We listen to your hiring requirements and recruitment plan." },
       { num: "03", title: "Contract",              body: "We sign an agreement and begin the formal placement process." },
       { num: "04", title: "Candidate Intro",       body: "We select candidates and submit their application documents." },
@@ -30,7 +30,7 @@ const T = {
     sectionLabel: "Quy trình",
     intro: "Đây là quy trình giới thiệu nhân sự của chúng tôi.",
     steps: [
-      { num: "01", title: "Yêu cầu Tuyển dụng",    body: "Liên hệ qua form hoặc điện thoại để gửi yêu cầu." },
+      { num: "01", title: "Tư vấn Miễn phí / Liên hệ", body: "Vui lòng liên hệ với chúng tôi." },
       { num: "02", title: "Tư vấn",                 body: "Chúng tôi lắng nghe yêu cầu và kế hoạch tuyển dụng của bạn." },
       { num: "03", title: "Ký Hợp đồng",            body: "Ký kết hợp đồng và bắt đầu quá trình giới thiệu nhân sự chính thức." },
       { num: "04", title: "Giới thiệu Ứng viên",    body: "Chúng tôi chọn lọc ứng viên phù hợp và gửi hồ sơ." },

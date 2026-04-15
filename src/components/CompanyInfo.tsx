@@ -16,7 +16,7 @@ const ROWS = {
     { label: "顧問税理士",     value: "大石会計事務所" },
     { label: "許認可・届出", span: true, value: "有料職業紹介事業（許可番号：13-ユ-313472)\n登録支援機関 (登録番号：22登-007089)" },
     { label: "グループ会社",   value: "株式会社クローバーホールディングス" },
-    { label: "主要取引銀行", span: true, value: "三井住友銀行 新宿岩戸支店 / 東京シティ信用金庫　秋葉原支店" },
+    { label: "主要取引銀行", span: true, value: "三井住友銀行 新小岩支店 / 東京シティ信用金庫　秋葉原支店" },
   ] as Row[],
   EN: [
     { label: "Company Name",        value: "ASEKA Co., Ltd." },
@@ -48,11 +48,6 @@ const ROWS = {
   ] as Row[],
 };
 
-const NOTE = {
-  JP: "株式会社ASEKAは、日本とベトナムをつなぐ人材支援のプロフェッショナルとして、\n企業と求職者双方の夢の実現に貢献してまいります。",
-  EN: "As a professional human resource support company connecting Japan and Vietnam,\nASEKA Co., Ltd. is committed to helping both companies and job seekers realize their dreams.",
-  VN: "Công ty Cổ phần ASEKA, là chuyên gia hỗ trợ nhân lực kết nối Nhật Bản và Việt Nam,\ncam kết đóng góp vào việc hiện thực hóa ước mơ của cả doanh nghiệp lẫn người tìm việc.",
-};
 
 export default function CompanyInfo() {
   const { lang } = useLang();
@@ -145,25 +140,6 @@ export default function CompanyInfo() {
         ))}
       </div>
 
-      {/* Note */}
-      <div style={{
-        marginTop: "40px",
-        padding: "32px 40px",
-        background: "white",
-        borderLeft: "4px solid #B8963E",
-      }}>
-        <p style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "14px",
-          lineHeight: 2.0,
-          color: "#3d3833",
-          letterSpacing: "0.02em",
-          whiteSpace: "pre-line",
-          margin: 0,
-        }}>
-          {NOTE[lang]}
-        </p>
-      </div>
 
       <style>{`
         @media (max-width: 900px) {

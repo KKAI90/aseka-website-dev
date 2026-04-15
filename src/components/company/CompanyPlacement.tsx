@@ -19,14 +19,18 @@ const T = {
           "土木及び建築におけるAuto CAD, BIMオペレーター、施工管理",
           "文系出身求職者（事務、営業、翻訳・通訳、ホテルスタッフ、マーケティング等）",
         ],
+        strengthsLabel: "強み",
+        strengths: ["日本語レベルN2以上の人材も多数在籍", "実務経験者中心のご紹介", "最短3日でのスピード提案"],
       },
       {
         num: "02",
         tag: "Specified Skills",
         title: "特定技能紹介・支援",
-        desc: "当社では、特定技能の全16業種を紹介及び支援しております。日本語能力試験JLPT 中上級（N4〜N1）の求職者様を中心に対応しております。",
+        desc: "特定技能全分野に対応し、採用から入社後の支援まで一貫してサポートいたします。ビザ手続きや各種書類対応もお任せください。",
         jobsLabel: "主な取扱職種",
-        jobs: ["介護", "飲食料品製造業", "外食業", "素形材産業／産業機械製造業"],
+        jobs: ["介護", "飲食料品製造業", "外食業", "素形材産業／産業機械製造業", "宿泊業"],
+        strengthsLabel: "強み",
+        strengths: ["大量採用にも対応可能", "最短3日での紹介実績", "登録支援機関として定着支援まで対応"],
       },
     ],
   },
@@ -47,14 +51,18 @@ const T = {
           "Civil & Architecture: Auto CAD / BIM Operator, Construction Management",
           "Liberal Arts (Office, Sales, Translation/Interpretation, Hotel Staff, Marketing, etc.)",
         ],
+        strengthsLabel: "Strengths",
+        strengths: ["Many candidates with N2+ Japanese proficiency", "Focused on candidates with practical experience", "Fastest proposal in as little as 3 days"],
       },
       {
         num: "02",
         tag: "Specified Skills",
         title: "Specified Skilled Workers",
-        desc: "We provide placement and support services across all 16 industries for specified skilled workers. We mainly handle candidates with JLPT N4–N1 (intermediate to advanced).",
+        desc: "We provide comprehensive support across all specified skilled fields, from recruitment to post-hire retention. Leave visa procedures and all documentation to us.",
         jobsLabel: "Main Job Categories",
-        jobs: ["Nursing Care", "Food & Beverage Manufacturing", "Restaurant Industry", "Foundry / Industrial Machinery Manufacturing"],
+        jobs: ["Nursing Care", "Food & Beverage Manufacturing", "Restaurant Industry", "Foundry / Industrial Machinery Manufacturing", "Accommodation"],
+        strengthsLabel: "Strengths",
+        strengths: ["Capable of handling large-scale hiring", "Placement track record in as little as 3 days", "Retention support as a registered support organization"],
       },
     ],
   },
@@ -75,14 +83,18 @@ const T = {
           "Xây dựng & Kiến trúc: Vận hành Auto CAD / BIM, Quản lý Thi công",
           "Nhóm ngành Xã hội (Văn phòng, Kinh doanh, Phiên/Biên dịch, Khách sạn, Marketing, v.v.)",
         ],
+        strengthsLabel: "Thế mạnh",
+        strengths: ["Nhiều ứng viên có trình độ tiếng Nhật N2 trở lên", "Tập trung ứng viên có kinh nghiệm thực tế", "Đề xuất ứng viên trong tối thiểu 3 ngày"],
       },
       {
         num: "02",
         tag: "Specified Skills",
         title: "Lao động Kỹ năng Đặc định",
-        desc: "Chúng tôi giới thiệu và hỗ trợ tất cả 16 ngành nghề kỹ năng đặc định. Chủ yếu hỗ trợ ứng viên có JLPT N4–N1.",
+        desc: "Chúng tôi hỗ trợ toàn diện tất cả các ngành kỹ năng đặc định, từ tuyển dụng đến hỗ trợ sau khi nhận việc. Thủ tục visa và các giấy tờ liên quan cũng do chúng tôi đảm nhận.",
         jobsLabel: "Các vị trí chính",
-        jobs: ["Điều dưỡng", "Sản xuất Thực phẩm & Đồ uống", "Ngành Nhà hàng", "Công nghiệp Đúc / Sản xuất Máy móc"],
+        jobs: ["Điều dưỡng", "Sản xuất Thực phẩm & Đồ uống", "Ngành Nhà hàng", "Công nghiệp Đúc / Sản xuất Máy móc", "Lưu trú khách sạn"],
+        strengthsLabel: "Thế mạnh",
+        strengths: ["Có thể đáp ứng tuyển dụng số lượng lớn", "Thành tích giới thiệu trong tối thiểu 3 ngày", "Hỗ trợ gắn bó với tư cách tổ chức hỗ trợ đăng ký"],
       },
     ],
   },
@@ -168,7 +180,7 @@ export default function CompanyPlacement() {
                 fontStyle: "italic", marginBottom: "16px",
               }}>{s.jobsLabel}</div>
 
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "32px" }}>
                 {s.jobs.map((job) => (
                   <span key={job} className="job-tag" style={{
                     padding: "7px 16px",
@@ -180,6 +192,28 @@ export default function CompanyPlacement() {
                     cursor: "default",
                   }}>
                     {job}
+                  </span>
+                ))}
+              </div>
+
+              {/* Strengths */}
+              <div style={{
+                fontSize: "10px", letterSpacing: "2.5px",
+                color: "var(--gold)", textTransform: "uppercase",
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: "italic", marginBottom: "12px",
+              }}>{s.strengthsLabel}</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {s.strengths.map((item) => (
+                  <span key={item} style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "6px 14px",
+                    background: "#0C1F2E",
+                    fontSize: "12px", letterSpacing: "0.3px",
+                    color: "rgba(250,247,242,0.85)",
+                  }}>
+                    <span style={{ color: "var(--gold)", fontSize: "10px" }}>◆</span>
+                    {item}
                   </span>
                 ))}
               </div>
