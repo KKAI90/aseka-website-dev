@@ -3,18 +3,18 @@ import { useLang } from "@/contexts/LangContext";
 
 const STATS = {
   JP: [
-    { num: "200,000", suffix: "+",   label: "SNSフォロワー" },
-    { num: "700",     suffix: "名",   label: "累計紹介実績" },
-    { num: "3",       suffix: "日間", prefix: "最短", label: "最短着任期間" },
+    { num: "210,000", suffix: "+",   label: "SNSフォロワー" },
+    { num: "1,000",   suffix: "名以上", label: "累計紹介実績" },
+    { num: "3",       suffix: "日間", prefix: "最短", label: "最短採用可能" },
   ],
   EN: [
-    { num: "200,000", suffix: "+",      label: "SNS Followers" },
-    { num: "700",     suffix: "+",      label: "Placements" },
+    { num: "210,000", suffix: "+",      label: "SNS Followers" },
+    { num: "1,000",   suffix: "+",      label: "Placements" },
     { num: "3",       suffix: " Days",  label: "Fastest Onboarding" },
   ],
   VN: [
-    { num: "200,000", suffix: "+",      label: "Người theo dõi SNS" },
-    { num: "700",     suffix: "+",      label: "Hồ sơ đã Giới thiệu" },
+    { num: "210,000", suffix: "+",      label: "Người theo dõi SNS" },
+    { num: "1,000",   suffix: "+",      label: "Hồ sơ đã Giới thiệu" },
     { num: "3",       suffix: " ngày",  label: "Nhanh nhất" },
   ],
 };

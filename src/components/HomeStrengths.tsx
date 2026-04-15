@@ -14,7 +14,7 @@ const T = {
       {
         num: "①",
         title: "圧倒的な集客力",
-        desc: "SNS20万人のネットワークにより、意欲の高い人材が安定して集まります。他社では難しい母集団形成を実現しています。",
+        desc: "SNS21万人のネットワークにより、意欲の高い人材が安定して集まります。他社では難しい母集団形成を実現しています。",
       },
       {
         num: "②",
@@ -39,7 +39,7 @@ const T = {
       {
         num: "①",
         title: "Unmatched Talent Reach",
-        desc: "Our 200,000-strong SNS network ensures a steady flow of motivated candidates — enabling talent pooling that other agencies simply cannot match.",
+        desc: "Our 210,000-strong SNS network ensures a steady flow of motivated candidates — enabling talent pooling that other agencies simply cannot match.",
       },
       {
         num: "②",
@@ -64,7 +64,7 @@ const T = {
       {
         num: "①",
         title: "Sức hút nhân tài vượt trội",
-        desc: "Mạng lưới 200.000 người trên SNS giúp thu hút liên tục nguồn nhân lực có động lực cao — tạo lập nguồn ứng viên mà các công ty khác không thể đạt được.",
+        desc: "Mạng lưới 210.000 người trên SNS giúp thu hút liên tục nguồn nhân lực có động lực cao — tạo lập nguồn ứng viên mà các công ty khác không thể đạt được.",
       },
       {
         num: "②",

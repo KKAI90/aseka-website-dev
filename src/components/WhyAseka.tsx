@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useLang } from "@/contexts/LangContext";
 
 const T = {
@@ -96,9 +97,10 @@ export default function WhyAseka() {
   const t = T[lang];
 
   return (
-    <section style={{ padding: "120px 60px", background: "#FAF7F2" }}>
+    <section style={{ background: "#FAF7F2", overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ maxWidth: "640px", marginBottom: "72px" }}>
+      <div style={{ padding: "100px 60px 64px" }} className="why-header-wrap">
+      <div style={{ maxWidth: "640px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
           <div style={{ width: "32px", height: "1px", background: "var(--gold)", opacity: 0.7 }} />
           <span style={{
@@ -111,110 +113,37 @@ export default function WhyAseka() {
           fontFamily: "'Noto Serif JP', serif",
           fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
           color: "var(--dark)", letterSpacing: "1px",
-          marginBottom: "14px", lineHeight: 1.3,
+          lineHeight: 1.3,
         }}>{t.title}</h2>
-        <p style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "14px", color: "var(--warm-gray)",
-          letterSpacing: "0.5px",
-        }}>{t.sub}</p>
+      </div>
       </div>
 
-      {/* Pillars */}
-      <div className="why-grid" style={{
-        display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "2px",
-      }}>
-        {t.pillars.map((p, i) => (
-          <div key={i} className="why-card" style={{
-            background: "white",
-            padding: "52px 44px",
-            position: "relative", overflow: "hidden",
-            borderTop: "3px solid transparent",
-            transition: "border-color 0.4s, transform 0.3s",
-          }}>
-            {/* Large background number — outlined style */}
-            <div style={{
-              position: "absolute", top: "-8px", right: "24px",
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "100px", fontWeight: 600,
-              color: "transparent",
-              WebkitTextStroke: "1.5px rgba(184,150,62,0.22)",
-              lineHeight: 1, userSelect: "none", letterSpacing: "-2px",
-            }}>{p.num}</div>
-
-            {/* Icon */}
-            <div style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "24px", color: "var(--gold)",
-              marginBottom: "24px", opacity: 0.8,
-            }}>{p.icon}</div>
-
-            {/* Tag */}
-            <div style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "11px", letterSpacing: "2px",
-              color: "var(--gold)", fontStyle: "normal",
-              marginBottom: "12px", textTransform: "uppercase",
-              fontWeight: 400,
-            }}>{p.tag}</div>
-
-            {/* Divider */}
-            <div style={{ height: "1px", background: "rgba(184,150,62,0.2)", marginBottom: "20px" }} />
-
-            {/* Title */}
-            <h3 style={{
-              fontFamily: "'Noto Serif JP', serif",
-              fontSize: "19px", fontWeight: 400,
-              color: "var(--dark)", letterSpacing: "0.5px",
-              marginBottom: "16px", lineHeight: 1.4,
-            }}>{p.title}</h3>
-
-            {/* Description */}
-            <p style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "13.5px", lineHeight: 1.95,
-              color: "#5a5550", letterSpacing: "0.02em",
-            }}>{p.desc}</p>
-          </div>
-        ))}
-      </div>
-
-
-      {/* Quote band */}
-      <div style={{
-        marginTop: "64px",
-        background: "#0C1F2E",
-        padding: "64px 80px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Decorative left gold bar */}
+      {/* Image Quote Band */}
+      <div style={{ position: "relative", height: "420px", overflow: "hidden" }} className="why-imgband">
+        <Image
+          src="/images/office-meeting.jpg"
+          alt="ASEKA support"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center 30%" }}
+        />
+        {/* Dark gradient overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to right, rgba(10,20,35,0.88) 0%, rgba(10,20,35,0.65) 55%, rgba(10,20,35,0.15) 100%)",
+        }} />
+        {/* Left gold bar */}
         <div style={{
           position: "absolute", left: 0, top: 0, bottom: 0,
           width: "4px",
           background: "linear-gradient(to bottom, transparent, var(--gold), transparent)",
         }} />
-
-        {/* Decorative quote mark */}
+        {/* Text */}
         <div style={{
-          position: "absolute", right: "48px", top: "20px",
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: "160px", lineHeight: 1,
-          color: "transparent",
-          WebkitTextStroke: "1px rgba(184,150,62,0.12)",
-          userSelect: "none", pointerEvents: "none",
-}}>&ldquo;</div>
-
-        {/* Content */}
-        <div style={{ maxWidth: "860px", position: "relative", zIndex: 1 }}>
-          {/* Gold accent line */}
-          <div style={{
-            width: "40px", height: "2px",
-            background: "var(--gold)",
-            marginBottom: "32px",
-          }} />
-
+          position: "absolute", left: "80px", top: "50%",
+          transform: "translateY(-50%)",
+          maxWidth: "560px", zIndex: 1,
+        }} className="why-imgband-text">
+          <div style={{ width: "40px", height: "2px", background: "var(--gold)", marginBottom: "32px" }} />
           <p style={{
             fontFamily: "'Noto Serif JP', serif",
             fontSize: "clamp(15px, 1.5vw, 17px)",
@@ -229,13 +158,10 @@ export default function WhyAseka() {
       </div>
 
       <style>{`
-        .why-card:hover { border-top-color: var(--gold) !important; transform: translateY(-4px); }
-        @media (max-width: 900px) {
-          .why-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 600px) {
-          section { padding: 80px 24px !important; }
-          .why-quote { padding: 48px 32px !important; }
+        @media (max-width: 768px) {
+          .why-header-wrap { padding: 72px 24px 48px !important; }
+          .why-imgband { height: 520px !important; }
+          .why-imgband-text { left: 28px !important; right: 28px !important; max-width: 100% !important; }
         }
       `}</style>
     </section>
