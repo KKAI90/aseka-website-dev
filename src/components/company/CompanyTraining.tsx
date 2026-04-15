@@ -73,15 +73,15 @@ export default function CompanyTraining() {
           {/* Section label */}
           <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "52px" }}>
             <span style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "13px", color: "var(--gold)",
-              letterSpacing: "2px", fontWeight: 500,
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "14px", color: "var(--gold)",
+              letterSpacing: "2px", fontWeight: 500, fontStyle: "normal",
             }}>04</span>
-            <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.4, flexShrink: 0 }} />
+            <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
             <span style={{
               fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "11px", letterSpacing: "4px",
-              color: "var(--warm-gray)", textTransform: "uppercase",
+              fontSize: "13px", letterSpacing: "3px",
+              color: "#3d3833", textTransform: "uppercase", fontWeight: 400,
             }}>{t.sectionLabel}</span>
           </div>
 
