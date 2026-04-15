@@ -32,9 +32,9 @@ export default function CompanyContact() {
   return (
     <section id="contact" style={{ background: "#0E2233", padding: "100px 60px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "64px", justifyContent: "center" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "13px", color: "var(--gold)", letterSpacing: "2px" }}>05</span>
-        <div style={{ width: "60px", height: "1px", background: "var(--gold)", opacity: 0.4, flexShrink: 0 }} />
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "11px", letterSpacing: "5px", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", color: "var(--gold)", letterSpacing: "2px", fontStyle: "normal", fontWeight: 500 }}>05</span>
+        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
+        <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", letterSpacing: "3px", color: "rgba(255,255,255,0.55)", textTransform: "uppercase", fontWeight: 400 }}>{t.sectionLabel}</span>
       </div>
 
       <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "22px", lineHeight: 2, color: "rgba(255,255,255,0.85)", textAlign: "center", marginBottom: "64px", whiteSpace: "pre-line" }}>
