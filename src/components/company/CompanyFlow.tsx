@@ -50,9 +50,9 @@ export default function CompanyFlow() {
       {/* Header */}
       <div style={{ padding: "0 60px 56px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "36px" }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "13px", color: "var(--gold)", letterSpacing: "2px" }}>02</span>
-          <div style={{ width: "60px", height: "1px", background: "var(--gold)", opacity: 0.4, flexShrink: 0 }} />
-          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "11px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", color: "var(--gold)", letterSpacing: "2px", fontStyle: "normal", fontWeight: 500 }}>02</span>
+          <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", letterSpacing: "3px", color: "#3d3833", textTransform: "uppercase", fontWeight: 400 }}>{t.sectionLabel}</span>
         </div>
         <p style={{
           fontFamily: "'Noto Serif JP', serif",

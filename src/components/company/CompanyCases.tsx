@@ -57,9 +57,9 @@ export default function CompanyCases() {
   return (
     <section id="cases" style={{ padding: "100px 60px", background: "var(--cream)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "64px" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "13px", color: "var(--gold)", letterSpacing: "2px" }}>03</span>
-        <div style={{ width: "60px", height: "1px", background: "var(--gold)", opacity: 0.4, flexShrink: 0 }} />
-        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "11px", letterSpacing: "5px", color: "var(--warm-gray)", textTransform: "uppercase" }}>{t.sectionLabel}</span>
+        <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "14px", color: "var(--gold)", letterSpacing: "2px", fontStyle: "normal", fontWeight: 500 }}>03</span>
+        <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.6, flexShrink: 0 }} />
+        <span style={{ fontFamily: "'Noto Sans JP', sans-serif", fontSize: "13px", letterSpacing: "3px", color: "#3d3833", textTransform: "uppercase", fontWeight: 400 }}>{t.sectionLabel}</span>
       </div>
 
       <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "22px", letterSpacing: "2px", color: "var(--dark)", marginBottom: "48px", textAlign: "center" }}>
