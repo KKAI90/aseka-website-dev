@@ -10,25 +10,25 @@ const T = {
     imgOverlay: "外国人材の定着率向上に向け、入社後のフォロー体制を整えています。\nミスマッチを防ぎ、長期的な雇用につなげます。\nまた、返金制度を設けているため、安心してご導入いただけます。",
     pillars: [
       {
-        num: "01",
+        num: "①",
         icon: "◈",
-        title: "20万人のSNSコミュニティ",
-        desc: "創業者タオ氏が築いた20万人規模のベトナム人コミュニティ。意欲ある人材へ直接リーチできる、他社にはない圧倒的なネットワークです。",
-        tag: "Community Network",
+        title: "圧倒的な集客力",
+        desc: "SNS21万人のネットワークにより、意欲の高い人材が安定して集まります。他社では難しい母集団形成を実現しています。",
+        tag: "Talent Reach",
       },
       {
-        num: "02",
+        num: "②",
         icon: "◈",
-        title: "8,000件超の紹介実績",
-        desc: "累計8,000件以上のマッチング実績。業種・在留資格・日本語レベルを熟知したコンサルタントが、ミスマッチゼロを目指します。",
-        tag: "Track Record",
+        title: "即戦力人材のご紹介",
+        desc: "日本語教育と選考により、入社後すぐに活躍できる人材をご紹介しています。",
+        tag: "Placement",
       },
       {
-        num: "03",
+        num: "③",
         icon: "◈",
-        title: "採用から定着まで一貫支援",
-        desc: "求人紹介・ビザ申請・社会保険・生活サポートまで、外国人材が安心して働ける環境づくりをワンストップで提供します。",
-        tag: "Full Support",
+        title: "高い定着率の実現",
+        desc: "入社前後のフォロー体制により、長期就業につながる採用を実現しています。",
+        tag: "Retention",
       },
     ],
   },
@@ -39,25 +39,25 @@ const T = {
     imgOverlay: "We provide thorough post-hire follow-up to improve retention of foreign talent.\nWe help prevent mismatches and support long-term employment.\nWe also offer a refund policy for added peace of mind.",
     pillars: [
       {
-        num: "01",
+        num: "①",
         icon: "◈",
-        title: "200,000-Strong SNS Community",
-        desc: "A vast Vietnamese community built by our founder Thao — giving us direct reach to motivated talent that no other agency can match.",
-        tag: "Community Network",
+        title: "Unmatched Talent Reach",
+        desc: "Our 210,000-strong SNS network ensures a steady flow of motivated candidates — enabling talent pooling that other agencies simply cannot match.",
+        tag: "Talent Reach",
       },
       {
-        num: "02",
+        num: "②",
         icon: "◈",
-        title: "8,000+ Successful Placements",
-        desc: "Over 8,000 cumulative introductions across all industries. Our consultants know visa statuses, Japanese levels, and industries inside-out — minimizing mismatches.",
-        tag: "Track Record",
+        title: "Ready-to-Work Candidates",
+        desc: "Through Japanese language training and rigorous screening, we introduce candidates who can contribute from day one.",
+        tag: "Placement",
       },
       {
-        num: "03",
+        num: "③",
         icon: "◈",
-        title: "End-to-End Support",
-        desc: "From job placement to visa processing, pension support, and daily life assistance — we ensure every foreign worker can settle in and thrive.",
-        tag: "Full Support",
+        title: "High Retention Rates",
+        desc: "Our pre- and post-hire follow-up system supports long-term employment, helping companies build stable, committed teams.",
+        tag: "Retention",
       },
     ],
   },
@@ -68,25 +68,25 @@ const T = {
     imgOverlay: "Chúng tôi xây dựng hệ thống hỗ trợ sau tuyển dụng nhằm nâng cao tỷ lệ gắn bó của nhân lực nước ngoài.\nChúng tôi giúp ngăn chặn sự không phù hợp và hướng đến hợp đồng lao động dài hạn.\nNgoài ra, chính sách hoàn tiền giúp doanh nghiệp yên tâm triển khai.",
     pillars: [
       {
-        num: "01",
+        num: "①",
         icon: "◈",
-        title: "Cộng đồng 200.000 người",
-        desc: "Mạng lưới cộng đồng người Việt rộng lớn do Giám đốc Thảo xây dựng — tiếp cận trực tiếp nhân tài tiềm năng mà không công ty nào khác có được.",
-        tag: "Community Network",
+        title: "Sức hút nhân tài vượt trội",
+        desc: "Mạng lưới 210.000 người trên SNS giúp thu hút liên tục nguồn nhân lực có động lực cao — tạo lập nguồn ứng viên mà các công ty khác không thể đạt được.",
+        tag: "Talent Reach",
       },
       {
-        num: "02",
+        num: "②",
         icon: "◈",
-        title: "Hơn 8.000 hồ sơ thành công",
-        desc: "Hơn 8.000 ca giới thiệu việc làm thành công. Chuyên viên tư vấn am hiểu tư cách lưu trú, trình độ tiếng Nhật và đặc thù ngành nghề — hạn chế tối đa sự không phù hợp.",
-        tag: "Track Record",
+        title: "Ứng viên sẵn sàng làm việc ngay",
+        desc: "Qua đào tạo tiếng Nhật và quy trình tuyển chọn nghiêm ngặt, chúng tôi giới thiệu ứng viên có thể đóng góp ngay từ ngày đầu.",
+        tag: "Placement",
       },
       {
-        num: "03",
+        num: "③",
         icon: "◈",
-        title: "Hỗ trợ toàn diện từ A–Z",
-        desc: "Từ giới thiệu việc làm, xin visa, nenkin, bảo hiểm đến hỗ trợ cuộc sống hàng ngày — chúng tôi đồng hành để người lao động yên tâm làm việc.",
-        tag: "Full Support",
+        title: "Tỷ lệ gắn bó cao",
+        desc: "Hệ thống hỗ trợ trước và sau khi nhận việc giúp duy trì việc làm lâu dài, xây dựng đội ngũ ổn định cho doanh nghiệp.",
+        tag: "Retention",
       },
     ],
   },
@@ -116,59 +116,6 @@ export default function WhyAseka() {
           lineHeight: 1.3,
         }}>{t.title}</h2>
       </div>
-      </div>
-
-      {/* Pillar cards */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "2px", background: "rgba(184,150,62,0.12)",
-        margin: "0 60px 80px",
-      }} className="why-pillars">
-        {t.pillars.map((p) => (
-          <div key={p.num} style={{
-            background: "white",
-            padding: "48px 40px",
-            position: "relative", overflow: "hidden",
-          }}>
-            {/* Large decorative number — top right */}
-            <div style={{
-              position: "absolute", top: "-4px", right: "16px",
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "80px", fontWeight: 400,
-              color: "var(--gold)", opacity: 0.13,
-              lineHeight: 1, userSelect: "none", pointerEvents: "none",
-            }}>{p.num}</div>
-
-            {/* Icon + tag */}
-            <div style={{ marginBottom: "20px" }}>
-              <span style={{ fontSize: "18px", color: "var(--gold)" }}>{p.icon}</span>
-              <div style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: "10px", letterSpacing: "3px",
-                color: "var(--gold)", fontStyle: "italic",
-                textTransform: "uppercase", marginTop: "8px",
-              }}>{p.tag}</div>
-            </div>
-
-            {/* Divider */}
-            <div style={{ width: "32px", height: "1px", background: "rgba(184,150,62,0.4)", marginBottom: "20px" }} />
-
-            {/* Title */}
-            <h3 style={{
-              fontFamily: "'Noto Serif JP', serif",
-              fontSize: "18px", fontWeight: 400,
-              color: "var(--dark)", letterSpacing: "0.5px",
-              marginBottom: "16px", lineHeight: 1.5,
-            }}>{p.title}</h3>
-
-            {/* Description */}
-            <p style={{
-              fontFamily: "'Noto Sans JP', sans-serif",
-              fontSize: "13.5px", lineHeight: 2,
-              color: "var(--warm-gray)", letterSpacing: "0.02em",
-            }}>{p.desc}</p>
-          </div>
-        ))}
       </div>
 
       {/* Image Quote Band */}
@@ -214,8 +161,7 @@ export default function WhyAseka() {
       <style>{`
         @media (max-width: 768px) {
           .why-header-wrap { padding: 72px 24px 48px !important; }
-          .why-pillars { grid-template-columns: 1fr !important; margin: 0 24px 60px !important; }
-          .why-imgband { height: 520px !important; }
+.why-imgband { height: 520px !important; }
           .why-imgband-text { left: 28px !important; right: 28px !important; max-width: 100% !important; }
         }
       `}</style>
