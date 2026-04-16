@@ -35,7 +35,7 @@ export default function Navbar() {
       {/* Logo */}
       <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
         <Image
-          src="/images/aseka-logo-icon.png"
+          src="/images/logo-aseka.png"
           alt="ASEKA"
           width={120}
           height={120}
