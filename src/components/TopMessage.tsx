@@ -152,7 +152,7 @@ function PersonBlock({
         right: photoLeft ? "auto" : 0,
         background: "var(--gold)", padding: "10px 24px",
         fontFamily: "'Noto Sans JP', sans-serif",
-        fontSize: "12px", letterSpacing: "1px",
+        fontSize: "15px", letterSpacing: "1px",
         color: "white", zIndex: 2, fontWeight: 400,
       }}>
         {ceoLabel}

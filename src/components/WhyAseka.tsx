@@ -118,6 +118,59 @@ export default function WhyAseka() {
       </div>
       </div>
 
+      {/* Pillar cards */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "2px", background: "rgba(184,150,62,0.12)",
+        margin: "0 60px 80px",
+      }} className="why-pillars">
+        {t.pillars.map((p) => (
+          <div key={p.num} style={{
+            background: "white",
+            padding: "48px 40px",
+            position: "relative", overflow: "hidden",
+          }}>
+            {/* Large decorative number — top right */}
+            <div style={{
+              position: "absolute", top: "-4px", right: "16px",
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "80px", fontWeight: 400,
+              color: "var(--gold)", opacity: 0.13,
+              lineHeight: 1, userSelect: "none", pointerEvents: "none",
+            }}>{p.num}</div>
+
+            {/* Icon + tag */}
+            <div style={{ marginBottom: "20px" }}>
+              <span style={{ fontSize: "18px", color: "var(--gold)" }}>{p.icon}</span>
+              <div style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "10px", letterSpacing: "3px",
+                color: "var(--gold)", fontStyle: "italic",
+                textTransform: "uppercase", marginTop: "8px",
+              }}>{p.tag}</div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: "32px", height: "1px", background: "rgba(184,150,62,0.4)", marginBottom: "20px" }} />
+
+            {/* Title */}
+            <h3 style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "18px", fontWeight: 400,
+              color: "var(--dark)", letterSpacing: "0.5px",
+              marginBottom: "16px", lineHeight: 1.5,
+            }}>{p.title}</h3>
+
+            {/* Description */}
+            <p style={{
+              fontFamily: "'Noto Sans JP', sans-serif",
+              fontSize: "13.5px", lineHeight: 2,
+              color: "var(--warm-gray)", letterSpacing: "0.02em",
+            }}>{p.desc}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Image Quote Band */}
       <div style={{ position: "relative", height: "420px", overflow: "hidden" }} className="why-imgband">
         <Image
@@ -161,6 +214,7 @@ export default function WhyAseka() {
       <style>{`
         @media (max-width: 768px) {
           .why-header-wrap { padding: 72px 24px 48px !important; }
+          .why-pillars { grid-template-columns: 1fr !important; margin: 0 24px 60px !important; }
           .why-imgband { height: 520px !important; }
           .why-imgband-text { left: 28px !important; right: 28px !important; max-width: 100% !important; }
         }

@@ -106,7 +106,7 @@ export default function HomeHero() {
           fontFamily: "'Noto Sans JP', sans-serif",
           fontSize: lang === "JP" ? "16px" : "15px", lineHeight: 1.9,
           color: "rgba(250,247,242,0.85)",
-          maxWidth: "560px",
+          maxWidth: lang === "JP" ? "720px" : "560px",
           marginBottom: "48px",
           letterSpacing: "0.02em",
         }}>

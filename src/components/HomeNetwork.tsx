@@ -221,8 +221,8 @@ export default function HomeNetwork() {
             <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
           </div>
           <h2 style={{
-            fontFamily: "'Noto Sans JP', sans-serif",
-            fontSize: "clamp(24px, 3.2vw, 40px)", fontWeight: 500,
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "clamp(24px, 3.2vw, 40px)", fontWeight: 400,
             color: "var(--dark)", letterSpacing: "1px", marginBottom: "16px",
           }}>
             {t.title}

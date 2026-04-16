@@ -69,8 +69,8 @@ export default function ContactCTA() {
 
         {/* Title */}
         <h2 style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "clamp(22px, 3.2vw, 40px)", fontWeight: 500,
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "clamp(22px, 3.2vw, 40px)", fontWeight: 400,
           color: "#FAF7F2", letterSpacing: "2px",
           lineHeight: 1.5,
           marginBottom: "28px",
