@@ -19,7 +19,7 @@ const T = {
         "タオ氏は、日本語教育者としての専門性に加え、SNSを通じて21万人規模のフォロワーを持つインフルエンサーとして、多くの外国人材との強固なコミュニティを築いてこられました。この発信力・教育力・コミュニティは、ASEKAの大きな競争優位性であると認識しております。",
         "今後は、これらの強みをさらに発展させていくことを最重要の使命とし、クローバーホールディングスの経営資源を掛け合わせ、ASEKAを次の成長ステージへと導いてまいります。",
         "また、「人材を集め、育て、活かし、定着させる」仕組みを進化させ、企業価値の向上に取り組むとともに、外国人材が安心して働き、社会に貢献できる環境づくりを推進してまいります。",
-        "タオ氏と共に、そして社員の皆様と共に、ASEKAの未来を創り上げてまいります。今後とも、皆様の変わらぬご支援を賜りますよう、何卒よろしくお願い申し上げます。",
+        "社員の皆様と共に、ASEKAの未来を創り上げてまいります。今後とも、皆様の変わらぬご支援を賜りますよう、何卒よろしくお願い申し上げます。",
       ],
     },
     thao: {
@@ -54,7 +54,7 @@ const T = {
         "Ms. Thao has built a strong community of foreign talent — not only as an expert in Japanese language education, but also as an influencer with over 210,000 SNS followers. We recognize this reach, educational expertise, and community as a major competitive advantage for ASEKA.",
         "Our top priority going forward is to further develop these strengths, combined with the management resources of Clover Holdings, and lead ASEKA into its next stage of growth.",
         "We will also evolve our framework for attracting, developing, utilizing, and retaining talent — working to enhance corporate value while creating an environment where foreign professionals can work with confidence and contribute to society.",
-        "Together with Ms. Thao and all our employees, we will shape the future of ASEKA. We sincerely appreciate your continued support.",
+        "Together with all our employees, we will shape the future of ASEKA. We sincerely appreciate your continued support.",
       ],
     },
     thao: {
@@ -89,7 +89,7 @@ const T = {
         "Bà Thảo không chỉ là chuyên gia giáo dục tiếng Nhật, mà còn là influencer với hơn 210.000 người theo dõi trên mạng xã hội, đã xây dựng một cộng đồng nhân tài nước ngoài vững mạnh. Chúng tôi xem đây là lợi thế cạnh tranh lớn của ASEKA.",
         "Sứ mệnh quan trọng nhất của chúng tôi là tiếp tục phát huy những thế mạnh này, kết hợp với nguồn lực quản trị của Clover Holdings, để đưa ASEKA lên giai đoạn tăng trưởng tiếp theo.",
         "Chúng tôi sẽ không ngừng hoàn thiện hệ thống thu hút, đào tạo, sử dụng và giữ chân nhân tài — nâng cao giá trị doanh nghiệp và tạo môi trường để người lao động nước ngoài có thể yên tâm làm việc và đóng góp cho xã hội.",
-        "Cùng với bà Thảo và toàn thể nhân viên, chúng tôi sẽ cùng nhau xây dựng tương lai của ASEKA. Kính mong tiếp tục nhận được sự ủng hộ của quý vị.",
+        "Cùng với toàn thể nhân viên, chúng tôi sẽ cùng nhau xây dựng tương lai của ASEKA. Kính mong tiếp tục nhận được sự ủng hộ của quý vị.",
       ],
     },
     thao: {
