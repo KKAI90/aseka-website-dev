@@ -51,7 +51,7 @@ const T = {
     eyebrow: "NETWORK",
     title: "21万人ネットワーク",
     paragraphs: [
-      "創業者であり取締役のグェン フォン タオが運営する「THAO TOKYO」は、Facebook・YouTube・TikTokを中心に、累計21万人以上のフォロワーを有しています。",
+      "当社は、Facebook・YouTube・TikTokを中心に、累計21万人以上のフォロワーを有しています。",
       "フォロワーの約7割が日本在住、約9割が18歳〜34歳の若年層で構成されており、日本での就業意欲が高い人材が多い点が特徴です。",
       "また、日本語能力においても、N3以上の保有者が多数を占めており、即戦力として活躍可能な人材が集まっています。",
       "このネットワークにより、採用難易度の高い外国人材に対しても、安定した母集団形成を実現します。",
@@ -66,7 +66,7 @@ const T = {
     eyebrow: "NETWORK",
     title: "210,000+ Network",
     paragraphs: [
-      "\"THAO TOKYO\", operated by co-founder and Director Nguyen Phuong Thao, has accumulated over 210,000 followers across Facebook, YouTube, and TikTok.",
+      "We have accumulated over 210,000 followers across Facebook, YouTube, and TikTok.",
       "Approximately 70% of followers reside in Japan, and about 90% are young adults aged 18–34 with a strong desire to work in Japan.",
       "Many followers hold JLPT N3 or above, making them immediately deployable as capable professionals.",
       "This network enables stable talent pipeline formation even for hard-to-fill foreign national positions.",
@@ -81,7 +81,7 @@ const T = {
     eyebrow: "NETWORK",
     title: "Mạng lưới 210,000+",
     paragraphs: [
-      "\"THAO TOKYO\" do người sáng lập kiêm Giám đốc Nguyễn Phương Thảo điều hành, đã tích lũy hơn 210,000 người theo dõi trên Facebook, YouTube và TikTok.",
+      "Chúng tôi đã tích lũy hơn 210,000 người theo dõi trên Facebook, YouTube và TikTok.",
       "Khoảng 70% người theo dõi đang sinh sống tại Nhật Bản, và khoảng 90% là người trẻ từ 18–34 tuổi.",
       "Nhiều người theo dõi có trình độ JLPT N3 trở lên, sẵn sàng làm việc ngay lập tức.",
       "Mạng lưới này giúp chúng tôi xây dựng nguồn ứng viên ổn định, kể cả với những vị trí nhân sự nước ngoài khó tuyển.",
