@@ -67,7 +67,7 @@ export default function Navbar() {
 
         {/* Language switcher */}
         <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
-          {(["JP", "EN", "VN"] as const).map((l, i) => (
+          {(["JP"] as const).map((l, i) => (
             <span key={l} style={{ display: "flex", alignItems: "center" }}>
               {i > 0 && (
                 <span style={{ color: "rgba(184,150,62,0.35)", fontSize: "11px", padding: "0 4px" }}>|</span>
@@ -124,7 +124,7 @@ export default function Navbar() {
           ))}
           {/* Mobile lang switcher */}
           <div style={{ display: "flex", gap: "12px", paddingTop: "8px", borderTop: "1px solid rgba(184,150,62,0.2)" }}>
-            {(["JP", "EN", "VN"] as const).map((l) => (
+            {(["JP"] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => { setLang(l); setMobileOpen(false); }}

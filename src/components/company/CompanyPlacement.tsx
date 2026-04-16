@@ -206,13 +206,12 @@ export default function CompanyPlacement() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                 {s.strengths.map((item) => (
                   <span key={item} style={{
-                    display: "inline-flex", alignItems: "center", gap: "6px",
-                    padding: "6px 14px",
-                    background: "#0C1F2E",
-                    fontSize: "12px", letterSpacing: "0.3px",
-                    color: "rgba(250,247,242,0.85)",
+                    padding: "7px 16px",
+                    border: "1px solid rgba(184,150,62,0.3)",
+                    fontSize: "12.5px", letterSpacing: "0.3px",
+                    color: "#3d3833",
+                    background: "var(--cream)",
                   }}>
-                    <span style={{ color: "var(--gold)", fontSize: "10px" }}>◆</span>
                     {item}
                   </span>
                 ))}

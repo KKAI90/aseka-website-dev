@@ -7,7 +7,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "なぜASEKAが選ばれるのか",
     sub: "日本とベトナムをつなぐ、3つの強み。",
-    imgOverlay: "外国人材の定着率向上に向け、入社後のフォロー体制を整えています。ミスマッチを防ぎ、長期的な雇用につなげます。また、返金制度を設けているため、安心してご導入いただけます。",
+    imgOverlay: "外国人材の定着率向上に向け、入社後のフォロー体制を整えています。\nミスマッチを防ぎ、長期的な雇用につなげます。\nまた、返金制度を設けているため、安心してご導入いただけます。",
     pillars: [
       {
         num: "01",
@@ -36,7 +36,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "Why Companies Choose ASEKA",
     sub: "Three pillars connecting Japan and Vietnam.",
-    imgOverlay: "We provide thorough post-hire follow-up to improve retention of foreign talent, prevent mismatches, and build long-term employment. We also offer a refund policy for added peace of mind.",
+    imgOverlay: "We provide thorough post-hire follow-up to improve retention of foreign talent.\nWe help prevent mismatches and support long-term employment.\nWe also offer a refund policy for added peace of mind.",
     pillars: [
       {
         num: "01",
@@ -65,7 +65,7 @@ const T = {
     eyebrow: "Why ASEKA",
     title: "Tại sao chọn ASEKA?",
     sub: "Ba thế mạnh kết nối Nhật Bản và Việt Nam.",
-    imgOverlay: "Chúng tôi xây dựng hệ thống hỗ trợ sau tuyển dụng nhằm nâng cao tỷ lệ gắn bó của nhân lực nước ngoài, ngăn chặn sự không phù hợp và hướng đến hợp đồng lao động dài hạn. Ngoài ra, chính sách hoàn tiền giúp doanh nghiệp yên tâm triển khai.",
+    imgOverlay: "Chúng tôi xây dựng hệ thống hỗ trợ sau tuyển dụng nhằm nâng cao tỷ lệ gắn bó của nhân lực nước ngoài.\nChúng tôi giúp ngăn chặn sự không phù hợp và hướng đến hợp đồng lao động dài hạn.\nNgoài ra, chính sách hoàn tiền giúp doanh nghiệp yên tâm triển khai.",
     pillars: [
       {
         num: "01",
@@ -151,6 +151,7 @@ export default function WhyAseka() {
             color: "rgba(250,247,242,0.92)",
             letterSpacing: "0.04em",
             margin: 0,
+            whiteSpace: "pre-line",
           }}>
             {t.imgOverlay}
           </p>
