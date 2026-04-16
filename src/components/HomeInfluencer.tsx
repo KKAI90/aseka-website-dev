@@ -82,7 +82,7 @@ const T = {
       "現在では、こうした発信を通じて、日本で働きたいと考える人々の挑戦を後押しし続けています。",
     ],
     stats: [
-      { value: "200,000+", label: "SNSフォロワー" },
+      { value: "210,000+", label: "SNSフォロワー" },
       { value: "2019", label: "YouTube開始" },
     ],
   },
@@ -96,7 +96,7 @@ const T = {
       "Today, through this ongoing outreach, she continues to encourage and empower people who aspire to work in Japan.",
     ],
     stats: [
-      { value: "200,000+", label: "SNS Followers" },
+      { value: "210,000+", label: "SNS Followers" },
       { value: "2019", label: "YouTube Launch" },
     ],
   },
@@ -110,7 +110,7 @@ const T = {
       "Hiện tại, thông qua những chia sẻ liên tục này, cô tiếp tục khuyến khích và trao thêm động lực cho những ai khao khát làm việc tại Nhật Bản.",
     ],
     stats: [
-      { value: "200,000+", label: "Người theo dõi SNS" },
+      { value: "210,000+", label: "Người theo dõi SNS" },
       { value: "2019", label: "Bắt đầu YouTube" },
     ],
   },

@@ -6,7 +6,7 @@ const T = {
   JP: {
     eyebrow: "ASEKAの強み",
     title: "選ばれる3つの理由",
-    intro: "SNS23万人の独自ネットワークと日本語教育を強みに、人材の「集客・選定・定着」までを一貫して提供しています。これにより、「人材が集まらない」「採用しても定着しない」といった企業様の課題を解決します。",
+    intro: "SNS21万人の独自ネットワークと日本語教育を強みに、人材の「集客・選定・定着」までを一貫して提供しています。これにより、「人材が集まらない」「採用しても定着しない」といった企業様の課題を解決します。",
     cta1: "最短即日で人材をご提案可能です",
     cta2: "まずはお気軽にご相談ください",
     ctaBtn: "問い合わせフォーム",
@@ -31,7 +31,7 @@ const T = {
   EN: {
     eyebrow: "ASEKA Strengths",
     title: "3 Reasons to Choose ASEKA",
-    intro: "Leveraging our unique network of 230,000 SNS followers and Japanese language education, we provide end-to-end support for talent attraction, selection, and retention — solving the challenges of 'can't find people' and 'can't retain them'.",
+    intro: "Leveraging our unique network of 210,000 SNS followers and Japanese language education, we provide end-to-end support for talent attraction, selection, and retention — solving the challenges of 'can't find people' and 'can't retain them'.",
     cta1: "We can propose candidates as quickly as same-day.",
     cta2: "Feel free to reach out for a free consultation.",
     ctaBtn: "Contact Form",
@@ -56,7 +56,7 @@ const T = {
   VN: {
     eyebrow: "Thế mạnh của ASEKA",
     title: "3 Lý Do Chọn ASEKA",
-    intro: "Với mạng lưới 230.000 người trên mạng xã hội và thế mạnh giáo dục tiếng Nhật, chúng tôi cung cấp dịch vụ toàn diện từ thu hút, tuyển chọn đến giữ chân nhân tài — giải quyết bài toán \"không tuyển được người\" và \"tuyển xong lại nghỉ\".",
+    intro: "Với mạng lưới 210.000 người trên mạng xã hội và thế mạnh giáo dục tiếng Nhật, chúng tôi cung cấp dịch vụ toàn diện từ thu hút, tuyển chọn đến giữ chân nhân tài — giải quyết bài toán \"không tuyển được người\" và \"tuyển xong lại nghỉ\".",
     cta1: "Chúng tôi có thể giới thiệu ứng viên ngay trong ngày.",
     cta2: "Hãy liên hệ để được tư vấn miễn phí.",
     ctaBtn: "Form liên hệ",
