@@ -8,8 +8,8 @@ export function middleware(request: NextRequest) {
   if (host.startsWith("admin.")) {
     const pathname = url.pathname;
 
-    // Already under /admin — pass through
-    if (pathname.startsWith("/admin")) {
+    // Already under /admin or /api — pass through
+    if (pathname.startsWith("/admin") || pathname.startsWith("/api/")) {
       return NextResponse.next();
     }
 
