@@ -141,7 +141,7 @@ export default function WhyAseka() {
         <div style={{
           position: "absolute", left: "80px", top: "50%",
           transform: "translateY(-50%)",
-          maxWidth: "560px", zIndex: 1,
+          maxWidth: "720px", zIndex: 1,
         }} className="why-imgband-text">
           <div style={{ width: "40px", height: "2px", background: "var(--gold)", marginBottom: "32px" }} />
           <p style={{
