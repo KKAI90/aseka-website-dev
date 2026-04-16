@@ -121,10 +121,10 @@ export default function WhyAseka() {
       {/* Image Quote Band */}
       <div style={{ position: "relative", height: "420px", overflow: "hidden" }} className="why-imgband">
         <Image
-          src="/images/office-meeting.jpg"
+          src="/images/JPVN.jpg"
           alt="ASEKA support"
           fill
-          style={{ objectFit: "cover", objectPosition: "center 30%" }}
+          style={{ objectFit: "cover", objectPosition: "center center" }}
         />
         {/* Dark gradient overlay */}
         <div style={{
