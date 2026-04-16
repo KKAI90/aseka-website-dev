@@ -2,10 +2,10 @@
 import Image from "next/image";
 
 const PHOTOS = [
-  { src: "/images/teamwork.jpg",      alt: "チーム作業風景" },
-  { src: "/images/ズェン.jpg",         alt: "スタッフサポート" },
-  { src: "/images/JPVN.jpg",          alt: "ビジネスミーティング" },
-  { src: "/images/Professional.jpg",  alt: "オフィス作業" },
+  { src: "/images/teamwork.jpg",      alt: "チーム作業風景",    pos: "center center",  scale: 1 },
+  { src: "/images/ズェン.jpg",         alt: "スタッフサポート",  pos: "right center",   scale: 1.45 },
+  { src: "/images/JPVN.jpg",          alt: "ビジネスミーティング", pos: "center center", scale: 1 },
+  { src: "/images/Professional.jpg",  alt: "オフィス作業",      pos: "center center",  scale: 1 },
 ];
 
 export default function PhotoStrip() {
@@ -56,7 +56,13 @@ export default function PhotoStrip() {
                 src={p.src}
                 alt={p.alt}
                 fill
-                style={{ objectFit: "cover", transition: "transform 0.8s ease" }}
+                style={{
+                  objectFit: "cover",
+                  objectPosition: p.pos,
+                  transform: `scale(${p.scale})`,
+                  transformOrigin: p.pos,
+                  transition: "transform 0.8s ease",
+                }}
                 className="photo-strip-img"
               />
               {/* Gradient overlay */}
@@ -75,7 +81,6 @@ export default function PhotoStrip() {
           100% { transform: translateX(-50%); }
         }
         .photo-track:hover { animation-play-state: paused; }
-        .photo-strip-item:hover .photo-strip-img { transform: scale(1.06); }
       `}</style>
     </div>
   );
