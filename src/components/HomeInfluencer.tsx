@@ -137,8 +137,8 @@ export default function HomeInfluencer() {
 
         {/* Title */}
         <h2 style={{
-          fontFamily: "'Noto Sans JP', sans-serif",
-          fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 500,
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "clamp(26px, 3.5vw, 42px)", fontWeight: 400,
           color: "var(--dark)", letterSpacing: "1px",
           marginBottom: "0",
         }}>

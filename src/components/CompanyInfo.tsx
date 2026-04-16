@@ -95,7 +95,7 @@ export default function CompanyInfo() {
             }}>
               <span style={{
                 fontFamily: "'Noto Sans JP', sans-serif",
-                fontSize: "12px",
+                fontSize: "15px",
                 letterSpacing: "1px",
                 color: "rgba(250,247,242,0.88)",
                 fontWeight: 400,

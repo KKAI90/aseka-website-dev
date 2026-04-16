@@ -39,7 +39,7 @@ export default function Navbar() {
           alt="ASEKA"
           width={120}
           height={120}
-          style={{ objectFit: "contain", height: "56px", width: "auto" }}
+          style={{ objectFit: "contain", height: "52px", width: "auto" }}
           priority
         />
       </Link>

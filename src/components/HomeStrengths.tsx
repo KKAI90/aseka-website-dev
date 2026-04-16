@@ -93,7 +93,7 @@ export default function HomeStrengths() {
           <span style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: "12px", letterSpacing: "6px",
-            color: "var(--gold)", fontStyle: "italic",
+            color: "var(--gold)", fontStyle: "normal",
           }}>{t.eyebrow}</span>
           <div style={{ width: "48px", height: "1px", background: "var(--gold)", opacity: 0.5 }} />
         </div>
