@@ -4,13 +4,13 @@ import HostGuard from "@/components/HostGuard";
 import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Aseka株式会社 | ベトナム人材紹介・年金・ビザサポート",
+  title: "Aseka株式会社 | ベトナム人材紹介",
   description:
-    "人材紹介から年金・ビザ手続きまで。ベトナム語対応スタッフが日本での生活と仕事を全力サポート。Dịch vụ giới thiệu nhân sự, hỗ trợ nenkin và visa tại Nhật Bản.",
-  keywords: ["ベトナム人材", "年金サポート", "観光ビザ", "nhân sự Việt Nam", "nenkin", "visa Nhật"],
+    "ベトナム語対応スタッフが日本での就職・採用を全力サポート。21万人のネットワークで、意欲ある外国人材と企業をつなぎます。",
+  keywords: ["ベトナム人材", "外国人採用", "人材紹介", "nhân sự Việt Nam", "tuyển dụng Nhật Bản"],
   openGraph: {
     title: "Aseka株式会社",
-    description: "ベトナム人材紹介・年金・ビザサポート",
+    description: "ベトナム人材紹介",
     locale: "ja_JP",
     type: "website",
   },
