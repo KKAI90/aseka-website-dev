@@ -13,12 +13,12 @@ const T = {
     sectionLabel: "Case Studies",
     intro: "紹介事例",
     refund: "※弊社では、求職者の早期離職が発生した際に、紹介手数料の一部をご返還する",
-    refundHighlight: "「返還規定」",
+    refundHighlight: "「返金規定」",
     refund2: "を設けています。",
     cases: [
       { title: "高度人材（IT）",   items: ["北海道在住・26歳男性","年収：380万円 ／ ポジション：プログラマー","経験：2年間は業務管理システムをC#・Javaで機能開発〜テスト、3年間はカーナビの設計書作成・C#で機能開発・テスト","日本語レベル：N2（中級）"] },
-      { title: "高度人材（建設）", items: ["中国・韓国在住・29歳男性","年収：440万円","経験：2年間の太陽光パネル設置工事、5年間の高層ビル電気設備工事及び現場管理","日本語レベル：N1（上級）","資格：第1種電気工事士取得済、中型運転許可取得済"] },
-      { title: "高度人材（商系）", items: ["関東在住・32歳男性","年収：520万円 ／ ポジション：営業職","経験：物川会社で8年間、BtoB営業を経験","日本語レベル：N1（ビジネス）","英語レベル：TOEIC 940点"] },
+      { title: "高度人材（建設）", items: ["中国・四国在住・29歳男性","年収：440万円","経験：2年間の太陽光パネル設置工事、5年間の高層ビル電気設備工事及び現場管理","日本語レベル：N1（上級）","資格：第1種電気工事士取得済、中型運転許可取得済"] },
+      { title: "高度人材（文系）", items: ["関東在住・32歳男性","年収：520万円 ／ ポジション：営業職","経験：玩具会社で8年間、BtoB営業を経験","日本語レベル：N1（ビジネス）","英語レベル：TOEIC 940点"] },
       { title: "特定技能人材（介護）", items: ["関西在住・23歳女性","年収：300万円 ／ ポジション：介護スタッフ","経験：3年間実習生として勤務","日本語レベル：N2（中級）","資格：介護福祉士資格取得に向け勉強中"] },
     ],
   },
@@ -31,7 +31,7 @@ const T = {
     cases: [
       { title: "Skilled (IT)",           items: ["Male, 26, Hokkaido","Salary: ¥3.8M / Position: Programmer","Experience: 2 yrs C#/Java dev & testing for business systems; 3 yrs car navigation design docs & C# development","Japanese: JLPT N2 (Intermediate)"] },
       { title: "Skilled (Construction)", items: ["Male, 29, China / Korea","Salary: ¥4.4M","Experience: 2 yrs solar panel installation; 5 yrs high-rise electrical equipment & site management","Japanese: JLPT N1 (Advanced)","Certifications: Class-1 Electrician, Mid-size Driver's License"] },
-      { title: "Skilled (Business)",     items: ["Male, 32, Kanto","Salary: ¥5.2M / Position: Sales","Experience: 8 years BtoB sales at a trading company","Japanese: JLPT N1 (Business)","English: TOEIC 940"] },
+      { title: "Skilled (Liberal Arts)", items: ["Male, 32, Kanto","Salary: ¥5.2M / Position: Sales","Experience: 8 years BtoB sales at a toy company","Japanese: JLPT N1 (Business)","English: TOEIC 940"] },
       { title: "Specified Skilled (Nursing)", items: ["Female, 23, Kansai","Salary: ¥3.0M / Position: Care Staff","Experience: 3 years as a trainee","Japanese: JLPT N2 (Intermediate)","Currently studying for Care Worker certification"] },
     ],
   },
@@ -44,7 +44,7 @@ const T = {
     cases: [
       { title: "Nhân tài Cao cấp (IT)",          items: ["Nam, 26 tuổi, Hokkaido","Thu nhập: 3,8 triệu Yên / Vị trí: Lập trình viên","Kinh nghiệm: 2 năm phát triển & kiểm thử hệ thống C#/Java; 3 năm thiết kế tài liệu & lập trình C# cho hệ thống dẫn đường ô tô","Tiếng Nhật: JLPT N2 (Trung cấp)"] },
       { title: "Nhân tài Cao cấp (Xây dựng)",    items: ["Nam, 29 tuổi, Trung Quốc / Hàn Quốc","Thu nhập: 4,4 triệu Yên","Kinh nghiệm: 2 năm lắp đặt tấm pin năng lượng mặt trời; 5 năm thi công & quản lý công trình điện tòa nhà cao tầng","Tiếng Nhật: JLPT N1 (Cao cấp)","Bằng cấp: Thợ điện hạng 1, Bằng lái xe tải hạng trung"] },
-      { title: "Nhân tài Cao cấp (Kinh doanh)",  items: ["Nam, 32 tuổi, Kanto","Thu nhập: 5,2 triệu Yên / Vị trí: Nhân viên Kinh doanh","Kinh nghiệm: 8 năm kinh doanh BtoB tại công ty thương mại","Tiếng Nhật: JLPT N1 (Kinh doanh)","Tiếng Anh: TOEIC 940"] },
+      { title: "Nhân tài Cao cấp (Văn khoa)",    items: ["Nam, 32 tuổi, Kanto","Thu nhập: 5,2 triệu Yên / Vị trí: Nhân viên Kinh doanh","Kinh nghiệm: 8 năm kinh doanh BtoB tại công ty đồ chơi","Tiếng Nhật: JLPT N1 (Kinh doanh)","Tiếng Anh: TOEIC 940"] },
       { title: "Kỹ năng Đặc định (Điều dưỡng)", items: ["Nữ, 23 tuổi, Kansai","Thu nhập: 3,0 triệu Yên / Vị trí: Nhân viên Chăm sóc","Kinh nghiệm: 3 năm thực tập","Tiếng Nhật: JLPT N2 (Trung cấp)","Đang học để lấy chứng chỉ Điều dưỡng viên"] },
     ],
   },
