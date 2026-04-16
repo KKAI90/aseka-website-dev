@@ -5,7 +5,7 @@ const PHOTOS = [
   { src: "/images/teamwork.jpg",      alt: "チーム作業風景",    pos: "center center",  scale: 1 },
   { src: "/images/ズェン.jpg",         alt: "スタッフサポート",  pos: "60% 40%",        scale: 1.45 },
   { src: "/images/JPVN.jpg",          alt: "ビジネスミーティング", pos: "center center", scale: 1 },
-  { src: "/images/Professional.jpg",  alt: "オフィス作業",      pos: "center center",  scale: 1 },
+  { src: "/images/AB0101.jpy.JPG",     alt: "オフィス作業",      pos: "center center",  scale: 1 },
 ];
 
 export default function PhotoStrip() {
