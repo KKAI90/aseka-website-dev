@@ -130,7 +130,7 @@ export default function HomeHero() {
           >
             {t.btn1} →
           </Link>
-          <Link href="/dang-ky" style={{
+          <Link href="/" style={{
             display: "inline-flex", alignItems: "center", gap: "8px",
             padding: "16px 32px",
             background: "transparent",
