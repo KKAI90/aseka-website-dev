@@ -97,9 +97,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* SIDEBAR */}
       <div style={{ width: "210px", background: "#0B1F3A", display: "flex", flexDirection: "column", flexShrink: 0 }}>
         {/* Logo */}
-        <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: "9px", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ width: "32px", height: "32px", background: "rgba(255,255,255,0.1)", borderRadius: "7px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 7V13L10 18L2 13V7Z" stroke="white" strokeWidth="1.4"/><circle cx="10" cy="10" r="3" fill="white"/></svg>
+        <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "9px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "28px", height: "28px", objectFit: "contain", display: "block" }} />
           </div>
           <div>
             <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em" }}>ASEKA</div>
