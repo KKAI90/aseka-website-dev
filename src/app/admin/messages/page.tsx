@@ -39,6 +39,7 @@ export default function MessagesPage() {
   const [selected, setSelected] = useState<Msg | null>(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [chartYear, setChartYear] = useState(new Date().getFullYear());
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [showChart, setShowChart] = useState(true);
@@ -68,15 +69,14 @@ export default function MessagesPage() {
   const monthlyStats = useMemo(() => {
     const map: Record<string, number> = {};
     msgs.forEach(m => { const k = fmtMonth(m.created_at); map[k] = (map[k] || 0) + 1; });
-    const months: string[] = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i);
-      months.push(`${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`);
-    }
-    return months.map(m => ({ month: m, count: map[m] || 0, label: `${parseInt(m.slice(5))}月` }));
-  }, [msgs]);
+    return Array.from({ length: 12 }, (_, i) => {
+      const key = `${chartYear}/${String(i + 1).padStart(2, "0")}`;
+      return { month: key, count: map[key] || 0, label: `${i + 1}月` };
+    });
+  }, [msgs, chartYear]);
 
   const maxCount = Math.max(...monthlyStats.map(s => s.count), 1);
+  const currentYear = new Date().getFullYear();
 
   const filtered = useMemo(() => msgs.filter(m => {
     if (filterStatus !== "all" && m.status !== filterStatus) return false;
@@ -263,15 +263,29 @@ export default function MessagesPage() {
 
           {/* ── Monthly Chart ── */}
           <div className="card chart-wrap">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showChart ? "18px" : "0" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: showChart ? "18px" : "0", gap: "10px", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: "13px", fontWeight: 700, color: "#111827" }}>月別メッセージ数</div>
-                <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>直近6ヶ月のお問い合わせ推移</div>
+                <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>{chartYear}年のお問い合わせ推移</div>
               </div>
-              <button onClick={() => setShowChart(!showChart)}
-                style={{ fontSize: "11px", color: "#6B7280", background: "#F3F4F6", border: "none", borderRadius: "6px", padding: "5px 12px", cursor: "pointer", fontWeight: 500, transition: "background 0.15s" }}>
-                {showChart ? "非表示" : "表示"}
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                {/* Year navigator */}
+                <div style={{ display: "flex", alignItems: "center", gap: "2px", background: "#F3F4F6", borderRadius: "8px", padding: "3px" }}>
+                  <button onClick={() => setChartYear(y => y - 1)}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "#6B7280", width: "26px", height: "26px", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", transition: "background 0.1s" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#E5E7EB")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "none")}>‹</button>
+                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#374151", minWidth: "38px", textAlign: "center" }}>{chartYear}</span>
+                  <button onClick={() => setChartYear(y => y + 1)} disabled={chartYear >= currentYear}
+                    style={{ background: "none", border: "none", cursor: chartYear >= currentYear ? "not-allowed" : "pointer", color: chartYear >= currentYear ? "#D1D5DB" : "#6B7280", width: "26px", height: "26px", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", transition: "background 0.1s" }}
+                    onMouseEnter={e => { if (chartYear < currentYear) e.currentTarget.style.background = "#E5E7EB"; }}
+                    onMouseLeave={e => (e.currentTarget.style.background = "none")}>›</button>
+                </div>
+                <button onClick={() => setShowChart(!showChart)}
+                  style={{ fontSize: "11px", color: "#6B7280", background: "#F3F4F6", border: "none", borderRadius: "6px", padding: "5px 10px", cursor: "pointer", fontWeight: 500, whiteSpace: "nowrap" }}>
+                  {showChart ? "非表示" : "表示"}
+                </button>
+              </div>
             </div>
             {showChart && (
               <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", height: "104px" }}>

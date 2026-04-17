@@ -88,41 +88,50 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const roleBadgeColor = role === "superadmin" ? "#F59E0B" : "#60A5FA";
 
   const Sidebar = (
-    <div style={{ width: "220px", background: "#0B1F3A", display: "flex", flexDirection: "column", height: "100%", flexShrink: 0 }}>
+    <div style={{ width: "232px", background: "linear-gradient(180deg, #1a3358 0%, #152844 100%)", display: "flex", flexDirection: "column", height: "100%", flexShrink: 0 }}>
       {/* Logo */}
-      <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ width: "36px", height: "36px", borderRadius: "9px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+      <div style={{ padding: "18px 18px 16px", display: "flex", alignItems: "center", gap: "11px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ width: "40px", height: "40px", borderRadius: "11px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "28px", height: "28px", objectFit: "contain", display: "block" }} />
+          <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "30px", height: "30px", objectFit: "contain", display: "block" }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em" }}>ASEKA</div>
-          <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>Back Office · 管理画面</div>
+          <div style={{ fontSize: "16px", fontWeight: 800, color: "#fff", letterSpacing: "0.08em" }}>ASEKA</div>
+          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "1px" }}>Back Office</div>
         </div>
-        {/* Close button (mobile only) */}
         <button onClick={() => setSidebarOpen(false)} className="sidebar-close-btn"
-          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.5)", padding: "4px", display: "none" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "7px", cursor: "pointer", color: "rgba(255,255,255,0.6)", padding: "5px", display: "none", alignItems: "center", justifyContent: "center" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       {/* Nav */}
-      <div style={{ padding: "10px 8px", flex: 1, overflowY: "auto" }}>
+      <div style={{ padding: "12px 10px", flex: 1, overflowY: "auto" }}>
         {visibleNav.map(g => (
           <div key={g.section}>
-            <div style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", padding: "10px 8px 4px", textTransform: "uppercase" }}>
-              {g.section}
+            <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.3)", padding: "12px 10px 5px", textTransform: "uppercase" }}>
+              {g.section.split(" / ")[0]}
             </div>
             {g.items.map(item => {
               const active = pathname.startsWith(item.href);
               return (
                 <Link key={item.href} href={item.href}
-                  style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 12px", borderRadius: "8px", marginBottom: "2px", textDecoration: "none", background: active ? "rgba(255,255,255,0.13)" : "transparent" }}>
-                  <NavIcon name={item.icon} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "13px", color: active ? "#fff" : "rgba(255,255,255,0.72)", fontWeight: active ? 700 : 400 }}>{item.label}</div>
-                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", marginTop: "1px" }}>{item.sub}</div>
+                  style={{
+                    display: "flex", alignItems: "center", gap: "11px",
+                    padding: "11px 12px", borderRadius: "10px", marginBottom: "3px",
+                    textDecoration: "none",
+                    background: active ? "rgba(255,255,255,0.14)" : "transparent",
+                    borderLeft: active ? "3px solid #60A5FA" : "3px solid transparent",
+                    transition: "background 0.15s",
+                  }}>
+                  <div style={{ width: "20px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: active ? 1 : 0.7 }}>
+                    <NavIcon name={item.icon} />
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "14px", color: active ? "#fff" : "rgba(255,255,255,0.78)", fontWeight: active ? 700 : 400, lineHeight: 1.2 }}>{item.label}</div>
+                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.38)", marginTop: "2px" }}>{item.sub}</div>
+                  </div>
+                  {active && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#60A5FA", flexShrink: 0 }} />}
                 </Link>
               );
             })}
@@ -131,21 +140,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* User footer */}
-      <div style={{ padding: "12px 14px", borderTop: "0.5px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ marginBottom: "8px", display: "flex", justifyContent: "center" }}>
-          <span style={{ fontSize: "9px", fontWeight: 700, padding: "2px 10px", borderRadius: "20px", background: `${roleBadgeColor}22`, color: roleBadgeColor, border: `1px solid ${roleBadgeColor}44`, letterSpacing: "0.06em" }}>
-            {roleLabel}
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+      <div style={{ padding: "14px", borderTop: "1px solid rgba(255,255,255,0.07)", background: "rgba(0,0,0,0.15)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, #3B82F6, #1D4ED8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "#fff", flexShrink: 0, boxShadow: "0 2px 6px rgba(59,130,246,0.4)" }}>
             {initials}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email || "…"}</div>
+            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.85)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 500 }}>{email || "…"}</div>
+            <span style={{ fontSize: "10px", fontWeight: 700, padding: "1px 7px", borderRadius: "20px", background: `${roleBadgeColor}25`, color: roleBadgeColor, border: `1px solid ${roleBadgeColor}50`, letterSpacing: "0.04em", display: "inline-block", marginTop: "3px" }}>
+              {roleLabel}
+            </span>
           </div>
-          <button onClick={handleLogout} title="ログアウト" style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.45, flexShrink: 0 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <button onClick={handleLogout} title="ログアウト"
+            style={{ background: "rgba(255,255,255,0.07)", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.5)", padding: "7px", borderRadius: "8px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.14)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
           </button>
         </div>
       </div>
