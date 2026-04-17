@@ -10,9 +10,7 @@ const ALL_NAV: { section: string; role: Role | "all"; items: NavItem[] }[] = [
   {
     section: "概要 / Tổng quan",
     role: "superadmin",
-    items: [
-      { href: "/admin/dashboard", label: "ダッシュボード", sub: "Dashboard", icon: "grid" },
-    ],
+    items: [{ href: "/admin/dashboard", label: "ダッシュボード", sub: "Dashboard", icon: "grid" }],
   },
   {
     section: "管理 / Quản lý",
@@ -26,9 +24,7 @@ const ALL_NAV: { section: string; role: Role | "all"; items: NavItem[] }[] = [
   {
     section: "システム / Hệ thống",
     role: "superadmin",
-    items: [
-      { href: "/admin/settings", label: "設定", sub: "Google Form連携", icon: "settings" },
-    ],
+    items: [{ href: "/admin/settings", label: "設定", sub: "Google Form連携", icon: "settings" }],
   },
 ];
 
@@ -48,19 +44,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState<string>("");
   const [accessChecked, setAccessChecked] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (pathname === "/admin/login") return;
     setAccessChecked(false);
-
     fetch("/api/admin/me").then(async res => {
       if (!res.ok) { router.replace("/admin/login"); return; }
       const data = await res.json();
       const userRole: Role = data.role;
       setRole(userRole);
       setEmail(data.email);
-
-      // Redirect admin to /admin/messages if they try to access a restricted page
       if (!canAccess(userRole, pathname)) {
         router.replace("/admin/messages");
       } else {
@@ -69,6 +63,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
   }, [pathname, router]);
 
+  // Close sidebar on route change (mobile)
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
   if (pathname === "/admin/login") return <>{children}</>;
 
   const handleLogout = async () => {
@@ -76,13 +73,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/admin/login");
   };
 
-  // Filter nav sections/items based on role
   const visibleNav = ALL_NAV
     .filter(g => g.role === "all" || g.role === role)
     .map(g => ({
       ...g,
       items: g.role === "all" && role === "admin"
-        // admin: inside "管理" section, only show messages
         ? g.items.filter(i => i.href === "/admin/messages")
         : g.items,
     }))
@@ -92,77 +87,181 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const roleLabel = role === "superadmin" ? "Super Admin" : role === "admin" ? "Admin" : "…";
   const roleBadgeColor = role === "superadmin" ? "#F59E0B" : "#60A5FA";
 
-  return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", fontFamily: "'Noto Sans JP','Yu Gothic UI',sans-serif" }}>
-      {/* SIDEBAR */}
-      <div style={{ width: "210px", background: "#0B1F3A", display: "flex", flexDirection: "column", flexShrink: 0 }}>
-        {/* Logo */}
-        <div style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "9px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "28px", height: "28px", objectFit: "contain", display: "block" }} />
-          </div>
-          <div>
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em" }}>ASEKA</div>
-            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>Back Office · 管理画面</div>
-          </div>
+  const Sidebar = (
+    <div style={{ width: "220px", background: "#0B1F3A", display: "flex", flexDirection: "column", height: "100%", flexShrink: 0 }}>
+      {/* Logo */}
+      <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "0.5px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ width: "36px", height: "36px", borderRadius: "9px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "28px", height: "28px", objectFit: "contain", display: "block" }} />
         </div>
-
-        {/* Nav */}
-        <div style={{ padding: "10px 8px", flex: 1, overflowY: "auto" }}>
-          {visibleNav.map(g => (
-            <div key={g.section}>
-              <div style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", padding: "10px 8px 4px", textTransform: "uppercase" }}>
-                {g.section}
-              </div>
-              {g.items.map(item => {
-                const active = pathname.startsWith(item.href);
-                return (
-                  <Link key={item.href} href={item.href}
-                    style={{ display: "flex", alignItems: "center", gap: "8px", padding: "9px 10px", borderRadius: "7px", marginBottom: "2px", textDecoration: "none", background: active ? "rgba(255,255,255,0.13)" : "transparent" }}>
-                    <NavIcon name={item.icon} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "12px", color: active ? "#fff" : "rgba(255,255,255,0.72)", fontWeight: active ? 700 : 400 }}>{item.label}</div>
-                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", marginTop: "1px" }}>{item.sub}</div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em" }}>ASEKA</div>
+          <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)" }}>Back Office · 管理画面</div>
         </div>
-
-        {/* User footer */}
-        <div style={{ padding: "12px", borderTop: "0.5px solid rgba(255,255,255,0.08)" }}>
-          {/* Role badge */}
-          <div style={{ marginBottom: "8px", display: "flex", justifyContent: "center" }}>
-            <span style={{ fontSize: "9px", fontWeight: 700, padding: "2px 10px", borderRadius: "20px", background: `${roleBadgeColor}22`, color: roleBadgeColor, border: `1px solid ${roleBadgeColor}44`, letterSpacing: "0.06em" }}>
-              {roleLabel}
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-              {initials}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email || "…"}</div>
-            </div>
-            <button onClick={handleLogout} title="ログアウト" style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.45, flexShrink: 0 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            </button>
-          </div>
-        </div>
+        {/* Close button (mobile only) */}
+        <button onClick={() => setSidebarOpen(false)} className="sidebar-close-btn"
+          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.5)", padding: "4px", display: "none" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      {/* Main content — only render once access is confirmed to prevent content flash */}
-      <div style={{ flex: 1, overflow: "auto", background: "#F6F7F9" }}>
-        {accessChecked ? children : (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: "12px" }}>
-            <div style={{ width: "28px", height: "28px", border: "3px solid #E5E7EB", borderTopColor: "#2563EB", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      {/* Nav */}
+      <div style={{ padding: "10px 8px", flex: 1, overflowY: "auto" }}>
+        {visibleNav.map(g => (
+          <div key={g.section}>
+            <div style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.28)", padding: "10px 8px 4px", textTransform: "uppercase" }}>
+              {g.section}
+            </div>
+            {g.items.map(item => {
+              const active = pathname.startsWith(item.href);
+              return (
+                <Link key={item.href} href={item.href}
+                  style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 12px", borderRadius: "8px", marginBottom: "2px", textDecoration: "none", background: active ? "rgba(255,255,255,0.13)" : "transparent" }}>
+                  <NavIcon name={item.icon} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "13px", color: active ? "#fff" : "rgba(255,255,255,0.72)", fontWeight: active ? 700 : 400 }}>{item.label}</div>
+                    <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)", marginTop: "1px" }}>{item.sub}</div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        )}
+        ))}
+      </div>
+
+      {/* User footer */}
+      <div style={{ padding: "12px 14px", borderTop: "0.5px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ marginBottom: "8px", display: "flex", justifyContent: "center" }}>
+          <span style={{ fontSize: "9px", fontWeight: 700, padding: "2px 10px", borderRadius: "20px", background: `${roleBadgeColor}22`, color: roleBadgeColor, border: `1px solid ${roleBadgeColor}44`, letterSpacing: "0.06em" }}>
+            {roleLabel}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+            {initials}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email || "…"}</div>
+          </div>
+          <button onClick={handleLogout} title="ログアウト" style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.45, flexShrink: 0 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          </button>
+        </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Desktop layout ── */
+        .admin-root { display: flex; height: 100vh; overflow: hidden; font-family: 'Noto Sans JP','Yu Gothic UI',sans-serif; }
+        .admin-sidebar-desktop { display: flex; flex-direction: column; height: 100vh; }
+        .admin-sidebar-mobile { display: none; }
+        .admin-overlay { display: none; }
+        .admin-topbar-mobile { display: none; }
+        .sidebar-close-btn { display: none !important; }
+
+        /* ── Mobile layout (≤ 768px) ── */
+        @media (max-width: 768px) {
+          .admin-sidebar-desktop { display: none; }
+
+          /* Mobile top bar */
+          .admin-topbar-mobile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 14px;
+            height: 52px;
+            background: #0B1F3A;
+            flex-shrink: 0;
+          }
+
+          /* Drawer */
+          .admin-sidebar-mobile {
+            display: flex;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 300;
+            transform: translateX(-100%);
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+            width: 240px;
+          }
+          .admin-sidebar-mobile.open {
+            transform: translateX(0);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+          }
+          .sidebar-close-btn { display: flex !important; }
+
+          /* Backdrop */
+          .admin-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 299;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+          }
+          .admin-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+          }
+
+          /* Main takes full width */
+          .admin-root { flex-direction: column; }
+          .admin-main { flex: 1; overflow: auto; background: #F6F7F9; }
+        }
+      `}</style>
+
+      <div className="admin-root">
+
+        {/* Desktop sidebar */}
+        <div className="admin-sidebar-desktop">
+          {Sidebar}
+        </div>
+
+        {/* Mobile drawer */}
+        <div className={`admin-sidebar-mobile${sidebarOpen ? " open" : ""}`}>
+          {Sidebar}
+        </div>
+
+        {/* Backdrop */}
+        <div className={`admin-overlay${sidebarOpen ? " open" : ""}`} onClick={() => setSidebarOpen(false)} />
+
+        {/* Mobile top bar */}
+        <div className="admin-topbar-mobile">
+          <button onClick={() => setSidebarOpen(true)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", padding: "4px", display: "flex", alignItems: "center" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          </button>
+          <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width: "22px", height: "22px", objectFit: "contain" }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>ASEKA</div>
+            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.45)" }}>Back Office</div>
+          </div>
+          <button onClick={handleLogout} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.55, padding: "4px" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          </button>
+        </div>
+
+        {/* Main content */}
+        <div className="admin-main" style={{ flex: 1, overflow: "auto", background: "#F6F7F9" }}>
+          {accessChecked ? children : (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: "12px" }}>
+              <div style={{ width: "28px", height: "28px", border: "3px solid #E5E7EB", borderTopColor: "#2563EB", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
