@@ -167,11 +167,42 @@ export default function MessagesPage() {
         .action-a:hover { opacity: 0.85; }
         .empty-state { padding: 64px; text-align: center; }
         .loader { width: 30px; height: 30px; border: 3px solid #E5E7EB; border-top-color: #2563EB; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+        /* ── Tablet (≤ 900px) ── */
         @media (max-width: 900px) {
-          .kpi-grid { grid-template-columns: repeat(2,1fr); }
+          .kpi-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
           .table-layout { grid-template-columns: 1fr !important; }
-          .content { padding: 16px; }
+          .content { padding: 14px 16px; }
           .topbar { padding: 0 16px; }
+          .chart-wrap { padding: 16px; }
+          .detail-panel { position: static; animation: none; }
+        }
+        /* ── Mobile (≤ 600px) ── */
+        @media (max-width: 600px) {
+          .topbar { height: 52px; }
+          .topbar-title { font-size: 13px !important; }
+          .topbar-sub { display: none; }
+          .content { padding: 12px; }
+          .kpi-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 12px; }
+          .kpi { padding: 14px 14px; border-radius: 12px; }
+          .kpi-num { font-size: 28px !important; }
+          .kpi-label { font-size: 12px !important; }
+          .kpi-sub { display: none; }
+          .chart-wrap { padding: 14px 12px; margin-bottom: 12px; }
+          .bar-track { height: 52px; }
+          .toolbar { padding: 10px 12px; gap: 8px; }
+          .search-wrap { flex: 1 1 100%; }
+          .toolbar-dates { width: 100%; display: flex; gap: 6px; align-items: center; }
+          .date-input { flex: 1; min-width: 0; font-size: 11px; padding: 7px 8px; }
+          .msg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          .msg-th { padding: 10px 10px; font-size: 9px; }
+          .msg-td { padding: 11px 10px; }
+          .msg-th-content, .msg-th-service { display: none; }
+          .msg-td-content, .msg-td-service { display: none; }
+          .detail-panel { border-radius: 12px; }
+          .detail-header { padding: 14px 16px; }
+          .detail-body { padding: 14px 16px; }
+          .empty-state { padding: 40px 20px; }
+          .refresh-btn span:last-child { display: none; }
         }
       `}</style>
 
@@ -184,8 +215,8 @@ export default function MessagesPage() {
               💬
             </div>
             <div>
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>メッセージ管理</div>
-              <div style={{ fontSize: "11px", color: "#9CA3AF" }}>Webフォームからのお問い合わせ</div>
+              <div className="topbar-title" style={{ fontSize: "14px", fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>メッセージ管理</div>
+              <div className="topbar-sub" style={{ fontSize: "11px", color: "#9CA3AF" }}>Webフォームからのお問い合わせ</div>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -269,8 +300,8 @@ export default function MessagesPage() {
               <input className="search-input" type="text" placeholder="名前・会社名・メールで検索..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "11px", color: "#6B7280", fontWeight: 500 }}>期間</span>
+            <div className="toolbar-dates" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "11px", color: "#6B7280", fontWeight: 500, whiteSpace: "nowrap" }}>期間</span>
               <input className="date-input" type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
               <span style={{ fontSize: "12px", color: "#D1D5DB" }}>〜</span>
               <input className="date-input" type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
@@ -304,47 +335,51 @@ export default function MessagesPage() {
                   {hasFilter && <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "4px" }}>フィルターを変更してください</div>}
                 </div>
               ) : (
-                <table className="msg-table">
-                  <thead className="msg-thead">
-                    <tr>
-                      {["日時", "送信者", "サービス", "内容", "ステータス"].map((h, i) => (
-                        <th key={h} className="msg-th" style={{ width: i === 0 ? "128px" : i === 2 ? "108px" : i === 4 ? "96px" : "auto" }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map(m => {
-                      const st = ST[m.status] || ST.new;
-                      const svc = SVC[m.service || ""];
-                      const isSel = selected?.id === m.id;
-                      return (
-                        <tr key={m.id} className={`msg-row${isSel ? " msg-row-sel" : ""}`} onClick={() => setSelected(isSel ? null : m)}>
-                          <td className="msg-td" style={{ color: "#6B7280", fontSize: "11px", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
-                            {fmt(m.created_at)}
-                          </td>
-                          <td className="msg-td">
-                            <div style={{ fontWeight: 600, color: "#111827", fontSize: "13px" }}>{m.name}</div>
-                            {m.company && <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>{m.company}</div>}
-                          </td>
-                          <td className="msg-td">
-                            {svc
-                              ? <span className="badge" style={{ color: svc.color, background: svc.bg, borderColor: svc.border }}>{svc.ja}</span>
-                              : <span style={{ color: "#D1D5DB", fontSize: "12px" }}>—</span>}
-                          </td>
-                          <td className="msg-td" style={{ maxWidth: selected ? "90px" : "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "12px", color: "#6B7280" }}>
-                            {m.message || <span style={{ color: "#D1D5DB" }}>—</span>}
-                          </td>
-                          <td className="msg-td">
-                            <span className="badge" style={{ color: st.tc, background: st.tb, borderColor: st.border }}>
-                              <span className="dot" style={{ background: st.dot }} />
-                              {st.ja}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="msg-table-wrap">
+                  <table className="msg-table">
+                    <thead className="msg-thead">
+                      <tr>
+                        <th className="msg-th" style={{ width: "120px" }}>日時</th>
+                        <th className="msg-th">送信者</th>
+                        <th className="msg-th msg-th-service" style={{ width: "108px" }}>サービス</th>
+                        <th className="msg-th msg-th-content">内容</th>
+                        <th className="msg-th" style={{ width: "96px" }}>ステータス</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filtered.map(m => {
+                        const st = ST[m.status] || ST.new;
+                        const svc = SVC[m.service || ""];
+                        const isSel = selected?.id === m.id;
+                        return (
+                          <tr key={m.id} className={`msg-row${isSel ? " msg-row-sel" : ""}`} onClick={() => setSelected(isSel ? null : m)}>
+                            <td className="msg-td" style={{ color: "#6B7280", fontSize: "11px", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>
+                              {fmt(m.created_at)}
+                            </td>
+                            <td className="msg-td">
+                              <div style={{ fontWeight: 600, color: "#111827", fontSize: "13px" }}>{m.name}</div>
+                              {m.company && <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>{m.company}</div>}
+                            </td>
+                            <td className="msg-td msg-td-service">
+                              {svc
+                                ? <span className="badge" style={{ color: svc.color, background: svc.bg, borderColor: svc.border }}>{svc.ja}</span>
+                                : <span style={{ color: "#D1D5DB", fontSize: "12px" }}>—</span>}
+                            </td>
+                            <td className="msg-td msg-td-content" style={{ maxWidth: selected ? "90px" : "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: "12px", color: "#6B7280" }}>
+                              {m.message || <span style={{ color: "#D1D5DB" }}>—</span>}
+                            </td>
+                            <td className="msg-td">
+                              <span className="badge" style={{ color: st.tc, background: st.tb, borderColor: st.border }}>
+                                <span className="dot" style={{ background: st.dot }} />
+                                {st.ja}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 
