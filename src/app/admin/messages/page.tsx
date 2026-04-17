@@ -128,17 +128,21 @@ export default function MessagesPage() {
         .spin-icon { display: inline-block; }
         .spinning { animation: spin 0.6s linear infinite; }
         .chart-wrap { padding: 20px 24px; margin-bottom: 16px; }
-        .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .bar-track { width: 100%; height: 72px; display: flex; align-items: flex-end; background: #F3F4F6; border-radius: 8px; overflow: hidden; }
-        .bar-fill { width: 100%; border-radius: 8px 8px 0 0; transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1); animation: barGrow 0.6s ease both; }
-        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 12px 16px; margin-bottom: 14px; }
-        .search-wrap { position: relative; flex: 1 1 240px; }
-        .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9CA3AF; pointer-events: none; }
-        .search-input { width: 100%; padding: 8px 12px 8px 32px; border-radius: 8px; border: 1px solid #E5E7EB; font-size: 13px; outline: none; background: #F9FAFB; color: #111827; transition: border-color 0.15s, box-shadow 0.15s; }
-        .search-input:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: #fff; }
-        .date-input { padding: 7px 10px; border-radius: 8px; border: 1px solid #E5E7EB; font-size: 12px; outline: none; background: #F9FAFB; cursor: pointer; color: #374151; transition: border-color 0.15s; }
-        .date-input:focus { border-color: #2563EB; }
-        .clear-btn { padding: 7px 12px; border-radius: 8px; background: #FEF2F2; border: 1px solid #FECACA; font-size: 12px; color: #DC2626; cursor: pointer; font-weight: 500; white-space: nowrap; transition: background 0.15s; }
+        .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: default; }
+        .bar-area { width: 100%; height: 88px; display: flex; align-items: flex-end; justify-content: center; position: relative; }
+        .bar-fill { width: 60%; min-width: 8px; border-radius: 5px 5px 3px 3px; transition: height 0.55s cubic-bezier(0.34,1.56,0.64,1); animation: barGrow 0.55s ease both; }
+        .bar-col:hover .bar-fill { filter: brightness(1.1); }
+        .toolbar { display: flex; gap: 0; align-items: stretch; padding: 0; margin-bottom: 14px; overflow: hidden; }
+        .toolbar-search { position: relative; flex: 1 1 200px; border-right: 1px solid #E5E7EB; }
+        .toolbar-search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9CA3AF; pointer-events: none; }
+        .search-input { width: 100%; height: 46px; padding: 0 14px 0 38px; border: none; font-size: 13px; outline: none; background: transparent; color: #111827; }
+        .search-input::placeholder { color: #B0B7C3; }
+        .toolbar-date-wrap { display: flex; align-items: center; gap: 0; border-right: 1px solid #E5E7EB; flex-shrink: 0; }
+        .toolbar-date-label { font-size: 11px; color: #9CA3AF; font-weight: 600; padding: 0 10px 0 14px; white-space: nowrap; letter-spacing: 0.04em; }
+        .date-input { height: 46px; padding: 0 10px; border: none; font-size: 12px; outline: none; background: transparent; cursor: pointer; color: #374151; min-width: 120px; }
+        .date-sep { font-size: 12px; color: #D1D5DB; padding: 0 2px; }
+        .toolbar-right { display: flex; align-items: center; gap: 8px; padding: 0 14px; flex-shrink: 0; }
+        .clear-btn { padding: 5px 10px; border-radius: 6px; background: #FEF2F2; border: 1px solid #FECACA; font-size: 11px; color: #DC2626; cursor: pointer; font-weight: 600; white-space: nowrap; transition: background 0.15s; display: flex; align-items: center; gap: 4px; }
         .clear-btn:hover { background: #FEE2E2; }
         .table-layout { display: grid; gap: 14px; align-items: start; }
         .msg-table { width: 100%; border-collapse: collapse; }
@@ -189,10 +193,12 @@ export default function MessagesPage() {
           .kpi-sub { display: none; }
           .chart-wrap { padding: 14px 12px; margin-bottom: 12px; }
           .bar-track { height: 52px; }
-          .toolbar { padding: 10px 12px; gap: 8px; }
-          .search-wrap { flex: 1 1 100%; }
-          .toolbar-dates { width: 100%; display: flex; gap: 6px; align-items: center; }
-          .date-input { flex: 1; min-width: 0; font-size: 11px; padding: 7px 8px; }
+          .toolbar { flex-direction: column; }
+          .toolbar-search { border-right: none; border-bottom: 1px solid #E5E7EB; width: 100%; }
+          .toolbar-date-wrap { border-right: none; border-bottom: 1px solid #E5E7EB; width: 100%; padding: 0; }
+          .toolbar-date-label { padding-left: 14px; }
+          .date-input { flex: 1; min-width: 0; font-size: 11px; }
+          .toolbar-right { justify-content: space-between; padding: 8px 14px; }
           .msg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .msg-th { padding: 10px 10px; font-size: 9px; }
           .msg-td { padding: 11px 10px; }
@@ -288,47 +294,66 @@ export default function MessagesPage() {
               </div>
             </div>
             {showChart && (
-              <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", height: "104px" }}>
-                {monthlyStats.map(({ month, count, label }) => (
-                  <div key={month} className="bar-col">
-                    <div style={{ fontSize: "11px", fontWeight: 700, color: count > 0 ? "#1E3A5F" : "transparent", minHeight: "16px" }}>{count}</div>
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{
-                        height: count === 0 ? "0px" : `${Math.max(6, (count / maxCount) * 72)}px`,
-                        background: count === 0 ? "transparent" : "linear-gradient(180deg, #60A5FA 0%, #1E3A5F 100%)",
-                      }} />
-                    </div>
-                    <div style={{ fontSize: "10px", color: "#9CA3AF", fontWeight: 500 }}>{label}</div>
-                  </div>
-                ))}
+              <div style={{ position: "relative" }}>
+                {/* Subtle grid lines */}
+                <div style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: "22px", display: "flex", flexDirection: "column", justifyContent: "space-between", pointerEvents: "none" }}>
+                  {[0,1,2,3].map(i => (
+                    <div key={i} style={{ height: "1px", background: i === 3 ? "#E5E7EB" : "#F3F4F6", width: "100%" }} />
+                  ))}
+                </div>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", position: "relative" }}>
+                  {monthlyStats.map(({ month, count, label }, idx) => {
+                    const isCurrentMonth = month === `${new Date().getFullYear()}/${String(new Date().getMonth()+1).padStart(2,"0")}`;
+                    return (
+                      <div key={month} className="bar-col" style={{ animationDelay: `${idx * 0.03}s` }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, color: count > 0 ? "#1D4ED8" : "transparent", minHeight: "18px", textAlign: "center" }}>{count || ""}</div>
+                        <div className="bar-area">
+                          <div className="bar-fill" style={{
+                            height: count === 0 ? "3px" : `${Math.max(10, (count / maxCount) * 88)}px`,
+                            background: count === 0
+                              ? "#EEF0F3"
+                              : isCurrentMonth
+                                ? "linear-gradient(180deg, #93C5FD 0%, #2563EB 100%)"
+                                : "linear-gradient(180deg, #BFDBFE 0%, #3B82F6 100%)",
+                            boxShadow: count > 0 ? "0 2px 8px rgba(37,99,235,0.2)" : "none",
+                          }} />
+                        </div>
+                        <div style={{ fontSize: "10px", color: isCurrentMonth ? "#2563EB" : "#9CA3AF", fontWeight: isCurrentMonth ? 700 : 500, textAlign: "center" }}>{label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
 
           {/* ── Toolbar ── */}
-          <div className="card toolbar">
-            <div className="search-wrap">
+          <div className="card toolbar" style={{ marginBottom: "14px" }}>
+            {/* Search */}
+            <div className="toolbar-search">
               <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
                 <path d="M17 17L13 13M15 8.5A6.5 6.5 0 112 8.5a6.5 6.5 0 0113 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               </svg>
               <input className="search-input" type="text" placeholder="名前・会社名・メールで検索..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-
-            <div className="toolbar-dates" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ fontSize: "11px", color: "#6B7280", fontWeight: 500, whiteSpace: "nowrap" }}>期間</span>
+            {/* Date range */}
+            <div className="toolbar-date-wrap">
+              <span className="toolbar-date-label">期間</span>
               <input className="date-input" type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
-              <span style={{ fontSize: "12px", color: "#D1D5DB" }}>〜</span>
+              <span className="date-sep">—</span>
               <input className="date-input" type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
             </div>
-
-            {hasFilter && (
-              <button className="clear-btn" onClick={() => { setSearch(""); setDateFrom(""); setDateTo(""); setFilterStatus("all"); }}>
-                ✕ フィルター解除
-              </button>
-            )}
-
-            <div style={{ marginLeft: "auto", fontSize: "12px", color: "#6B7280", fontWeight: 500, whiteSpace: "nowrap" }}>
-              <span style={{ fontWeight: 700, color: "#111827" }}>{filtered.length}</span> 件表示
+            {/* Right side */}
+            <div className="toolbar-right">
+              {hasFilter && (
+                <button className="clear-btn" onClick={() => { setSearch(""); setDateFrom(""); setDateTo(""); setFilterStatus("all"); }}>
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                  クリア
+                </button>
+              )}
+              <div style={{ fontSize: "12px", color: "#6B7280", fontWeight: 500, whiteSpace: "nowrap" }}>
+                <span style={{ fontWeight: 700, color: "#111827" }}>{filtered.length}</span> 件
+              </div>
             </div>
           </div>
 
