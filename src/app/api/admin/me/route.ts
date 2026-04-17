@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { getRoleFromEmail } from "@/lib/roles";
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get("sb-access-token")?.value;
@@ -8,5 +9,7 @@ export async function GET(req: NextRequest) {
   const payload = verifyToken(token);
   if (!payload) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  return NextResponse.json({ email: payload.email });
+  // Always derive role from email so it stays up-to-date even for old tokens
+  const role = getRoleFromEmail(payload.email);
+  return NextResponse.json({ email: payload.email, role });
 }
