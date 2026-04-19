@@ -232,16 +232,18 @@ export default function MessagesPage() {
         .skeleton { border-radius:6px; background:linear-gradient(90deg,#F3F4F6 25%,#E9EAEC 50%,#F3F4F6 75%); background-size:400px 100%; animation:skeletonShimmer 1.4s infinite; }
 
         /* Detail panel */
-        .detail-panel { border-radius:14px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08); position:sticky; top:76px; animation:slideIn 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-        .detail-header { padding:18px 20px; border-bottom:1px solid #F3F4F6; display:flex; justify-content:space-between; align-items:flex-start; }
-        .detail-body { padding:18px 20px; }
+        .detail-panel { border-radius:14px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08); position:sticky; top:76px; max-height:calc(100vh - 100px); display:flex; flex-direction:column; animation:slideIn 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+        .detail-header { padding:18px 20px; border-bottom:1px solid #F3F4F6; display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0; }
+        .detail-body { padding:18px 20px; overflow-y:auto; flex:1; }
+        .detail-body::-webkit-scrollbar { width:4px; } .detail-body::-webkit-scrollbar-track { background:transparent; } .detail-body::-webkit-scrollbar-thumb { background:#E5E7EB; border-radius:4px; }
         .close-btn { width:30px; height:30px; border-radius:9px; background:#F3F4F6; border:none; cursor:pointer; color:#6B7280; display:flex; align-items:center; justify-content:center; font-weight:700; transition:all 0.15s; flex-shrink:0; }
         .close-btn:hover { background:#FEE2E2; color:#DC2626; transform:scale(1.1); }
         .info-row { display:flex; gap:8px; align-items:flex-start; padding:6px 8px; border-radius:8px; transition:background 0.12s; }
         .info-row:hover { background:#F9FAFB; }
         .info-label { font-size:11px; color:#9CA3AF; width:70px; flex-shrink:0; font-weight:500; padding-top:1px; }
         .info-val { font-size:12px; color:#374151; font-weight:500; word-break:break-all; }
-        .msg-box { background:#F9FAFB; border-radius:10px; padding:12px 14px; font-size:12px; color:#374151; line-height:1.75; border:1px solid #F3F4F6; max-height:160px; overflow:auto; }
+        .msg-box { position:relative; background:linear-gradient(135deg,#F8FAFF 0%,#F0F4FF 100%); border-radius:12px; padding:16px 18px 16px 22px; font-size:13px; color:#1E293B; line-height:1.85; border:1px solid #DBEAFE; border-left:4px solid #3B82F6; white-space:pre-wrap; word-break:break-word; }
+        .msg-box-quote { position:absolute; top:10px; right:12px; font-size:32px; color:#DBEAFE; line-height:1; pointer-events:none; font-family:Georgia,serif; }
         .sec-title { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; }
         .st-btn { flex:1; padding:9px 4px; border-radius:9px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid; transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
         .st-btn:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,0.1); }
@@ -577,8 +579,17 @@ export default function MessagesPage() {
 
                     {selected.message && (
                       <div style={{ marginBottom:"16px" }}>
-                        <div className="sec-title">メッセージ内容</div>
-                        <div className="msg-box">{selected.message}</div>
+                        <div style={{ display:"flex", alignItems:"center", gap:"6px", marginBottom:"10px" }}>
+                          <div style={{ width:"3px", height:"14px", background:"linear-gradient(180deg,#3B82F6,#1D4ED8)", borderRadius:"2px" }} />
+                          <span className="sec-title" style={{ marginBottom:0 }}>メッセージ内容</span>
+                          <span style={{ marginLeft:"auto", fontSize:"10px", color:"#9CA3AF", fontWeight:400 }}>
+                            {selected.message.length}文字
+                          </span>
+                        </div>
+                        <div className="msg-box">
+                          <span className="msg-box-quote">&ldquo;</span>
+                          {selected.message}
+                        </div>
                       </div>
                     )}
 
