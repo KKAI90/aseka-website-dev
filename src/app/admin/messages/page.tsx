@@ -92,6 +92,13 @@ export default function MessagesPage() {
 
   useEffect(() => { load().then(() => setTimeout(() => setPageReady(true), 50)); }, [load]);
 
+  // ESC key closes modal
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSelected(null); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const updateStatus = async (id: string, status: string) => {
     setUpdatingId(id);
     await fetch("/api/admin/messages", {
@@ -152,14 +159,14 @@ export default function MessagesPage() {
         * { box-sizing:border-box; }
         @keyframes spin      { to { transform:rotate(360deg); } }
         @keyframes fadeUp    { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes slideIn   { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:translateX(0); } }
         @keyframes barGrow   { from { height:0 !important; } to {} }
         @keyframes skeletonShimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
         @keyframes pulse     { 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.4)} 50%{box-shadow:0 0 0 6px rgba(37,99,235,0)} }
         @keyframes toastIn   { from{opacity:0;transform:translateY(12px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes toastOut  { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(8px) scale(0.96)} }
         @keyframes rowFadeIn { from{opacity:0;transform:translateX(-4px)} to{opacity:1;transform:translateX(0)} }
         @keyframes dotPulse  { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.6} }
+        @keyframes modalIn   { from{opacity:0;transform:scale(0.94) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes overlayIn { from{opacity:0} to{opacity:1} }
 
         .page-bg { background:#F0F2F5; min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
         .topbar { position:sticky; top:0; z-index:100; background:#fff; border-bottom:1px solid #E5E7EB; padding:0 28px; height:60px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
@@ -215,7 +222,6 @@ export default function MessagesPage() {
         .clear-btn:hover { background:#FEE2E2; transform:scale(1.03); }
 
         /* Table */
-        .table-layout { display:grid; gap:14px; align-items:start; }
         .msg-table { width:100%; border-collapse:collapse; }
         .msg-thead { background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
         .msg-th { padding:11px 16px; text-align:left; font-size:10px; font-weight:700; color:#6B7280; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; }
@@ -231,26 +237,37 @@ export default function MessagesPage() {
         /* Skeleton */
         .skeleton { border-radius:6px; background:linear-gradient(90deg,#F3F4F6 25%,#E9EAEC 50%,#F3F4F6 75%); background-size:400px 100%; animation:skeletonShimmer 1.4s infinite; }
 
-        /* Detail panel */
-        .detail-panel { border-radius:14px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.08); position:sticky; top:76px; max-height:calc(100vh - 100px); display:flex; flex-direction:column; animation:slideIn 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-        .detail-header { padding:18px 20px; border-bottom:1px solid #F3F4F6; display:flex; justify-content:space-between; align-items:flex-start; flex-shrink:0; }
-        .detail-body { padding:18px 20px; overflow-y:auto; flex:1; }
-        .detail-body::-webkit-scrollbar { width:4px; } .detail-body::-webkit-scrollbar-track { background:transparent; } .detail-body::-webkit-scrollbar-thumb { background:#E5E7EB; border-radius:4px; }
-        .close-btn { width:30px; height:30px; border-radius:9px; background:#F3F4F6; border:none; cursor:pointer; color:#6B7280; display:flex; align-items:center; justify-content:center; font-weight:700; transition:all 0.15s; flex-shrink:0; }
-        .close-btn:hover { background:#FEE2E2; color:#DC2626; transform:scale(1.1); }
-        .info-row { display:flex; gap:8px; align-items:flex-start; padding:6px 8px; border-radius:8px; transition:background 0.12s; }
-        .info-row:hover { background:#F9FAFB; }
-        .info-label { font-size:11px; color:#9CA3AF; width:70px; flex-shrink:0; font-weight:500; padding-top:1px; }
-        .info-val { font-size:12px; color:#374151; font-weight:500; word-break:break-all; }
-        .msg-box { position:relative; background:linear-gradient(135deg,#F8FAFF 0%,#F0F4FF 100%); border-radius:12px; padding:16px 18px 16px 22px; font-size:13px; color:#1E293B; line-height:1.85; border:1px solid #DBEAFE; border-left:4px solid #3B82F6; white-space:pre-wrap; word-break:break-word; }
-        .msg-box-quote { position:absolute; top:10px; right:12px; font-size:32px; color:#DBEAFE; line-height:1; pointer-events:none; font-family:Georgia,serif; }
-        .sec-title { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em; }
-        .st-btn { flex:1; padding:9px 4px; border-radius:9px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid; transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
-        .st-btn:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,0.1); }
-        .st-btn:active { transform:scale(0.97); }
+        /* Modal overlay */
+        .modal-overlay { position:fixed; inset:0; z-index:400; background:rgba(10,20,40,0.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:20px; animation:overlayIn 0.2s ease; }
+        .modal-box { background:#fff; border-radius:20px; width:100%; max-width:920px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(0,0,0,0.22); animation:modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1); overflow:hidden; }
+        .modal-header { padding:20px 24px 18px; border-bottom:1px solid #F0F2F5; display:flex; align-items:flex-start; gap:14px; flex-shrink:0; background:linear-gradient(135deg,#F8FAFF 0%,#ffffff 100%); }
+        .modal-avatar { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg,#1E3A5F,#3B82F6); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:#fff; flex-shrink:0; box-shadow:0 4px 12px rgba(37,99,235,0.3); letter-spacing:-0.03em; }
+        .modal-body { display:flex; flex:1; overflow:hidden; }
+        .modal-left { width:268px; flex-shrink:0; border-right:1px solid #F0F2F5; padding:20px 18px; overflow-y:auto; background:#FAFBFD; }
+        .modal-left::-webkit-scrollbar { width:3px; } .modal-left::-webkit-scrollbar-thumb { background:#E5E7EB; border-radius:3px; }
+        .modal-right { flex:1; padding:22px 24px; overflow-y:auto; display:flex; flex-direction:column; gap:18px; }
+        .modal-right::-webkit-scrollbar { width:4px; } .modal-right::-webkit-scrollbar-track { background:transparent; } .modal-right::-webkit-scrollbar-thumb { background:#E5E7EB; border-radius:4px; }
+        .modal-footer { padding:14px 24px; border-top:1px solid #F0F2F5; display:flex; align-items:center; gap:8px; flex-shrink:0; background:#FAFBFD; }
+
+        .close-btn { width:34px; height:34px; border-radius:10px; background:#F3F4F6; border:none; cursor:pointer; color:#6B7280; display:flex; align-items:center; justify-content:center; font-weight:700; transition:all 0.15s; flex-shrink:0; }
+        .close-btn:hover { background:#FEE2E2; color:#DC2626; transform:scale(1.08); }
+        .nav-btn { width:34px; height:34px; border-radius:10px; background:#F3F4F6; border:none; cursor:pointer; color:#374151; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; transition:all 0.15s; flex-shrink:0; }
+        .nav-btn:hover:not(:disabled) { background:#EFF6FF; color:#1D4ED8; }
+        .nav-btn:disabled { opacity:0.3; cursor:not-allowed; }
+        .info-row { display:flex; gap:8px; align-items:flex-start; padding:7px 8px; border-radius:8px; transition:background 0.12s; }
+        .info-row:hover { background:#F0F2F5; }
+        .info-label { font-size:11px; color:#9CA3AF; width:62px; flex-shrink:0; font-weight:600; padding-top:2px; letter-spacing:0.02em; }
+        .info-val { font-size:12.5px; color:#1E293B; font-weight:500; word-break:break-all; line-height:1.5; }
+        .msg-box { position:relative; background:linear-gradient(160deg,#F8FAFF 0%,#EEF4FF 100%); border-radius:14px; padding:20px 22px 20px 26px; font-size:14px; color:#1E293B; line-height:1.9; border:1px solid #DBEAFE; border-left:4px solid #3B82F6; white-space:pre-wrap; word-break:break-word; flex:1; }
+        .msg-box-quote { position:absolute; top:8px; right:14px; font-size:48px; color:#DBEAFE; line-height:1; pointer-events:none; font-family:Georgia,serif; }
+        .sec-title { font-size:10px; color:#9CA3AF; font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.07em; display:flex; align-items:center; gap:6px; }
+        .sec-title::before { content:""; display:inline-block; width:3px; height:12px; background:linear-gradient(180deg,#3B82F6,#1D4ED8); border-radius:2px; }
+        .st-btn { flex:1; padding:10px 6px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid; transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+        .st-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.12); }
+        .st-btn:active:not(:disabled) { transform:scale(0.97); }
         .st-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-        .action-a { flex:1; padding:10px 8px; border-radius:10px; font-size:12px; font-weight:600; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.18s; }
-        .action-a:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.15); opacity:0.9; }
+        .action-a { flex:1; padding:11px 10px; border-radius:11px; font-size:13px; font-weight:600; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.18s; }
+        .action-a:hover { transform:translateY(-1px); box-shadow:0 5px 16px rgba(0,0,0,0.15); opacity:0.92; }
 
         /* Empty / Loading */
         .empty-state { padding:64px; text-align:center; }
@@ -266,11 +283,19 @@ export default function MessagesPage() {
         /* Responsive */
         @media (max-width:900px) {
           .kpi-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
-          .table-layout { grid-template-columns:1fr !important; }
           .content { padding:14px 16px; }
           .topbar { padding:0 16px; }
           .chart-wrap { padding:16px; }
-          .detail-panel { position:static; animation:fadeUp 0.3s ease; }
+          .modal-box { max-width:100%; border-radius:16px; max-height:95vh; }
+          .modal-left { width:220px; }
+        }
+        @media (max-width:660px) {
+          .modal-body { flex-direction:column; }
+          .modal-left { width:100%; border-right:none; border-bottom:1px solid #F0F2F5; padding:14px 16px; overflow-y:visible; }
+          .modal-box { border-radius:16px 16px 0 0; max-height:96vh; position:fixed; bottom:0; left:0; right:0; max-width:100%; margin:0; }
+          .modal-overlay { align-items:flex-end; padding:0; }
+          .modal-right { padding:16px; }
+          .modal-footer { padding:12px 16px; }
         }
         @media (max-width:600px) {
           .topbar { height:52px; }
@@ -455,183 +480,214 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* ── Table + Detail Panel ── */}
-          <div className="table-layout" style={{ gridTemplateColumns: selected ? "1fr 400px" : "1fr" }}>
-
-            {/* Table */}
-            <div className="card section-appear" style={{ overflow:"hidden", animationDelay:"0.25s" }}>
-              {loading ? (
-                /* Skeleton rows */
-                <div style={{ padding:"0" }}>
-                  <div style={{ padding:"11px 16px", background:"#F9FAFB", borderBottom:"1px solid #E5E7EB", display:"flex", gap:"24px" }}>
-                    {[80,120,80,140,70].map((w,i) => <div key={i} className="skeleton" style={{ height:"10px", width:`${w}px`, borderRadius:"4px" }} />)}
+          {/* ── Table (full width always) ── */}
+          <div className="card section-appear" style={{ overflow:"hidden", animationDelay:"0.25s" }}>
+            {loading ? (
+              <div>
+                <div style={{ padding:"11px 16px", background:"#F9FAFB", borderBottom:"1px solid #E5E7EB", display:"flex", gap:"24px" }}>
+                  {[80,120,80,140,70].map((w,i) => <div key={i} className="skeleton" style={{ height:"10px", width:`${w}px`, borderRadius:"4px" }} />)}
+                </div>
+                {[1,2,3].map(i => (
+                  <div key={i} style={{ padding:"16px", borderBottom:"1px solid #F3F4F6", display:"flex", gap:"24px", alignItems:"center" }}>
+                    <div className="skeleton" style={{ height:"12px", width:"80px" }} />
+                    <div style={{ flex:1 }}>
+                      <div className="skeleton" style={{ height:"13px", width:"100px", marginBottom:"6px" }} />
+                      <div className="skeleton" style={{ height:"10px", width:"70px" }} />
+                    </div>
+                    <div className="skeleton" style={{ height:"20px", width:"60px", borderRadius:"6px" }} />
+                    <div className="skeleton" style={{ height:"11px", width:"120px" }} />
+                    <div className="skeleton" style={{ height:"20px", width:"56px", borderRadius:"6px" }} />
                   </div>
-                  {[1,2,3].map(i => (
-                    <div key={i} style={{ padding:"16px", borderBottom:"1px solid #F3F4F6", display:"flex", gap:"24px", alignItems:"center" }}>
-                      <div className="skeleton" style={{ height:"12px", width:"80px" }} />
-                      <div style={{ flex:1 }}>
-                        <div className="skeleton" style={{ height:"13px", width:"100px", marginBottom:"6px" }} />
-                        <div className="skeleton" style={{ height:"10px", width:"70px" }} />
-                      </div>
-                      <div className="skeleton" style={{ height:"20px", width:"60px", borderRadius:"6px" }} />
-                      <div className="skeleton" style={{ height:"11px", width:"120px" }} />
-                      <div className="skeleton" style={{ height:"20px", width:"56px", borderRadius:"6px" }} />
-                    </div>
-                  ))}
-                </div>
-              ) : filtered.length === 0 ? (
-                <div className="empty-state">
-                  <div style={{ fontSize:"48px", marginBottom:"12px", opacity:0.25 }}>📭</div>
-                  <div style={{ fontSize:"14px", color:"#6B7280", fontWeight:600 }}>データが見つかりません</div>
-                  {hasFilter && <div style={{ fontSize:"12px", color:"#9CA3AF", marginTop:"6px" }}>フィルターを変更してください</div>}
-                </div>
-              ) : (
-                <div className="msg-table-wrap">
-                  <table className="msg-table">
-                    <thead className="msg-thead">
-                      <tr>
-                        <th className="msg-th" style={{ width:"120px" }}>日時</th>
-                        <th className="msg-th">送信者</th>
-                        <th className="msg-th msg-th-service" style={{ width:"108px" }}>サービス</th>
-                        <th className="msg-th msg-th-content">内容</th>
-                        <th className="msg-th" style={{ width:"96px" }}>ステータス</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((m, idx) => {
-                        const st = ST[m.status] || ST.new;
-                        const svc = SVC[m.service || ""];
-                        const isSel = selected?.id === m.id;
-                        return (
-                          <tr key={m.id}
-                            className={`msg-row${isSel ? " msg-row-sel" : ""}`}
-                            style={{ animationDelay:`${idx * 0.04}s` }}
-                            onClick={() => setSelected(isSel ? null : m)}>
-                            <td className="msg-td" style={{ color:"#6B7280", fontSize:"11px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums" }}>
-                              {fmt(m.created_at)}
-                            </td>
-                            <td className="msg-td">
-                              <div style={{ fontWeight:600, color:"#111827", fontSize:"13px" }}>{m.name}</div>
-                              {m.company && <div style={{ fontSize:"11px", color:"#9CA3AF", marginTop:"2px" }}>{m.company}</div>}
-                            </td>
-                            <td className="msg-td msg-td-service">
-                              {svc
-                                ? <span className="badge" style={{ color:svc.color, background:svc.bg, borderColor:svc.border }}>{svc.ja}</span>
-                                : <span style={{ color:"#D1D5DB", fontSize:"12px" }}>—</span>}
-                            </td>
-                            <td className="msg-td msg-td-content" style={{ maxWidth: selected ? "90px" : "220px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontSize:"12px", color:"#6B7280" }}>
-                              {m.message || <span style={{ color:"#D1D5DB" }}>—</span>}
-                            </td>
-                            <td className="msg-td">
-                              <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border }}>
-                                <span className={`dot${m.status==="new" ? " dot-pulse" : ""}`} style={{ background:st.dot }} />
-                                {st.ja}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Detail Panel */}
-            {selected && (() => {
-              const st = ST[selected.status] || ST.new;
-              const svc = SVC[selected.service || ""];
-              return (
-                <div className="card detail-panel" style={{ background:"#fff" }}>
-                  {/* Header */}
-                  <div className="detail-header" style={{ background:"linear-gradient(135deg,#F8FAFC,#fff)" }}>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:"15px", fontWeight:700, color:"#111827", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{selected.name}</div>
-                      {selected.company && <div style={{ fontSize:"12px", color:"#6B7280", marginTop:"2px" }}>{selected.company}</div>}
-                      <div style={{ marginTop:"8px" }}>
-                        <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border, fontSize:"11px", padding:"4px 10px" }}>
-                          <span className={`dot${selected.status==="new" ? " dot-pulse" : ""}`} style={{ width:"6px", height:"6px", background:st.dot }} />
-                          {st.ja} · {st.vn}
-                        </span>
-                      </div>
-                    </div>
-                    <button className="close-btn" onClick={() => setSelected(null)} style={{ marginLeft:"10px", marginTop:"2px" }}>
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                    </button>
-                  </div>
-
-                  <div className="detail-body">
-                    <div style={{ display:"flex", flexDirection:"column", gap:"2px", marginBottom:"16px" }}>
-                      {[
-                        { icon:"✉️", label:"メール",   value:selected.email },
-                        { icon:"📞", label:"電話番号", value:selected.phone||"—" },
-                        { icon:"🏢", label:"種別",     value:selected.type==="business" ? "企業" : "個人" },
-                        { icon:"📋", label:"サービス", value:svc?.ja||"—" },
-                        { icon:"🕐", label:"受信日時", value:fmt(selected.created_at) },
-                      ].map(r => (
-                        <div key={r.label} className="info-row">
-                          <span style={{ fontSize:"13px", width:"22px", textAlign:"center", flexShrink:0 }}>{r.icon}</span>
-                          <span className="info-label">{r.label}</span>
-                          <span className="info-val">{r.value}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {selected.message && (
-                      <div style={{ marginBottom:"16px" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:"6px", marginBottom:"10px" }}>
-                          <div style={{ width:"3px", height:"14px", background:"linear-gradient(180deg,#3B82F6,#1D4ED8)", borderRadius:"2px" }} />
-                          <span className="sec-title" style={{ marginBottom:0 }}>メッセージ内容</span>
-                          <span style={{ marginLeft:"auto", fontSize:"10px", color:"#9CA3AF", fontWeight:400 }}>
-                            {selected.message.length}文字
-                          </span>
-                        </div>
-                        <div className="msg-box">
-                          <span className="msg-box-quote">&ldquo;</span>
-                          {selected.message}
-                        </div>
-                      </div>
-                    )}
-
-                    <div style={{ height:"1px", background:"#F3F4F6", margin:"0 -20px 16px" }} />
-
-                    <div style={{ marginBottom:"14px" }}>
-                      <div className="sec-title">ステータス変更</div>
-                      <div style={{ display:"flex", gap:"6px" }}>
-                        {Object.entries(ST).map(([k, v]) => {
-                          const isAct = selected.status === k;
-                          const isLoading = updatingId === selected.id;
-                          return (
-                            <button key={k} className="st-btn"
-                              disabled={isLoading}
-                              onClick={() => updateStatus(selected.id, k)}
-                              style={{ background: isAct ? v.tc : v.tb, color: isAct ? "#fff" : v.tc, borderColor: isAct ? v.tc : v.border, boxShadow: isAct ? `0 2px 8px ${v.tc}44` : "none" }}>
-                              {isLoading && isAct ? "…" : v.ja}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div style={{ display:"flex", gap:"8px" }}>
-                      <a href={`mailto:${selected.email}`} className="action-a"
-                        style={{ background:"linear-gradient(135deg,#1E3A5F,#2563EB)", color:"#fff", boxShadow:"0 2px 8px rgba(37,99,235,0.25)" }}>
-                        ✉️ メール送信
-                      </a>
-                      {selected.phone && (
-                        <a href={`tel:${selected.phone}`} className="action-a"
-                          style={{ flex:"0 0 auto", padding:"10px 16px", background:"#ECFDF5", color:"#065F46", border:"1px solid #A7F3D0" }}>
-                          📞 電話
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="empty-state">
+                <div style={{ fontSize:"48px", marginBottom:"12px", opacity:0.25 }}>📭</div>
+                <div style={{ fontSize:"14px", color:"#6B7280", fontWeight:600 }}>データが見つかりません</div>
+                {hasFilter && <div style={{ fontSize:"12px", color:"#9CA3AF", marginTop:"6px" }}>フィルターを変更してください</div>}
+              </div>
+            ) : (
+              <div className="msg-table-wrap">
+                <table className="msg-table">
+                  <thead className="msg-thead">
+                    <tr>
+                      <th className="msg-th" style={{ width:"130px" }}>日時</th>
+                      <th className="msg-th">送信者</th>
+                      <th className="msg-th msg-th-service" style={{ width:"108px" }}>サービス</th>
+                      <th className="msg-th msg-th-content">内容プレビュー</th>
+                      <th className="msg-th" style={{ width:"96px" }}>ステータス</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((m, idx) => {
+                      const st = ST[m.status] || ST.new;
+                      const svc = SVC[m.service || ""];
+                      const isSel = selected?.id === m.id;
+                      return (
+                        <tr key={m.id}
+                          className={`msg-row${isSel ? " msg-row-sel" : ""}`}
+                          style={{ animationDelay:`${idx * 0.04}s` }}
+                          onClick={() => setSelected(m)}>
+                          <td className="msg-td" style={{ color:"#6B7280", fontSize:"11px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums" }}>
+                            {fmt(m.created_at)}
+                          </td>
+                          <td className="msg-td">
+                            <div style={{ fontWeight:600, color:"#111827", fontSize:"13px" }}>{m.name}</div>
+                            {m.company && <div style={{ fontSize:"11px", color:"#9CA3AF", marginTop:"2px" }}>{m.company}</div>}
+                          </td>
+                          <td className="msg-td msg-td-service">
+                            {svc
+                              ? <span className="badge" style={{ color:svc.color, background:svc.bg, borderColor:svc.border }}>{svc.ja}</span>
+                              : <span style={{ color:"#D1D5DB", fontSize:"12px" }}>—</span>}
+                          </td>
+                          <td className="msg-td msg-td-content" style={{ maxWidth:"260px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontSize:"12px", color:"#6B7280" }}>
+                            {m.message || <span style={{ color:"#D1D5DB" }}>—</span>}
+                          </td>
+                          <td className="msg-td">
+                            <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border }}>
+                              <span className={`dot${m.status==="new" ? " dot-pulse" : ""}`} style={{ background:st.dot }} />
+                              {st.ja}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* ── Detail Modal ── */}
+      {selected && (() => {
+        const st = ST[selected.status] || ST.new;
+        const svc = SVC[selected.service || ""];
+        const selIdx = filtered.findIndex(m => m.id === selected.id);
+        const hasPrev = selIdx > 0;
+        const hasNext = selIdx < filtered.length - 1;
+        const initials = selected.name.trim().slice(0, 2).toUpperCase();
+        return (
+          <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
+            <div className="modal-box">
+
+              {/* ── Modal Header ── */}
+              <div className="modal-header">
+                <div className="modal-avatar">{initials}</div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:"10px", flexWrap:"wrap" }}>
+                    <span style={{ fontSize:"17px", fontWeight:800, color:"#0F172A", letterSpacing:"-0.02em" }}>{selected.name}</span>
+                    <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border, fontSize:"11px", padding:"4px 11px" }}>
+                      <span className={`dot${selected.status==="new" ? " dot-pulse" : ""}`} style={{ width:"6px", height:"6px", background:st.dot }} />
+                      {st.ja}
+                    </span>
+                  </div>
+                  <div style={{ marginTop:"4px", display:"flex", gap:"12px", flexWrap:"wrap" }}>
+                    {selected.company && <span style={{ fontSize:"12px", color:"#64748B", fontWeight:500 }}>{selected.company}</span>}
+                    <span style={{ fontSize:"12px", color:"#94A3B8" }}>{fmt(selected.created_at)}</span>
+                  </div>
+                </div>
+                <button className="close-btn" onClick={() => setSelected(null)} title="閉じる (ESC)">
+                  <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                </button>
+              </div>
+
+              {/* ── Modal Body ── */}
+              <div className="modal-body">
+
+                {/* Left: Contact Info */}
+                <div className="modal-left">
+                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"12px" }}>連絡先情報</div>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"2px" }}>
+                    {[
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, label:"メール", value:selected.email },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, label:"電話番号", value:selected.phone||"—" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>, label:"種別", value:selected.type==="business" ? "企業" : "個人" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>, label:"サービス", value:svc?.ja||"—" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>, label:"受信日時", value:fmt(selected.created_at) },
+                    ].map(r => (
+                      <div key={r.label} className="info-row">
+                        <span style={{ width:"20px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{r.icon}</span>
+                        <span className="info-label">{r.label}</span>
+                        <span className="info-val">{r.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ height:"1px", background:"#EEF0F4", margin:"16px 0" }} />
+
+                  {/* Status change in left panel */}
+                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"10px" }}>ステータス変更</div>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"6px" }}>
+                    {Object.entries(ST).map(([k, v]) => {
+                      const isAct = selected.status === k;
+                      const isLoading = updatingId === selected.id;
+                      return (
+                        <button key={k} className="st-btn"
+                          disabled={isLoading}
+                          onClick={() => updateStatus(selected.id, k)}
+                          style={{ display:"flex", alignItems:"center", gap:"8px", textAlign:"left", background: isAct ? v.tc : v.tb, color: isAct ? "#fff" : v.tc, borderColor: isAct ? v.tc : v.border, boxShadow: isAct ? `0 3px 10px ${v.tc}44` : "none", flex:"unset" }}>
+                          <span style={{ width:"8px", height:"8px", borderRadius:"50%", background: isAct ? "rgba(255,255,255,0.7)" : v.dot, flexShrink:0 }} />
+                          {isLoading && isAct ? "更新中…" : v.ja}
+                          {isAct && <svg style={{ marginLeft:"auto" }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Right: Message content */}
+                <div className="modal-right">
+                  <div>
+                    <div className="sec-title">
+                      メッセージ内容
+                      <span style={{ marginLeft:"auto", fontSize:"10px", color:"#94A3B8", fontWeight:400, textTransform:"none", letterSpacing:0 }}>
+                        {selected.message ? `${selected.message.length}文字` : ""}
+                      </span>
+                    </div>
+                    {selected.message ? (
+                      <div className="msg-box">
+                        <span className="msg-box-quote">&ldquo;</span>
+                        {selected.message}
+                      </div>
+                    ) : (
+                      <div style={{ padding:"32px", textAlign:"center", color:"#D1D5DB", fontSize:"13px" }}>メッセージなし</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Modal Footer: actions + navigation ── */}
+              <div className="modal-footer">
+                <a href={`mailto:${selected.email}`} className="action-a"
+                  style={{ flex:"none", padding:"10px 20px", background:"linear-gradient(135deg,#1E3A5F,#2563EB)", color:"#fff", boxShadow:"0 2px 10px rgba(37,99,235,0.3)", borderRadius:"11px" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  メール送信
+                </a>
+                {selected.phone && (
+                  <a href={`tel:${selected.phone}`} className="action-a"
+                    style={{ flex:"none", padding:"10px 18px", background:"#ECFDF5", color:"#065F46", border:"1px solid #A7F3D0", borderRadius:"11px" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    電話
+                  </a>
+                )}
+                <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:"6px" }}>
+                  <span style={{ fontSize:"11px", color:"#94A3B8", marginRight:"4px" }}>
+                    {selIdx + 1} / {filtered.length}
+                  </span>
+                  <button className="nav-btn" disabled={!hasPrev} onClick={() => setSelected(filtered[selIdx - 1])} title="前へ">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <button className="nav-btn" disabled={!hasNext} onClick={() => setSelected(filtered[selIdx + 1])} title="次へ">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Toast notification ── */}
       {toast && (
