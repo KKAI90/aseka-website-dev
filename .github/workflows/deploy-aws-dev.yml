@@ -7,30 +7,46 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: aws-dev
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
+      # Build chạy hoàn toàn ở đây (CI) — KHÔNG build trên EC2 (RAM t4g.micro thấp,
+      # dễ OOM). EC2 chỉ nhận artifact đã build sẵn rồi restart PM2.
       - name: Install & build
+        env:
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DEV_DIRECT_URL }}
         run: |
           npm ci
           npx prisma generate
           npm run build
 
-      # TODO: bật khi đã có EC2 dev instance + secrets (EC2_DEV_HOST, EC2_DEV_SSH_KEY)
-      # - name: Deploy via SSH
+      # TODO: bật khi đã có EC2 dev instance + secrets:
+      # EC2_DEV_HOST, EC2_DEV_SSH_KEY, DEV_DATABASE_URL, DEV_DIRECT_URL
+      # - name: Rsync build artifact lên EC2 (không git pull / không rebuild trên server)
+      #   uses: burnett01/rsync-deployments@7.0.1
+      #   with:
+      #     switches: -avzr --delete
+      #     path: .next/ package.json package-lock.json prisma/ public/ next.config.js
+      #     remote_path: /var/www/aseka-dev/
+      #     remote_host: ${{ secrets.EC2_DEV_HOST }}
+      #     remote_user: ec2-user
+      #     remote_key: ${{ secrets.EC2_DEV_SSH_KEY }}
+      #
+      # - name: Cài production deps + restart PM2 trên EC2
       #   uses: appleboy/ssh-action@v1
       #   with:
       #     host: ${{ secrets.EC2_DEV_HOST }}
-      #     username: ubuntu
+      #     username: ec2-user
       #     key: ${{ secrets.EC2_DEV_SSH_KEY }}
       #     script: |
-      #       cd /var/www/aseka
-      #       git pull origin aseka-dev
-      #       npm ci
+      #       cd /var/www/aseka-dev
+      #       npm ci --omit=dev
       #       npx prisma generate
-      #       npm run build
-      #       pm2 restart aseka-dev
+      #       pm2 restart aseka-dev --update-env || pm2 start npm --name aseka-dev -- start
