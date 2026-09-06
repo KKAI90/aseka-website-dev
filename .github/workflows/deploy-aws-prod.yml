@@ -1,0 +1,55 @@
+name: Deploy to AWS (prod)
+
+on:
+  push:
+    branches: [aseka-main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: aws-prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Build chạy hoàn toàn ở đây (CI) — KHÔNG build trên EC2 (RAM t4g.micro thấp,
+      # dễ OOM). EC2 chỉ nhận artifact đã build sẵn rồi restart PM2.
+      - name: Install & build
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          npm ci
+          npx prisma generate
+          npm run build
+
+      # TODO: bật khi đã có EC2 prod instance + secrets:
+      # EC2_PROD_HOST, EC2_PROD_SSH_KEY, PROD_DATABASE_URL, PROD_DIRECT_URL
+      # Chỉ merge vào aseka-main sau khi đã test kỹ trên aseka-dev.
+      # - name: Rsync build artifact lên EC2 (không git pull / không rebuild trên server)
+      #   uses: burnett01/rsync-deployments@7.0.1
+      #   with:
+      #     switches: -avzr --delete
+      #     path: .next/ package.json package-lock.json prisma/ public/ next.config.js
+      #     remote_path: /var/www/aseka-prod/
+      #     remote_host: ${{ secrets.EC2_PROD_HOST }}
+      #     remote_user: ubuntu
+      #     remote_key: ${{ secrets.EC2_PROD_SSH_KEY }}
+      #
+      # - name: Cài production deps + restart PM2 trên EC2
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.EC2_PROD_HOST }}
+      #     username: ubuntu
+      #     key: ${{ secrets.EC2_PROD_SSH_KEY }}
+      #     script: |
+      #       cd /var/www/aseka-prod
+      #       npm ci --omit=dev
+      #       npx prisma generate
+      #       pm2 restart aseka-prod --update-env
+      #       sleep 3
+      #       curl -sf https://aseka.co.jp/api/admin/me -o /dev/null || echo "⚠ health check failed, kiểm tra ngay"
