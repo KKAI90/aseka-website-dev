@@ -31,7 +31,7 @@ jobs:
         uses: burnett01/rsync-deployments@7.0.1
         with:
           switches: -avzr --delete --exclude=".env"
-          path: .next/ package.json package-lock.json prisma/ public/ next.config.js
+          path: .next package.json package-lock.json prisma public next.config.js
           remote_path: /var/www/aseka-dev/
           remote_host: ${{ secrets.EC2_DEV_HOST }}
           remote_user: ec2-user
