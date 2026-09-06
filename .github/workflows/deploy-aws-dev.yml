@@ -27,26 +27,27 @@ jobs:
           npx prisma generate
           npm run build
 
-      # TODO: bật khi đã có EC2 dev instance + secrets:
-      # EC2_DEV_HOST, EC2_DEV_SSH_KEY, DEV_DATABASE_URL, DEV_DIRECT_URL
-      # - name: Rsync build artifact lên EC2 (không git pull / không rebuild trên server)
-      #   uses: burnett01/rsync-deployments@7.0.1
-      #   with:
-      #     switches: -avzr --delete
-      #     path: .next/ package.json package-lock.json prisma/ public/ next.config.js
-      #     remote_path: /var/www/aseka-dev/
-      #     remote_host: ${{ secrets.EC2_DEV_HOST }}
-      #     remote_user: ec2-user
-      #     remote_key: ${{ secrets.EC2_DEV_SSH_KEY }}
-      #
-      # - name: Cài production deps + restart PM2 trên EC2
-      #   uses: appleboy/ssh-action@v1
-      #   with:
-      #     host: ${{ secrets.EC2_DEV_HOST }}
-      #     username: ec2-user
-      #     key: ${{ secrets.EC2_DEV_SSH_KEY }}
-      #     script: |
-      #       cd /var/www/aseka-dev
-      #       npm ci --omit=dev
-      #       npx prisma generate
-      #       pm2 restart aseka-dev --update-env || pm2 start npm --name aseka-dev -- start
+      - name: Rsync build artifact lên EC2 (không git pull / không rebuild trên server)
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete --exclude=".env"
+          path: .next/ package.json package-lock.json prisma/ public/ next.config.js
+          remote_path: /var/www/aseka-dev/
+          remote_host: ${{ secrets.EC2_DEV_HOST }}
+          remote_user: ec2-user
+          remote_key: ${{ secrets.EC2_DEV_SSH_KEY }}
+
+      - name: Cài production deps + restart PM2 trên EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_DEV_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_DEV_SSH_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            cd /var/www/aseka-dev
+            npm ci --omit=dev
+            npx prisma generate
+            pm2 restart aseka-dev --update-env || pm2 start npm --name aseka-dev -- start
+            pm2 save
