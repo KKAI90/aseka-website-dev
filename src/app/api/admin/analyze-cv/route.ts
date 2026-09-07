@@ -29,7 +29,7 @@ Return ONLY valid JSON (no markdown, no explanation):
   "jlpt_actual": "as written in CV",
   "height_cm": null,
   "weight_kg": null,
-  "skill": "飲食 or 製造 or 農業 or ホテル or 宿泊業 or IT or その他",
+  "skill": "介護 or ビルクリーニング or 工業製品製造業 or 建設 or 造船・舶用工業 or 自動車整備 or 航空 or 宿泊 or 農業 or 漁業 or 飲食料品製造業 or 外食業 or 繊維業 or 印刷業 or 鉄道 or 林業 or IT or 機械・電気電子 or 国際業務 or 通訳・翻訳 or 経理・会計 or その他 (choose the closest match to job industries actually used by Aseka; do not default to その他 unless truly none fit)",
   "preferred_job": "希望職種 or empty",
   "work_hours": "or empty",
   "availability": "immediate or YYYY-MM or empty",
@@ -43,7 +43,7 @@ Return ONLY valid JSON (no markdown, no explanation):
   "summary_ja": "2-3 sentences in Japanese",
   "summary_vn": "2-3 câu tiếng Việt",
   "strengths": ["s1","s2","s3"],
-  "match_industry": "飲食 or 製造 or 農業 or ホテル or その他"
+  "match_industry": "same value as skill field above"
 }
 
 CV TEXT:
