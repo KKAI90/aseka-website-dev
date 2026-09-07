@@ -129,6 +129,12 @@ export default function CandidatesPage() {
   const [detailTab, setDetailTab] = useState<"basic"|"history"|"pr"|"match">("basic");
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [skillFilter, setSkillFilter] = useState("all");
+  const [jlptFilter, setJlptFilter] = useState("all");
+  const [sortKey, setSortKey] = useState<"name"|"jlpt"|"updated_at">("updated_at");
+  const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout>|null>(null);
   const [view, setView] = useState<"list"|"import"|"review">("list");
   const [fileItems, setFileItems] = useState<FileItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -144,22 +150,48 @@ export default function CandidatesPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const retryTimerRef = useRef<ReturnType<typeof setInterval>|null>(null);
 
-  const load = useCallback(async (s?:string) => {
+  const load = useCallback(async () => {
     const p = new URLSearchParams();
     if (filter!=="all") p.set("status",filter);
-    const q = s!==undefined?s:search;
-    if (q) p.set("search",q);
+    if (skillFilter!=="all") p.set("skill",skillFilter);
+    if (jlptFilter!=="all") p.set("jlpt",jlptFilter);
+    if (search) p.set("search",search);
     const res = await fetch(`/api/admin/candidates?${p}`);
     if (res.status===401){router.push("/admin/login");return;}
     const d = await res.json();
     setCands(d.data||[]);
     setLoading(false);
-  },[filter,search,router]);
+  },[filter,skillFilter,jlptFilter,search,router]);
 
   useEffect(()=>{load();},[load]);
 
+  // Debounce search input → search (300ms)
+  useEffect(()=>{
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(()=>setSearch(searchInput), 300);
+    return ()=>{if(searchDebounceRef.current) clearTimeout(searchDebounceRef.current);};
+  },[searchInput]);
+
   const counts: Record<string,number> = {all:cands.length};
   Object.keys(ST).forEach((k: string) => {counts[k] = cands.filter((c: Candidate) => c.status === k).length;});
+
+  const activeFilterCount = (filter!=="all"?1:0) + (skillFilter!=="all"?1:0) + (jlptFilter!=="all"?1:0) + (search?1:0);
+  const clearFilters = () => { setFilter("all"); setSkillFilter("all"); setJlptFilter("all"); setSearchInput(""); setSearch(""); };
+
+  // Distinct skill values currently in data, for the dropdown
+  const skillOptions = Array.from(new Set(cands.map(c=>c.skill).filter(Boolean))).sort();
+
+  const sortedCands = [...cands].sort((a,b)=>{
+    let cmp = 0;
+    if (sortKey==="name") cmp = a.name.localeCompare(b.name, "ja");
+    else if (sortKey==="jlpt") cmp = (a.jlpt||"").localeCompare(b.jlpt||"");
+    else cmp = new Date(a.updated_at||0).getTime() - new Date(b.updated_at||0).getTime();
+    return sortDir==="asc"?cmp:-cmp;
+  });
+  const toggleSort = (key: "name"|"jlpt"|"updated_at") => {
+    if (sortKey===key) setSortDir(d=>d==="asc"?"desc":"asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };
 
   const updateStatus = async (id:string, status:string) => {
     await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});
@@ -364,16 +396,12 @@ export default function CandidatesPage() {
   /* ─── LIST VIEW ─────────────────────────────────────────── */
   if (view==="list") return (
     <div>
-      <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
-          <div style={{fontSize:"14px",fontWeight:700,color:navy}}>人材管理 / Quản lý Ứng viên</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B"}}>Supabase DB · Groq AI · Export CV · Job Matching</div>
+          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>人材管理 <span style={{color:"#B4B2A9",fontWeight:400}}>/ Quản lý Ứng viên</span></div>
+          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>RDS DB · Groq AI · Export CV · Job Matching</div>
         </div>
         <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
-          <input type="text" placeholder="名前・メールで検索..." value={search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {setSearch(e.target.value); load(e.target.value);}}
-            style={{padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",width:"180px"}}/>
-
           {/* Form share button + popup */}
           <div style={{position:"relative"}}>
             <button onClick={()=>setShowFormPopup(p=>!p)}
@@ -414,6 +442,34 @@ export default function CandidatesPage() {
       </div>
 
       <div style={{padding:"16px 20px"}}>
+        {/* Search + advanced filters toolbar */}
+        <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
+          <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="氏名・メール・希望職種で検索 / Tìm tên, email, vị trí..." value={searchInput}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+              style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <select value={skillFilter} onChange={e=>setSkillFilter(e.target.value)}
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">業種すべて / Mọi ngành</option>
+            {skillOptions.map(s=><option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">日本語すべて / Mọi JLPT</option>
+            {["N1","N2","N3","N4","N5"].map(j=><option key={j} value={j}>{j}</option>)}
+          </select>
+          {activeFilterCount>0&&(
+            <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
+              ✕ フィルター解除 ({activeFilterCount})
+            </button>
+          )}
+          <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
+            {loading?"読み込み中...":`${cands.length}件 · ${cands.length} kết quả`}
+          </div>
+        </div>
+
         <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
           {[{key:"all",ja:"全件",vn:"Tất cả"},...Object.entries(ST).map(([k,v])=>({key:k,ja:v.ja,vn:v.vn}))].map(t=>(
             <button key={t.key} onClick={()=>setFilter(t.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===t.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===t.key?navy:"#fff",color:filter===t.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
@@ -433,16 +489,31 @@ export default function CandidatesPage() {
             </div>:(
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:"12px"}}>
                 <thead><tr style={{background:"#F6F7F9"}}>
-                  {["候補者","業種","日本語","希望職種","マッチ先","CV","ステータス","更新"].map(h=>(
-                    <th key={h} style={{padding:"9px 10px",textAlign:"left",fontSize:"10px",color:"#6B6B6B",fontWeight:600,borderBottom:"0.5px solid rgba(11,31,58,0.1)",whiteSpace:"nowrap"}}>{h}</th>
+                  {[
+                    {h:"候補者",key:"name" as const},
+                    {h:"業種",key:null},
+                    {h:"日本語",key:"jlpt" as const},
+                    {h:"希望職種",key:null},
+                    {h:"マッチ先",key:null},
+                    {h:"CV",key:null},
+                    {h:"ステータス",key:null},
+                    {h:"更新",key:"updated_at" as const},
+                  ].map(col=>(
+                    <th key={col.h} onClick={col.key?()=>toggleSort(col.key!):undefined}
+                      style={{padding:"9px 10px",textAlign:"left",fontSize:"10px",color:"#6B6B6B",fontWeight:600,borderBottom:"0.5px solid rgba(11,31,58,0.1)",whiteSpace:"nowrap",cursor:col.key?"pointer":"default",userSelect:"none"}}>
+                      {col.h}{col.key&&sortKey===col.key?(sortDir==="asc"?" ▲":" ▼"):""}
+                    </th>
                   ))}
                 </tr></thead>
                 <tbody>
-                  {cands.map(c=>{
+                  {sortedCands.map(c=>{
                     const st=ST[c.status]||ST.new; const jc=JC[c.jlpt]||JC["N5"];
                     const ini=c.name.split(" ").slice(-2).map((w:string)=>w[0]).join("").toUpperCase();
                     return(
-                      <tr key={c.id} onClick={()=>setSelected(selected?.id===c.id?null:c)} style={{borderBottom:"0.5px solid rgba(11,31,58,0.05)",cursor:"pointer",background:selected?.id===c.id?"#E6F1FB":"transparent"}}>
+                      <tr key={c.id} onClick={()=>setSelected(selected?.id===c.id?null:c)}
+                        onMouseEnter={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="#FAFBFC";}}
+                        onMouseLeave={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="transparent";}}
+                        style={{borderBottom:"0.5px solid rgba(11,31,58,0.05)",cursor:"pointer",background:selected?.id===c.id?"#E6F1FB":"transparent",transition:"background 0.12s"}}>
                         <td style={{padding:"10px 10px"}}>
                           <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
                             <div style={{width:"28px",height:"28px",borderRadius:"50%",background:st.tb,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",fontWeight:700,color:st.tc,flexShrink:0}}>{ini}</div>

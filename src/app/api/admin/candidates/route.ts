@@ -9,6 +9,8 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const search = searchParams.get("search");
+  const skill = searchParams.get("skill");
+  const jlpt = searchParams.get("jlpt");
   const id = searchParams.get("id");
 
   if (id) {
@@ -19,6 +21,8 @@ export async function GET(req: NextRequest) {
 
   const where: Record<string, unknown> = {};
   if (status && status !== "all") where.status = status;
+  if (skill && skill !== "all") where.skill = skill;
+  if (jlpt && jlpt !== "all") where.jlpt = jlpt;
   if (search) {
     const safe = search.slice(0, 100);
     where.OR = [
