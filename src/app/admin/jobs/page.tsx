@@ -30,11 +30,33 @@ const ST: Record<string,{ja:string;vn:string;tc:string;tb:string}> = {
   paused:{ja:"停止",    vn:"Tạm dừng",  tc:"#444441",tb:"#F1EFE8"},
 };
 const IND: Record<string,{tc:string;tb:string;icon:string}> = {
-  "飲食":  {tc:"#0C447C",tb:"#E6F1FB",icon:"🍽️"},
-  "製造":  {tc:"#27500A",tb:"#EAF3DE",icon:"🏭"},
-  "農業":  {tc:"#633806",tb:"#FAEEDA",icon:"🌾"},
-  "ホテル":{tc:"#534AB7",tb:"#EEEDFE",icon:"🏨"},
+  "介護":            {tc:"#0F6E6E",tb:"#E0F7F7",icon:"🩺"},
+  "ビルクリーニング": {tc:"#6B6B6B",tb:"#F6F7F9",icon:"🧹"},
+  "工業製品製造業":   {tc:"#27500A",tb:"#EAF3DE",icon:"🏭"},
+  "製造":            {tc:"#27500A",tb:"#EAF3DE",icon:"🏭"},
+  "建設":            {tc:"#8A6800",tb:"#FFF4D6",icon:"🏗️"},
+  "造船・舶用工業":   {tc:"#0369A1",tb:"#E0F2FE",icon:"🚢"},
+  "自動車整備":       {tc:"#3730A3",tb:"#E8EAFD",icon:"🔧"},
+  "航空":            {tc:"#0C447C",tb:"#E6F1FB",icon:"✈️"},
+  "宿泊":            {tc:"#534AB7",tb:"#EEEDFE",icon:"🏨"},
+  "ホテル":          {tc:"#534AB7",tb:"#EEEDFE",icon:"🏨"},
+  "農業":            {tc:"#633806",tb:"#FAEEDA",icon:"🌾"},
+  "漁業":            {tc:"#9F1239",tb:"#FFE4E6",icon:"🎣"},
+  "飲食料品製造業":   {tc:"#4D6B0A",tb:"#F0F9DB",icon:"🍱"},
+  "外食業":          {tc:"#0C447C",tb:"#E6F1FB",icon:"🍽️"},
+  "飲食":            {tc:"#0C447C",tb:"#E6F1FB",icon:"🍽️"},
+  "繊維業":          {tc:"#9D2467",tb:"#FDE7F3",icon:"🧵"},
+  "印刷業":          {tc:"#6B6B6B",tb:"#F6F7F9",icon:"🖨️"},
+  "鉄道":            {tc:"#0369A1",tb:"#E0F2FE",icon:"🚃"},
+  "林業":            {tc:"#27500A",tb:"#EAF3DE",icon:"🌲"},
+  "IT":              {tc:"#3730A3",tb:"#E8EAFD",icon:"💻"},
+  "機械・電気電子":   {tc:"#534AB7",tb:"#EEEDFE",icon:"⚙️"},
+  "国際業務":         {tc:"#0C447C",tb:"#E6F1FB",icon:"🌐"},
+  "通訳・翻訳":       {tc:"#8A6800",tb:"#FFF4D6",icon:"🗣️"},
+  "経理・会計":       {tc:"#9F1239",tb:"#FFE4E6",icon:"📊"},
+  "その他":          {tc:"#6B6B6B",tb:"#F6F7F9",icon:"📁"},
 };
+const INDUSTRY_LIST = ["介護","ビルクリーニング","工業製品製造業","建設","造船・舶用工業","自動車整備","航空","宿泊","農業","漁業","飲食料品製造業","外食業","繊維業","印刷業","鉄道","林業","IT","機械・電気電子","国際業務","通訳・翻訳","経理・会計","その他"];
 
 const FIELDS = [
   {key:"osusume_point",   ja:"おすすめポイント",    vn:"Điểm nổi bật",      rows:3},
@@ -61,7 +83,7 @@ const FIELDS = [
 ];
 
 const EMPTY_JOB = {
-  company:"",location:"",position_ja:"",position_vn:"",industry:"飲食",
+  company:"",location:"",position_ja:"",position_vn:"",industry:"その他",
   count:"1",salary:"",jlpt_min:"N4",status:"open",
   osusume_point:"",position_name:"",position_note:"",job_description:"",
   requirements:"",qualifications:"",language_skill:"",education:"",
@@ -76,6 +98,9 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("all");
+  const [jlptFilter, setJlptFilter] = useState("all");
   const [selected, setSelected] = useState<Job|null>(null);
   const [view, setView] = useState<"list"|"detail"|"form">("list");
   const [form, setForm] = useState<Record<string,string>>(EMPTY_JOB);
@@ -96,7 +121,19 @@ export default function JobsPage() {
 
   useEffect(()=>{load();},[load]);
 
-  const filtered = filter==="all" ? jobs : jobs.filter(j=>j.status===filter);
+  const filtered = jobs.filter(j=>{
+    if (filter!=="all" && j.status!==filter) return false;
+    if (industryFilter!=="all" && j.industry!==industryFilter) return false;
+    if (jlptFilter!=="all" && j.jlpt_min!==jlptFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const hay = `${j.company} ${j.position_ja} ${j.position_vn} ${j.location}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const activeFilterCount = (filter!=="all"?1:0) + (industryFilter!=="all"?1:0) + (jlptFilter!=="all"?1:0) + (search?1:0);
+  const clearFilters = () => { setFilter("all"); setIndustryFilter("all"); setJlptFilter("all"); setSearch(""); };
   const counts = {
     all:jobs.length,
     urgent:jobs.filter(j=>j.status==="urgent").length,
@@ -166,37 +203,84 @@ export default function JobsPage() {
   // ── LIST VIEW ──────────────────────────────────────
   if (view==="list") return (
     <div>
-      <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <style>{`
+        @keyframes jobCardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes shimmer { 0%{background-position:-400px 0;} 100%{background-position:400px 0;} }
+      `}</style>
+      <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
-          <div style={{fontSize:"14px",fontWeight:700,color:navy}}>求人管理 / Quản lý Công việc</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B"}}>クリックで求人詳細・Groqマッチング</div>
+          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>求人管理 <span style={{color:"#B4B2A9",fontWeight:400}}>/ Quản lý Công việc</span></div>
+          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>RDS DB · Groq AI · クリックで求人詳細・AIマッチング</div>
         </div>
-        <button onClick={()=>openForm()} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>
-          + 求人追加
+        <button onClick={()=>openForm()} style={{padding:"9px 16px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",transition:"opacity 0.15s"}}
+          onMouseEnter={e=>{e.currentTarget.style.opacity="0.85";}} onMouseLeave={e=>{e.currentTarget.style.opacity="1";}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          求人追加
         </button>
       </div>
       <div style={{padding:"16px 20px"}}>
-        <div style={{display:"flex",gap:0,borderBottom:"0.5px solid rgba(11,31,58,0.1)",marginBottom:"14px"}}>
+        {/* Search + advanced filters toolbar */}
+        <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
+          <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="企業名・職種・勤務地で検索 / Tìm công ty, vị trí..." value={search}
+              onChange={e=>setSearch(e.target.value)}
+              style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <select value={industryFilter} onChange={e=>setIndustryFilter(e.target.value)}
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">業種すべて / Mọi ngành</option>
+            {INDUSTRY_LIST.map(i=><option key={i} value={i}>{IND[i]?.icon} {i}</option>)}
+          </select>
+          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">日本語すべて / Mọi JLPT</option>
+            {["N1","N2","N3","N4","N5","なし"].map(j=><option key={j} value={j}>{j}</option>)}
+          </select>
+          {activeFilterCount>0&&(
+            <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
+              ✕ フィルター解除 ({activeFilterCount})
+            </button>
+          )}
+          <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
+            {loading?"読み込み中...":`${filtered.length}件 · ${filtered.length} kết quả`}
+          </div>
+        </div>
+
+        <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
           {[{k:"all",l:`全件(${counts.all})`},{k:"urgent",l:`緊急(${counts.urgent})`},{k:"open",l:`募集中(${counts.open})`},{k:"full",l:`充足(${counts.full})`},{k:"paused",l:`停止(${counts.paused})`}].map(t=>(
-            <button key={t.k} onClick={()=>setFilter(t.k)} style={{padding:"8px 14px",fontSize:"11px",fontWeight:filter===t.k?700:400,color:filter===t.k?navy:"#6B6B6B",border:"none",background:"transparent",borderBottom:`2px solid ${filter===t.k?navy:"transparent"}`,cursor:"pointer",marginBottom:"-0.5px",whiteSpace:"nowrap"}}>{t.l}</button>
+            <button key={t.k} onClick={()=>setFilter(t.k)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===t.k?navy:"rgba(11,31,58,0.15)"}`,background:filter===t.k?navy:"#fff",color:filter===t.k?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.15s"}}>{t.l}</button>
           ))}
         </div>
 
-        {loading ? <div style={{padding:"40px",textAlign:"center",color:"#6B6B6B"}}>読み込み中...</div> :
+        {loading ? (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:"12px"}}>
+            {Array.from({length:6}).map((_,i)=>(
+              <div key={i} style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",height:"172px"}}>
+                <div style={{height:"14px",width:"70%",borderRadius:"4px",marginBottom:"10px",background:"linear-gradient(90deg,#F1EFE8 0px,#F8F7F3 40px,#F1EFE8 80px)",backgroundSize:"400px 100%",animation:"shimmer 1.4s infinite linear"}}/>
+                <div style={{height:"10px",width:"40%",borderRadius:"4px",marginBottom:"18px",background:"linear-gradient(90deg,#F1EFE8 0px,#F8F7F3 40px,#F1EFE8 80px)",backgroundSize:"400px 100%",animation:"shimmer 1.4s infinite linear"}}/>
+                <div style={{height:"10px",width:"90%",borderRadius:"4px",marginBottom:"8px",background:"linear-gradient(90deg,#F1EFE8 0px,#F8F7F3 40px,#F1EFE8 80px)",backgroundSize:"400px 100%",animation:"shimmer 1.4s infinite linear"}}/>
+                <div style={{height:"10px",width:"60%",borderRadius:"4px",background:"linear-gradient(90deg,#F1EFE8 0px,#F8F7F3 40px,#F1EFE8 80px)",backgroundSize:"400px 100%",animation:"shimmer 1.4s infinite linear"}}/>
+              </div>
+            ))}
+          </div>
+        ) :
         filtered.length===0 ? (
           <div style={{padding:"48px",textAlign:"center",background:"#fff",...B,borderRadius:"10px"}}>
             <div style={{fontSize:"32px",marginBottom:"12px"}}>📋</div>
-            <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>求人なし / Chưa có công việc</div>
-            <button onClick={()=>openForm()} style={{marginTop:"12px",padding:"8px 20px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>+ 求人を追加する</button>
+            <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>{activeFilterCount>0?"該当する求人がありません / Không tìm thấy kết quả":"求人なし / Chưa có công việc"}</div>
+            {activeFilterCount>0
+              ? <button onClick={clearFilters} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"transparent",color:navy,border:`1px solid ${navy}`,cursor:"pointer"}}>フィルターを解除</button>
+              : <button onClick={()=>openForm()} style={{marginTop:"12px",padding:"8px 20px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>+ 求人を追加する</button>}
           </div>
         ) : (
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:"12px"}}>
-            {filtered.map(j=>{
+            {filtered.map((j,idx)=>{
               const st=ST[j.status]||ST.open;
-              const ind=IND[j.industry]||IND["飲食"];
+              const ind=IND[j.industry]||IND["その他"];
               return(
-                <div key={j.id} onClick={()=>openDetail(j)} style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",cursor:"pointer",transition:"all 0.15s",boxShadow:"0 1px 3px rgba(11,31,58,0.06)"}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.boxShadow="0 4px 12px rgba(11,31,58,0.12)";(e.currentTarget as HTMLDivElement).style.transform="translateY(-1px)";}}
+                <div key={j.id} onClick={()=>openDetail(j)} style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",cursor:"pointer",transition:"box-shadow 0.15s, transform 0.15s",boxShadow:"0 1px 3px rgba(11,31,58,0.06)",animation:"jobCardIn 0.35s ease both",animationDelay:`${Math.min(idx*30,300)}ms`}}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.boxShadow="0 6px 18px rgba(11,31,58,0.13)";(e.currentTarget as HTMLDivElement).style.transform="translateY(-2px)";}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.boxShadow="0 1px 3px rgba(11,31,58,0.06)";(e.currentTarget as HTMLDivElement).style.transform="translateY(0)";}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"10px"}}>
                     <div style={{flex:1}}>
@@ -238,7 +322,7 @@ export default function JobsPage() {
   // ── DETAIL VIEW ────────────────────────────────────
   if (view==="detail" && selected) {
     const st=ST[selected.status]||ST.open;
-    const ind=IND[selected.industry]||IND["飲食"];
+    const ind=IND[selected.industry]||IND["その他"];
     return (
       <div>
         <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -456,8 +540,8 @@ export default function JobsPage() {
             ))}
             <div>
               <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>業種</label>
-              <select value={form.industry||"飲食"} onChange={e=>setForm({...form,industry:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
-                {["飲食","製造","農業","ホテル","その他"].map(i=><option key={i}>{i}</option>)}
+              <select value={form.industry||"その他"} onChange={e=>setForm({...form,industry:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
+                {INDUSTRY_LIST.map(i=><option key={i}>{i}</option>)}
               </select>
             </div>
             <div>
