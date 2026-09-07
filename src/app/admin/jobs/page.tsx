@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useAdminLang, fieldLabel } from "@/lib/adminI18n";
 
 type Job = {
   id: string; company: string; location: string;
@@ -23,11 +24,11 @@ type MatchResult = {
   candidate: { id:string;name:string;skill:string;jlpt:string;status:string;email:string;phone:string };
 };
 
-const ST: Record<string,{ja:string;vn:string;tc:string;tb:string}> = {
-  urgent:{ja:"緊急募集",vn:"Khẩn cấp",tc:"#A32D2D",tb:"#FCEBEB"},
-  open:  {ja:"募集中",  vn:"Đang tuyển",tc:"#0C447C",tb:"#E6F1FB"},
-  full:  {ja:"充足",    vn:"Đủ người",  tc:"#27500A",tb:"#EAF3DE"},
-  paused:{ja:"停止",    vn:"Tạm dừng",  tc:"#444441",tb:"#F1EFE8"},
+const ST: Record<string,{ja:string;vn:string;tc:string;tb:string;labelKey:string}> = {
+  urgent:{ja:"緊急募集",vn:"Khẩn cấp",tc:"#A32D2D",tb:"#FCEBEB",labelKey:"jobs.statusUrgent"},
+  open:  {ja:"募集中",  vn:"Đang tuyển",tc:"#0C447C",tb:"#E6F1FB",labelKey:"jobs.statusOpen"},
+  full:  {ja:"充足",    vn:"Đủ người",  tc:"#27500A",tb:"#EAF3DE",labelKey:"jobs.statusFull"},
+  paused:{ja:"停止",    vn:"Tạm dừng",  tc:"#444441",tb:"#F1EFE8",labelKey:"jobs.statusPaused"},
 };
 const IND: Record<string,{tc:string;tb:string;icon:string}> = {
   "介護":            {tc:"#0F6E6E",tb:"#E0F7F7",icon:"🩺"},
@@ -95,6 +96,7 @@ const EMPTY_JOB = {
 
 export default function JobsPage() {
   const router = useRouter();
+  const { lang, t } = useAdminLang();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
@@ -179,7 +181,7 @@ export default function JobsPage() {
   };
 
   const deleteJob = async (id:string) => {
-    if (!confirm("削除しますか？")) return;
+    if (!confirm(t("jobs.deleteConfirm"))) return;
     await fetch(`/api/admin/jobs?id=${id}`,{method:"DELETE"});
     setJobs(p=>p.filter(j=>j.id!==id));
     setView("list");
@@ -209,13 +211,13 @@ export default function JobsPage() {
       `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
-          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>求人管理 <span style={{color:"#B4B2A9",fontWeight:400}}>/ Quản lý Công việc</span></div>
-          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>RDS DB · Groq AI · クリックで求人詳細・AIマッチング</div>
+          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("jobs.title")}</div>
+          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>{t("jobs.subtitle")}</div>
         </div>
         <button onClick={()=>openForm()} style={{padding:"9px 16px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",transition:"opacity 0.15s"}}
           onMouseEnter={e=>{e.currentTarget.style.opacity="0.85";}} onMouseLeave={e=>{e.currentTarget.style.opacity="1";}}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          求人追加
+          {t("jobs.addJob")}
         </button>
       </div>
       <div style={{padding:"16px 20px"}}>
@@ -223,33 +225,33 @@ export default function JobsPage() {
         <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
           <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="企業名・職種・勤務地で検索 / Tìm công ty, vị trí..." value={search}
+            <input type="text" placeholder={t("jobs.searchPlaceholder")} value={search}
               onChange={e=>setSearch(e.target.value)}
               style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
           </div>
           <select value={industryFilter} onChange={e=>setIndustryFilter(e.target.value)}
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
-            <option value="all">業種すべて / Mọi ngành</option>
+            <option value="all">{t("jobs.allIndustries")}</option>
             {INDUSTRY_LIST.map(i=><option key={i} value={i}>{IND[i]?.icon} {i}</option>)}
           </select>
           <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
-            <option value="all">日本語すべて / Mọi JLPT</option>
+            <option value="all">{t("jobs.allJlpt")}</option>
             {["N1","N2","N3","N4","N5","なし"].map(j=><option key={j} value={j}>{j}</option>)}
           </select>
           {activeFilterCount>0&&(
             <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
-              ✕ フィルター解除 ({activeFilterCount})
+              ✕ {t("common.clearFilters")} ({activeFilterCount})
             </button>
           )}
           <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
-            {loading?"読み込み中...":`${filtered.length}件 · ${filtered.length} kết quả`}
+            {loading?t("common.loading"):`${filtered.length} ${t("common.results")}`}
           </div>
         </div>
 
         <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
-          {[{k:"all",l:`全件(${counts.all})`},{k:"urgent",l:`緊急(${counts.urgent})`},{k:"open",l:`募集中(${counts.open})`},{k:"full",l:`充足(${counts.full})`},{k:"paused",l:`停止(${counts.paused})`}].map(t=>(
-            <button key={t.k} onClick={()=>setFilter(t.k)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===t.k?navy:"rgba(11,31,58,0.15)"}`,background:filter===t.k?navy:"#fff",color:filter===t.k?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.15s"}}>{t.l}</button>
+          {[{k:"all",lk:"common.all",n:counts.all},{k:"urgent",lk:"jobs.statusUrgent",n:counts.urgent},{k:"open",lk:"jobs.statusOpen",n:counts.open},{k:"full",lk:"jobs.statusFull",n:counts.full},{k:"paused",lk:"jobs.statusPaused",n:counts.paused}].map(f=>(
+            <button key={f.k} onClick={()=>setFilter(f.k)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.k?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.k?navy:"#fff",color:filter===f.k?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.15s"}}>{t(f.lk)}({f.n})</button>
           ))}
         </div>
 
@@ -268,10 +270,10 @@ export default function JobsPage() {
         filtered.length===0 ? (
           <div style={{padding:"48px",textAlign:"center",background:"#fff",...B,borderRadius:"10px"}}>
             <div style={{fontSize:"32px",marginBottom:"12px"}}>📋</div>
-            <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>{activeFilterCount>0?"該当する求人がありません / Không tìm thấy kết quả":"求人なし / Chưa có công việc"}</div>
+            <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>{activeFilterCount>0?t("jobs.emptyFiltered"):t("jobs.empty")}</div>
             {activeFilterCount>0
-              ? <button onClick={clearFilters} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"transparent",color:navy,border:`1px solid ${navy}`,cursor:"pointer"}}>フィルターを解除</button>
-              : <button onClick={()=>openForm()} style={{marginTop:"12px",padding:"8px 20px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>+ 求人を追加する</button>}
+              ? <button onClick={clearFilters} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"transparent",color:navy,border:`1px solid ${navy}`,cursor:"pointer"}}>{t("common.clearFilters")}</button>
+              : <button onClick={()=>openForm()} style={{marginTop:"12px",padding:"8px 20px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("jobs.addFirstJob")}</button>}
           </div>
         ) : (
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:"12px"}}>
@@ -287,7 +289,7 @@ export default function JobsPage() {
                       <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"2px"}}>{j.company}</div>
                       <div style={{fontSize:"10px",color:"#6B6B6B"}}>{j.location}</div>
                     </div>
-                    <span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"3px 8px",borderRadius:"20px",flexShrink:0,marginLeft:"8px"}}>{st.ja}</span>
+                    <span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"3px 8px",borderRadius:"20px",flexShrink:0,marginLeft:"8px"}}>{t(st.labelKey)}</span>
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
                     <span style={{fontSize:"16px"}}>{ind.icon}</span>
@@ -298,12 +300,12 @@ export default function JobsPage() {
                   </div>
                   <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"10px"}}>
                     <span style={{background:ind.tb,color:ind.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.industry}</span>
-                    <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.jlpt_min}以上</span>
-                    <span style={{background:"#F6F7F9",color:"#6B6B6B",fontSize:"10px",padding:"2px 7px",borderRadius:"4px"}}>{j.count}名募集</span>
+                    <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.jlptOrMore",{lvl:j.jlpt_min})}</span>
+                    <span style={{background:"#F6F7F9",color:"#6B6B6B",fontSize:"10px",padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.peopleWantedFull",{n:j.count})}</span>
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"10px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
-                    <span style={{fontSize:"12px",fontWeight:700,color:"#27500A"}}>{j.salary||j.annual_income||"応相談"}</span>
-                    <span style={{fontSize:"10px",color:"#185FA5",fontWeight:600}}>詳細を見る →</span>
+                    <span style={{fontSize:"12px",fontWeight:700,color:"#27500A"}}>{j.salary||j.annual_income||t("jobs.negotiable")}</span>
+                    <span style={{fontSize:"10px",color:"#185FA5",fontWeight:600}}>{t("jobs.viewDetail")}</span>
                   </div>
                   {j.osusume_point && (
                     <div style={{marginTop:"8px",background:"#FFFBEB",borderRadius:"6px",padding:"6px 10px",fontSize:"10px",color:"#92400E",borderLeft:"3px solid #F59E0B"}}>
@@ -329,7 +331,7 @@ export default function JobsPage() {
           <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
             <button onClick={()=>setView("list")} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",display:"flex",alignItems:"center",gap:"4px",fontSize:"12px"}}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              一覧へ
+              {t("common.backToList")}
             </button>
             <div style={{width:"1px",height:"20px",background:"rgba(11,31,58,0.1)"}}/>
             <div>
@@ -339,10 +341,10 @@ export default function JobsPage() {
           </div>
           <div style={{display:"flex",gap:"8px"}}>
             <button onClick={runMatch} disabled={matching} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:matching?"#888":"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
-              {matching?<>⏳ マッチング中...</>:<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>AI候補者マッチング</>}
+              {matching?<>{t("jobs.matchingInProgress")}</>:<><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>{t("jobs.aiMatchBtn")}</>}
             </button>
-            <button onClick={()=>openForm(selected)} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>✏️ 編集</button>
-            <button onClick={()=>deleteJob(selected.id)} style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer"}}>削除</button>
+            <button onClick={()=>openForm(selected)} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>✏️ {t("common.edit")}</button>
+            <button onClick={()=>deleteJob(selected.id)} style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer"}}>{t("common.delete")}</button>
           </div>
         </div>
 
@@ -357,25 +359,25 @@ export default function JobsPage() {
                   <div style={{fontSize:"12px",color:"#6B6B6B",display:"flex",alignItems:"center",gap:"8px"}}>
                     <span>📍 {selected.work_location||selected.location}</span>
                     <span>·</span>
-                    <span>👥 {selected.count}名募集</span>
+                    <span>👥 {t("jobs.peopleWantedFull",{n:selected.count})}</span>
                   </div>
                 </div>
                 <div style={{textAlign:"right"}}>
-                  <div style={{background:st.tb,color:st.tc,fontSize:"11px",fontWeight:700,padding:"4px 10px",borderRadius:"20px",marginBottom:"6px"}}>{st.ja} · {st.vn}</div>
+                  <div style={{background:st.tb,color:st.tc,fontSize:"11px",fontWeight:700,padding:"4px 10px",borderRadius:"20px",marginBottom:"6px"}}>{t(st.labelKey)}</div>
                   <select value={selected.status} onChange={e=>updateStatus(selected.id,e.target.value)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"10px",border:"0.5px solid rgba(11,31,58,0.2)",background:"transparent",cursor:"pointer",outline:"none"}}>
-                    {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{v.ja}</option>)}
+                    {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{t(v.labelKey)}</option>)}
                   </select>
                 </div>
               </div>
               <div style={{display:"flex",gap:"6px",flexWrap:"wrap"}}>
                 <span style={{background:ind.tb,color:ind.tc,fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{ind.icon} {selected.industry}</span>
-                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{selected.jlpt_min}以上</span>
-                <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{selected.employment_type||"正社員"}</span>
+                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{t("jobs.jlptOrMore",{lvl:selected.jlpt_min})}</span>
+                <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{selected.employment_type||t("jobs.employmentTypeDefault")}</span>
                 <span style={{background:"#F6F7F9",color:"#444",fontSize:"11px",padding:"3px 10px",borderRadius:"20px"}}>{selected.salary||selected.annual_income}</span>
               </div>
               {selected.osusume_point&&(
                 <div style={{marginTop:"12px",background:"#FFFBEB",borderRadius:"8px",padding:"10px 14px",fontSize:"12px",color:"#92400E",borderLeft:"3px solid #F59E0B",lineHeight:1.7}}>
-                  <div style={{fontWeight:700,marginBottom:"4px"}}>⭐ おすすめポイント</div>
+                  <div style={{fontWeight:700,marginBottom:"4px"}}>{t("jobs.osusumePointLabel")}</div>
                   {selected.osusume_point}
                 </div>
               )}
@@ -383,9 +385,9 @@ export default function JobsPage() {
 
             {/* Tabs */}
             <div style={{display:"flex",gap:0,marginBottom:"12px",background:"#fff",borderRadius:"10px 10px 0 0",overflow:"hidden",border:"0.5px solid rgba(11,31,58,0.1)",borderBottom:"none"}}>
-              {[{k:"info",l:"求人概要"},{k:"match",l:`AIマッチング${matches.length>0?` (${matches.length}名)`:""}`}].map(t=>(
-                <button key={t.k} onClick={()=>setActiveTab(t.k as "info"|"match")} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===t.k?700:400,color:activeTab===t.k?navy:"#6B6B6B",border:"none",background:activeTab===t.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===t.k?navy:"transparent"}`,cursor:"pointer"}}>
-                  {t.l}
+              {[{k:"info",l:t("jobs.tabInfo")},{k:"match",l:`${t("jobs.tabMatch")}${matches.length>0?` (${matches.length})`:""}`}].map(tb=>(
+                <button key={tb.k} onClick={()=>setActiveTab(tb.k as "info"|"match")} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===tb.k?700:400,color:activeTab===tb.k?navy:"#6B6B6B",border:"none",background:activeTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+                  {tb.l}
                 </button>
               ))}
             </div>
@@ -398,8 +400,7 @@ export default function JobsPage() {
                   return(
                     <div key={field.key} style={{display:"grid",gridTemplateColumns:"160px 1fr",borderBottom:"0.5px solid rgba(11,31,58,0.06)",background:i%2===0?"#fff":"#FAFAFA"}}>
                       <div style={{padding:"12px 14px",background:"#F6F7F9",borderRight:"0.5px solid rgba(11,31,58,0.08)"}}>
-                        <div style={{fontSize:"11px",fontWeight:700,color:navy}}>{field.ja}</div>
-                        <div style={{fontSize:"10px",color:"#6B6B6B"}}>{field.vn}</div>
+                        <div style={{fontSize:"11px",fontWeight:700,color:navy}}>{fieldLabel(field.key,lang)}</div>
                       </div>
                       <div style={{padding:"12px 14px",fontSize:"12px",color:"#333",lineHeight:1.7,whiteSpace:"pre-wrap"}}>{val}</div>
                     </div>
@@ -407,8 +408,8 @@ export default function JobsPage() {
                 })}
                 {!FIELDS.some(f=>f.key!=="osusume_point"&&(selected as Record<string,unknown>)[f.key])&&(
                   <div style={{padding:"32px",textAlign:"center",color:"#6B6B6B",fontSize:"13px"}}>
-                    求人概要が未入力です。「編集」ボタンから詳細を入力してください。
-                    <br/><button onClick={()=>openForm(selected)} style={{marginTop:"12px",padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>✏️ 今すぐ入力する</button>
+                    {t("jobs.emptyDetail")}
+                    <br/><button onClick={()=>openForm(selected)} style={{marginTop:"12px",padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("jobs.fillNow")}</button>
                   </div>
                 )}
               </div>
@@ -419,16 +420,16 @@ export default function JobsPage() {
                 {matching&&(
                   <div style={{textAlign:"center",padding:"32px",color:"#6B6B6B"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🤖</div>
-                    <div style={{fontSize:"13px",fontWeight:600,color:navy}}>Groq AIが候補者を分析中...</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginTop:"4px"}}>全候補者との適合度を計算しています</div>
+                    <div style={{fontSize:"13px",fontWeight:600,color:navy}}>{t("jobs.aiAnalyzing")}</div>
+                    <div style={{fontSize:"11px",color:"#6B6B6B",marginTop:"4px"}}>{t("jobs.aiAnalyzingDesc")}</div>
                   </div>
                 )}
                 {!matching&&matches.length===0&&(
                   <div style={{textAlign:"center",padding:"32px"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🎯</div>
-                    <div style={{fontSize:"13px",fontWeight:600,color:navy,marginBottom:"6px"}}>AIマッチングを実行してください</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>求人内容をもとにGroq AIが最適な候補者を提案します</div>
-                    <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>AIマッチング開始</button>
+                    <div style={{fontSize:"13px",fontWeight:600,color:navy,marginBottom:"6px"}}>{t("jobs.runMatchTitle")}</div>
+                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>{t("jobs.runMatchDesc")}</div>
+                    <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.startMatching")}</button>
                   </div>
                 )}
                 {matches.map((m,i)=>(
@@ -443,7 +444,7 @@ export default function JobsPage() {
                       </div>
                       <div style={{textAlign:"right"}}>
                         <div style={{fontSize:"20px",fontWeight:700,color:m.matchPct>=70?"#27500A":m.matchPct>=50?"#633806":"#6B6B6B"}}>{m.matchPct}%</div>
-                        <div style={{fontSize:"9px",color:"#6B6B6B"}}>マッチ度</div>
+                        <div style={{fontSize:"9px",color:"#6B6B6B"}}>{t("jobs.matchDegree")}</div>
                       </div>
                     </div>
                     <div style={{background:"#F1EFE8",borderRadius:"4px",height:"5px",overflow:"hidden",marginBottom:"8px"}}>
@@ -456,8 +457,8 @@ export default function JobsPage() {
                       </div>
                     )}
                     <div style={{display:"flex",gap:"6px"}}>
-                      <a href={`mailto:${m.candidate?.email}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>メール送信</a>
-                      {m.candidate?.phone&&<a href={`tel:${m.candidate.phone}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:"#EAF3DE",color:"#27500A",textDecoration:"none",border:"0.5px solid #27500A"}}>電話する</a>}
+                      <a href={`mailto:${m.candidate?.email}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>{t("common.sendEmail")}</a>
+                      {m.candidate?.phone&&<a href={`tel:${m.candidate.phone}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:"#EAF3DE",color:"#27500A",textDecoration:"none",border:"0.5px solid #27500A"}}>{t("common.call")}</a>}
                     </div>
                   </div>
                 ))}
@@ -468,19 +469,19 @@ export default function JobsPage() {
           {/* Right: Quick info */}
           <div>
             <div style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",marginBottom:"12px"}}>
-              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"12px"}}>⚡ クイック情報</div>
+              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"12px"}}>{t("jobs.quickInfo")}</div>
               {[
-                {l:"勤務地",v:selected.work_location||selected.location},
-                {l:"給与",v:selected.salary||selected.annual_income},
-                {l:"雇用形態",v:selected.employment_type},
-                {l:"勤務時間",v:selected.work_hours},
-                {l:"日本語",v:selected.language_skill||`${selected.jlpt_min}以上`},
-                {l:"試用期間",v:selected.trial_period},
-                {l:"保険",v:selected.insurance},
-                {l:"休日",v:selected.holidays},
+                {lk:"jobs.location",v:selected.work_location||selected.location},
+                {lk:"jobs.salary",v:selected.salary||selected.annual_income},
+                {lk:"jobs.employmentType",v:selected.employment_type},
+                {lk:"jobs.workHours",v:selected.work_hours},
+                {lk:"jobs.japaneseReq",v:selected.language_skill||t("jobs.jlptOrMore",{lvl:selected.jlpt_min})},
+                {lk:"jobs.trialPeriod",v:selected.trial_period},
+                {lk:"jobs.insurance",v:selected.insurance},
+                {lk:"jobs.holidays",v:selected.holidays},
               ].filter(r=>r.v).map(r=>(
-                <div key={r.l} style={{display:"flex",gap:"8px",padding:"7px 0",borderBottom:"0.5px solid rgba(11,31,58,0.05)"}}>
-                  <span style={{fontSize:"11px",color:"#6B6B6B",width:"70px",flexShrink:0}}>{r.l}</span>
+                <div key={r.lk} style={{display:"flex",gap:"8px",padding:"7px 0",borderBottom:"0.5px solid rgba(11,31,58,0.05)"}}>
+                  <span style={{fontSize:"11px",color:"#6B6B6B",width:"70px",flexShrink:0}}>{t(r.lk)}</span>
                   <span style={{fontSize:"11px",color:navy,fontWeight:500,flex:1}}>{r.v}</span>
                 </div>
               ))}
@@ -488,14 +489,14 @@ export default function JobsPage() {
 
             {selected.reference_url&&(
               <div style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",marginBottom:"12px"}}>
-                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"8px"}}>🔗 参考リンク</div>
+                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"8px"}}>{t("jobs.refLink")}</div>
                 <a href={selected.reference_url} target="_blank" style={{fontSize:"11px",color:"#185FA5",wordBreak:"break-all"}}>{selected.reference_url}</a>
               </div>
             )}
 
             <div style={{background:"#fff",...B,borderRadius:"12px",padding:"16px"}}>
-              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>📅 登録情報</div>
-              <div style={{fontSize:"10px",color:"#6B6B6B"}}>作成日: {new Date(selected.created_at).toLocaleDateString("ja-JP")}</div>
+              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>{t("jobs.registeredInfo")}</div>
+              <div style={{fontSize:"10px",color:"#6B6B6B"}}>{t("jobs.createdAt")}: {new Date(selected.created_at).toLocaleDateString("ja-JP")}</div>
             </div>
           </div>
         </div>
@@ -510,50 +511,50 @@ export default function JobsPage() {
         <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
           <button onClick={()=>setView(selected?"detail":"list")} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",fontSize:"12px",display:"flex",alignItems:"center",gap:"4px"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            戻る
+            {t("common.back")}
           </button>
           <div style={{width:"1px",height:"20px",background:"rgba(11,31,58,0.1)"}}/>
-          <div style={{fontSize:"14px",fontWeight:700,color:navy}}>{form.id?"求人編集":"新規求人追加"} / {form.id?"Sửa":"Thêm mới"}</div>
+          <div style={{fontSize:"14px",fontWeight:700,color:navy}}>{form.id?t("jobs.formEdit"):t("jobs.formNew")}</div>
         </div>
         <button form="job-form" type="submit" disabled={saving} style={{padding:"7px 16px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:saving?"#888":navy,color:"#fff",border:"none",cursor:"pointer"}}>
-          {saving?"保存中...":"💾 保存 / Lưu"}
+          {saving?t("common.saving"):`💾 ${t("common.save")}`}
         </button>
       </div>
 
       <form id="job-form" onSubmit={saveJob} style={{padding:"16px 20px",maxWidth:"900px"}}>
         {/* Basic info */}
         <div style={{background:"#fff",...B,borderRadius:"12px",padding:"20px",marginBottom:"12px"}}>
-          <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"14px",paddingBottom:"10px",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>📋 基本情報 / Thông tin cơ bản</div>
+          <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"14px",paddingBottom:"10px",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>{t("jobs.basicInfo")}</div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"12px"}}>
             {[
-              {f:"company",     l:"企業名 *",          p:"山本フーズ株式会社",  req:true},
-              {f:"location",    l:"勤務地（略称）",     p:"東京都 新宿区",       req:false},
-              {f:"position_ja", l:"職種（日本語）*",    p:"調理師",              req:true},
-              {f:"position_vn", l:"Vị trí (Việt)",     p:"Nhân viên bếp",       req:false},
-              {f:"salary",      l:"給与（略称）",       p:"¥200,000〜",          req:false},
-              {f:"count",       l:"募集人数",           p:"3",                   req:false},
+              {f:"company",     lk:"jobs.fieldCompany",     p:"山本フーズ株式会社",  req:true},
+              {f:"location",    lk:"jobs.fieldLocation",    p:"東京都 新宿区",       req:false},
+              {f:"position_ja", lk:"jobs.fieldPositionJa",  p:"調理師",              req:true},
+              {f:"position_vn", lk:"jobs.fieldPositionVn",  p:"Nhân viên bếp",       req:false},
+              {f:"salary",      lk:"jobs.fieldSalary",      p:"¥200,000〜",          req:false},
+              {f:"count",       lk:"jobs.fieldCount",       p:"3",                   req:false},
             ].map(x=>(
               <div key={x.f}>
-                <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{x.l}</label>
+                <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t(x.lk)}</label>
                 <input required={x.req} type={x.f==="count"?"number":"text"} placeholder={x.p} value={form[x.f]||""} onChange={e=>setForm({...form,[x.f]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
               </div>
             ))}
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>業種</label>
+              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldIndustry")}</label>
               <select value={form.industry||"その他"} onChange={e=>setForm({...form,industry:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {INDUSTRY_LIST.map(i=><option key={i}>{i}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>日本語要件</label>
+              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldJlptMin")}</label>
               <select value={form.jlpt_min||"N4"} onChange={e=>setForm({...form,jlpt_min:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {["N1","N2","N3","N4","N5","なし"].map(j=><option key={j}>{j}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>ステータス</label>
+              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldStatus")}</label>
               <select value={form.status||"open"} onChange={e=>setForm({...form,status:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
-                {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{v.ja} · {v.vn}</option>)}
+                {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{t(v.labelKey)}</option>)}
               </select>
             </div>
           </div>
@@ -561,20 +562,23 @@ export default function JobsPage() {
 
         {/* 求人概要 fields */}
         <div style={{background:"#fff",...B,borderRadius:"12px",padding:"20px"}}>
-          <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"14px",paddingBottom:"10px",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>📄 求人概要 / Chi tiết công việc</div>
+          <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"14px",paddingBottom:"10px",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>{t("jobs.jobDetail")}</div>
           <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
-            {FIELDS.map(field=>(
+            {FIELDS.map(field=>{
+              const label = fieldLabel(field.key,lang);
+              return(
               <div key={field.key}>
                 <label style={{display:"block",fontSize:"11px",color:navy,marginBottom:"4px",fontWeight:700}}>
-                  {field.ja} <span style={{fontWeight:400,color:"#6B6B6B"}}>/ {field.vn}</span>
+                  {label}
                 </label>
                 {field.rows===1 ? (
-                  <input type="text" placeholder={`${field.ja}を入力...`} value={form[field.key]||""} onChange={e=>setForm({...form,[field.key]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
+                  <input type="text" placeholder={t("jobs.inputPlaceholder",{field:label})} value={form[field.key]||""} onChange={e=>setForm({...form,[field.key]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
                 ) : (
-                  <textarea rows={field.rows} placeholder={`${field.ja}を入力...`} value={form[field.key]||""} onChange={e=>setForm({...form,[field.key]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",resize:"vertical",lineHeight:1.6}}/>
+                  <textarea rows={field.rows} placeholder={t("jobs.inputPlaceholder",{field:label})} value={form[field.key]||""} onChange={e=>setForm({...form,[field.key]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",resize:"vertical",lineHeight:1.6}}/>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </form>

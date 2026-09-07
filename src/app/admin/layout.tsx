@@ -3,28 +3,30 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { type Role, canAccess } from "@/lib/roles";
+import { AdminLangProvider, useAdminLang } from "@/lib/adminI18n";
+import AdminLangSwitcher from "@/components/AdminLangSwitcher";
 
-type NavItem = { href: string; label: string; sub: string; icon: string };
+type NavItem = { href: string; labelKey: string; subKey: string; icon: string };
 
-const ALL_NAV: { section: string; role: Role | "all"; items: NavItem[] }[] = [
+const ALL_NAV: { sectionKey: string; role: Role | "all"; items: NavItem[] }[] = [
   {
-    section: "概要 / Tổng quan",
+    sectionKey: "sidebar.overview",
     role: "superadmin",
-    items: [{ href: "/admin/dashboard", label: "ダッシュボード", sub: "Dashboard", icon: "grid" }],
+    items: [{ href: "/admin/dashboard", labelKey: "sidebar.dashboard", subKey: "sidebar.dashboard", icon: "grid" }],
   },
   {
-    section: "管理 / Quản lý",
+    sectionKey: "sidebar.management",
     role: "all",
     items: [
-      { href: "/admin/jobs",       label: "求人管理",   sub: "Công việc",  icon: "briefcase" },
-      { href: "/admin/candidates", label: "人材管理",   sub: "Ứng viên",   icon: "users" },
-      { href: "/admin/messages",   label: "メッセージ", sub: "Tin nhắn",   icon: "message" },
+      { href: "/admin/jobs",       labelKey: "sidebar.jobs",       subKey: "sidebar.jobs",       icon: "briefcase" },
+      { href: "/admin/candidates", labelKey: "sidebar.candidates", subKey: "sidebar.candidates", icon: "users" },
+      { href: "/admin/messages",   labelKey: "sidebar.messages",   subKey: "sidebar.messages",   icon: "message" },
     ],
   },
   {
-    section: "システム / Hệ thống",
+    sectionKey: "sidebar.system",
     role: "superadmin",
-    items: [{ href: "/admin/settings", label: "設定", sub: "Google Form連携", icon: "settings" }],
+    items: [{ href: "/admin/settings", labelKey: "sidebar.settings", subKey: "sidebar.settingsSub", icon: "settings" }],
   },
 ];
 
@@ -39,6 +41,15 @@ function NavIcon({ name }: { name: string }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminLangProvider>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
+    </AdminLangProvider>
+  );
+}
+
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
+  const { t } = useAdminLang();
   const router = useRouter();
   const pathname = usePathname();
   const [role, setRole] = useState<Role | null>(null);
@@ -84,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     .filter(g => g.items.length > 0);
 
   const initials = email ? email.slice(0, 2).toUpperCase() : "AD";
-  const roleLabel = role === "superadmin" ? "Super Admin" : role === "admin" ? "Admin" : "…";
+  const roleLabel = role === "superadmin" ? t("common.superAdmin") : role === "admin" ? t("common.admin") : "…";
   const roleBadgeColor = role === "superadmin" ? "#F59E0B" : "#60A5FA";
 
   const Sidebar = (
@@ -97,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: "16px", fontWeight: 800, color: "#fff", letterSpacing: "0.08em" }}>ASEKA</div>
-          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "1px" }}>Back Office</div>
+          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "1px" }}>{t("common.backOffice")}</div>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="sidebar-close-btn"
           style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "7px", cursor: "pointer", color: "rgba(255,255,255,0.6)", padding: "5px", display: "none", alignItems: "center", justifyContent: "center" }}>
@@ -108,9 +119,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Nav */}
       <div style={{ padding: "12px 10px", flex: 1, overflowY: "auto" }}>
         {visibleNav.map(g => (
-          <div key={g.section}>
+          <div key={g.sectionKey}>
             <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(255,255,255,0.3)", padding: "12px 10px 5px", textTransform: "uppercase" }}>
-              {g.section.split(" / ")[0]}
+              {t(g.sectionKey)}
             </div>
             {g.items.map(item => {
               const active = pathname.startsWith(item.href);
@@ -128,8 +139,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <NavIcon name={item.icon} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "14px", color: active ? "#fff" : "rgba(255,255,255,0.78)", fontWeight: active ? 700 : 400, lineHeight: 1.2 }}>{item.label}</div>
-                    <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.38)", marginTop: "2px" }}>{item.sub}</div>
+                    <div style={{ fontSize: "14px", color: active ? "#fff" : "rgba(255,255,255,0.78)", fontWeight: active ? 700 : 400, lineHeight: 1.2 }}>{t(item.labelKey)}</div>
+                    {item.subKey !== item.labelKey && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.38)", marginTop: "2px" }}>{t(item.subKey)}</div>}
                   </div>
                   {active && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#60A5FA", flexShrink: 0 }} />}
                 </Link>
@@ -137,6 +148,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             })}
           </div>
         ))}
+        <div style={{ padding: "14px 10px 6px" }}>
+          <AdminLangSwitcher />
+        </div>
       </div>
 
       {/* User footer */}
@@ -151,7 +165,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {roleLabel}
             </span>
           </div>
-          <button onClick={handleLogout} title="ログアウト"
+          <button onClick={handleLogout} title={t("sidebar.logout")}
             style={{ background: "rgba(255,255,255,0.07)", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.5)", padding: "7px", borderRadius: "8px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}
             onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.14)")}
             onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}>
@@ -256,7 +270,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: "13px", fontWeight: 700, color: "#fff", letterSpacing: "0.04em" }}>ASEKA</div>
-            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.45)" }}>Back Office</div>
+            <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.45)" }}>{t("common.backOffice")}</div>
           </div>
           <button onClick={handleLogout} style={{ background: "none", border: "none", cursor: "pointer", opacity: 0.55, padding: "4px" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAdminLang, dashLabel, dashTime, type AdminLang } from "@/lib/adminI18n";
 
 type PipelineItem  = { ja:string; vn:string; val:number; pct:number; color:string };
 type ActivityItem  = { time:string; ja:string; vn:string; obj:string; tc:string; tb:string };
@@ -18,7 +19,7 @@ const navy = "#0B1F3A";
 const B = { border:"0.5px solid rgba(11,31,58,0.1)" };
 
 /* ── Donut chart (SVG stroke-dasharray technique) ── */
-function DonutChart({ items }: { items: PipelineItem[] }) {
+function DonutChart({ items, lang, t }: { items: PipelineItem[]; lang: AdminLang; t: (key: string, vars?: Record<string,string|number>) => string }) {
   const total = items.reduce((s, p) => s + p.val, 0);
   const r = 62, cx = 80, cy = 80;
   const C = 2 * Math.PI * r;
@@ -45,8 +46,8 @@ function DonutChart({ items }: { items: PipelineItem[] }) {
             ))
         }
         <text x={cx} y={cy - 8} textAnchor="middle" fontSize="26" fontWeight="700" fill={navy}>{total}</text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fontSize="10" fill="#6B6B6B">名登録中</text>
-        <text x={cx} y={cy + 24} textAnchor="middle" fontSize="9" fill="#6B6B6B">Ứng viên</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fontSize="10" fill="#6B6B6B">{t("dashboard.registered")}</text>
+        <text x={cx} y={cy + 24} textAnchor="middle" fontSize="9" fill="#6B6B6B">{t("sidebar.candidates")}</text>
       </svg>
 
       {/* Legend */}
@@ -56,8 +57,7 @@ function DonutChart({ items }: { items: PipelineItem[] }) {
             <div style={{ display:"flex", alignItems:"center", gap:"7px" }}>
               <div style={{ width:"10px", height:"10px", borderRadius:"3px", background:s.color, flexShrink:0 }} />
               <div>
-                <div style={{ fontSize:"11px", fontWeight:600, color:navy }}>{s.ja}</div>
-                <div style={{ fontSize:"9px", color:"#6B6B6B" }}>{s.vn}</div>
+                <div style={{ fontSize:"11px", fontWeight:600, color:navy }}>{dashLabel(s.ja, lang, s.vn)}</div>
               </div>
             </div>
             <div style={{ textAlign:"right" }}>
@@ -72,13 +72,13 @@ function DonutChart({ items }: { items: PipelineItem[] }) {
 }
 
 /* ── Bar chart (vertical grouped) ── */
-function BarChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { cv:number; jobs:number; offers:number } }) {
+function BarChart({ pipeline, monthly, lang, t }: { pipeline: PipelineItem[]; monthly: { cv:number; jobs:number; offers:number }; lang: AdminLang; t: (key: string, vars?: Record<string,string|number>) => string }) {
   const stages = [
-    { key:"新規登録", color:"#378ADD", labelVn:"Mới ký" },
-    { key:"面接中",   color:"#EF9F27", labelVn:"Phỏng vấn" },
-    { key:"内定済み", color:"#5DCAA5", labelVn:"Đã offer" },
-    { key:"就業中",   color:"#27500A", labelVn:"Đang làm" },
-    { key:"退職",     color:"#B4B2A9", labelVn:"Nghỉ việc" },
+    { key:"新規登録", color:"#378ADD" },
+    { key:"面接中",   color:"#EF9F27" },
+    { key:"内定済み", color:"#5DCAA5" },
+    { key:"就業中",   color:"#27500A" },
+    { key:"退職",     color:"#B4B2A9" },
   ];
   const data = stages.map(s => {
     const found = pipeline.find(p => p.ja === s.key);
@@ -92,14 +92,13 @@ function BarChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { 
       {/* Monthly summary badges */}
       <div style={{ display:"flex", gap:"8px", marginBottom:"16px" }}>
         {[
-          { label:"今月登録CV", labelVn:"CV tháng này",   val:monthly.cv,     color:"#185FA5", bg:"#EBF4FF" },
-          { label:"今月求人",   labelVn:"Việc tháng này", val:monthly.jobs,   color:"#7C6FF7", bg:"#F0EFFE" },
-          { label:"今月内定",   labelVn:"Offer tháng này",val:monthly.offers, color:"#27A87A", bg:"#EAFAF5" },
+          { labelKey:"dashboard.cvThisMonth",     val:monthly.cv,     color:"#185FA5", bg:"#EBF4FF" },
+          { labelKey:"dashboard.jobsThisMonth",   val:monthly.jobs,   color:"#7C6FF7", bg:"#F0EFFE" },
+          { labelKey:"dashboard.offersThisMonth", val:monthly.offers, color:"#27A87A", bg:"#EAFAF5" },
         ].map(b => (
-          <div key={b.label} style={{ flex:1, background:b.bg, borderRadius:"10px", padding:"9px 8px", textAlign:"center", border:`0.5px solid ${b.color}22` }}>
+          <div key={b.labelKey} style={{ flex:1, background:b.bg, borderRadius:"10px", padding:"9px 8px", textAlign:"center", border:`0.5px solid ${b.color}22` }}>
             <div style={{ fontSize:"22px", fontWeight:800, color:b.color, lineHeight:1 }}>{b.val}</div>
-            <div style={{ fontSize:"10px", fontWeight:600, color:navy, marginTop:"3px" }}>{b.label}</div>
-            <div style={{ fontSize:"9px", color:"#6B6B6B" }}>{b.labelVn}</div>
+            <div style={{ fontSize:"10px", fontWeight:600, color:navy, marginTop:"3px" }}>{t(b.labelKey)}</div>
           </div>
         ))}
       </div>
@@ -124,8 +123,7 @@ function BarChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { 
               </div>
               {/* x-axis label */}
               <div style={{ textAlign:"center", marginTop:"4px" }}>
-                <div style={{ fontSize:"10px", fontWeight:600, color:navy, whiteSpace:"nowrap" }}>{s.key}</div>
-                <div style={{ fontSize:"8px", color:"#6B6B6B", whiteSpace:"nowrap" }}>{s.labelVn}</div>
+                <div style={{ fontSize:"10px", fontWeight:600, color:navy, whiteSpace:"nowrap" }}>{dashLabel(s.key, lang)}</div>
               </div>
             </div>
           );
@@ -139,6 +137,7 @@ function BarChart({ pipeline, monthly }: { pipeline: PipelineItem[]; monthly: { 
 }
 
 export default function Dashboard() {
+  const { lang, t } = useAdminLang();
   const [time, setTime] = useState("");
   const [data, setData] = useState<DashData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,25 +161,25 @@ export default function Dashboard() {
 
   const d = data;
   const stats = d ? [
-    { val: d.stats.interview,  ja:"選考中の人材",      vn:"Ứng viên đang tuyển", sub:`↑ ${d.totals.candidates}名登録中`, color:"#185FA5" },
-    { val: d.stats.offered,    ja:"内定済み",           vn:"Đã offer thành công", sub:`↑ ${d.stats.offered}件今月`,       color:"#27500A" },
-    { val: d.stats.activeJobs, ja:"募集中求人",          vn:"Công việc đang tuyển", sub: d.stats.urgentJobs > 0 ? `⚡ ${d.stats.urgentJobs}件緊急` : "募集中", color:"#633806" },
-    { val: d.stats.unreadMsgs, ja:"未対応メッセージ",    vn:"Tin nhắn chưa xử lý", sub: d.stats.unreadMsgs > 0 ? "● 本日新着" : "対応済み", color:"#C8002A" },
+    { val: d.stats.interview,  labelKey:"dashboard.statInterview",   sub: t("dashboard.subRegistered", { n: d.totals.candidates }), color:"#185FA5" },
+    { val: d.stats.offered,    labelKey:"dashboard.statOffered",     sub: t("dashboard.subThisMonth", { n: d.stats.offered }),       color:"#27500A" },
+    { val: d.stats.activeJobs, labelKey:"dashboard.statActiveJobs",  sub: d.stats.urgentJobs > 0 ? t("dashboard.subUrgent", { n: d.stats.urgentJobs }) : t("dashboard.subRecruiting"), color:"#633806" },
+    { val: d.stats.unreadMsgs, labelKey:"dashboard.statUnreadMsgs",  sub: d.stats.unreadMsgs > 0 ? t("dashboard.subNewToday") : t("dashboard.subHandled"), color:"#C8002A" },
   ] : [];
 
   return (
     <div>
       <div style={{ background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
         <div>
-          <div style={{ fontSize:"14px",fontWeight:700,color:navy }}>ダッシュボード / Dashboard</div>
+          <div style={{ fontSize:"14px",fontWeight:700,color:navy }}>{t("dashboard.title")}</div>
           <div style={{ fontSize:"10px",color:"#6B6B6B" }}>{time}</div>
         </div>
         <div style={{ display:"flex",gap:"8px" }}>
           <Link href="/dang-ky" target="_blank" style={{ padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"#E6F1FB",color:navy,textDecoration:"none",display:"flex",alignItems:"center",gap:"5px",border:"1px solid rgba(11,31,58,0.15)" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-            登録フォーム
+            {t("dashboard.registerFormLink")}
           </Link>
-          <Link href="/admin/jobs" style={{ padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",textDecoration:"none" }}>+ 新規追加 / Thêm mới</Link>
+          <Link href="/admin/jobs" style={{ padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",textDecoration:"none" }}>{t("dashboard.addNew")}</Link>
         </div>
       </div>
 
@@ -195,10 +194,9 @@ export default function Dashboard() {
                 </div>
               ))
             : stats.map(s => (
-                <div key={s.ja} style={{ background:"#fff",...B,borderRadius:"10px",padding:"14px 16px" }}>
+                <div key={s.labelKey} style={{ background:"#fff",...B,borderRadius:"10px",padding:"14px 16px" }}>
                   <div style={{ fontSize:"28px",fontWeight:700,color:s.color }}>{s.val}</div>
-                  <div style={{ fontSize:"12px",fontWeight:600,color:navy,margin:"2px 0 1px" }}>{s.ja}</div>
-                  <div style={{ fontSize:"10px",color:"#6B6B6B" }}>{s.vn}</div>
+                  <div style={{ fontSize:"12px",fontWeight:600,color:navy,margin:"2px 0 1px" }}>{t(s.labelKey)}</div>
                   <div style={{ fontSize:"10px",color:s.color,marginTop:"3px" }}>{s.sub}</div>
                 </div>
               ))
@@ -208,13 +206,13 @@ export default function Dashboard() {
         {/* Pipeline + Jobs bars */}
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"12px" }}>
           {[
-            { title:"人材パイプライン / Pipeline ứng viên", data: d?.pipeline||[], href:"/admin/candidates" },
-            { title:"業種別求人 / Công việc theo ngành",    data: d?.jobsByIndustry||[], href:"/admin/jobs" },
+            { titleKey:"dashboard.pipelineTitle", data: d?.pipeline||[], href:"/admin/candidates" },
+            { titleKey:"dashboard.jobsByIndustryTitle", data: d?.jobsByIndustry||[], href:"/admin/jobs" },
           ].map(card => (
-            <div key={card.title} style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
+            <div key={card.titleKey} style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
               <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
-                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{card.title}</div>
-                <Link href={card.href} style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>全件表示 →</Link>
+                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t(card.titleKey)}</div>
+                <Link href={card.href} style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
               </div>
               <div style={{ padding:"14px 16px" }}>
                 {loading
@@ -225,12 +223,11 @@ export default function Dashboard() {
                       </div>
                     ))
                   : card.data.length === 0
-                  ? <div style={{ textAlign:"center",padding:"20px",fontSize:"12px",color:"#6B6B6B" }}>データなし</div>
+                  ? <div style={{ textAlign:"center",padding:"20px",fontSize:"12px",color:"#6B6B6B" }}>{t("dashboard.noData")}</div>
                   : card.data.map(p => (
                       <div key={p.ja} style={{ display:"flex",alignItems:"center",gap:"8px",marginBottom:"9px" }}>
                         <div style={{ width:"100px",flexShrink:0 }}>
-                          <div style={{ fontSize:"11px",color:navy,fontWeight:500 }}>{p.ja}</div>
-                          <div style={{ fontSize:"9px",color:"#6B6B6B" }}>{p.vn}</div>
+                          <div style={{ fontSize:"11px",color:navy,fontWeight:500 }}>{dashLabel(p.ja, lang, p.vn)}</div>
                         </div>
                         <div style={{ flex:1,height:"5px",background:"#F6F7F9",borderRadius:"3px",overflow:"hidden" }}>
                           <div style={{ width:`${p.pct}%`,height:"100%",background:p.color,borderRadius:"3px",transition:"width 0.6s ease" }}/>
@@ -251,17 +248,17 @@ export default function Dashboard() {
           <div style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
             <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
               <div>
-                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>人材ステータス分布 / Phân bổ ứng viên</div>
-                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>Biểu đồ hình quạt · 円グラフ</div>
+                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.statusDistTitle")}</div>
+                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>{t("dashboard.donutSub")}</div>
               </div>
-              <Link href="/admin/candidates" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>全件表示 →</Link>
+              <Link href="/admin/candidates" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
             </div>
             <div style={{ padding:"16px 20px" }}>
               {loading
                 ? <div style={{ height:"160px",display:"flex",alignItems:"center",justifyContent:"center" }}>
                     <div style={{ width:"120px",height:"120px",borderRadius:"50%",background:"#F1EFE8",animation:"pulse 1.5s infinite" }}/>
                   </div>
-                : <DonutChart items={d?.pipeline || []} />
+                : <DonutChart items={d?.pipeline || []} lang={lang} t={t} />
               }
             </div>
           </div>
@@ -270,10 +267,10 @@ export default function Dashboard() {
           <div style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
             <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
               <div>
-                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>採用ステージ・今月実績 / Tình trạng tuyển dụng · Tháng này</div>
-                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>Biểu đồ hình cột · 棒グラフ</div>
+                <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.stageMonthTitle")}</div>
+                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>{t("dashboard.barSub")}</div>
               </div>
-              <Link href="/admin/candidates" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>全件表示 →</Link>
+              <Link href="/admin/candidates" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
             </div>
             <div style={{ padding:"16px 20px" }}>
               {loading
@@ -282,7 +279,7 @@ export default function Dashboard() {
                       <div key={i} style={{ flex:1,background:"#F1EFE8",borderRadius:"6px 6px 3px 3px",animation:"pulse 1.5s infinite",height:`${40 + i*20}px` }}/>
                     ))}
                   </div>
-                : <BarChart pipeline={d?.pipeline || []} monthly={d?.monthly || { cv:0, jobs:0, offers:0 }} />
+                : <BarChart pipeline={d?.pipeline || []} monthly={d?.monthly || { cv:0, jobs:0, offers:0 }} lang={lang} t={t} />
               }
             </div>
           </div>
@@ -291,30 +288,29 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <div style={{ background:"#fff",...B,borderRadius:"10px",overflow:"hidden" }}>
           <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)" }}>
-            <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>最近のアクティビティ / Hoạt động gần đây</div>
+            <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.activityTitle")}</div>
           </div>
           {loading
-            ? <div style={{ padding:"20px",textAlign:"center",color:"#6B6B6B",fontSize:"12px" }}>読み込み中...</div>
+            ? <div style={{ padding:"20px",textAlign:"center",color:"#6B6B6B",fontSize:"12px" }}>{t("common.loading")}</div>
             : (d?.activity || []).length === 0
-            ? <div style={{ padding:"20px",textAlign:"center",color:"#6B6B6B",fontSize:"12px" }}>アクティビティなし</div>
+            ? <div style={{ padding:"20px",textAlign:"center",color:"#6B6B6B",fontSize:"12px" }}>{t("dashboard.noActivity")}</div>
             : (
               <table style={{ width:"100%",borderCollapse:"collapse",fontSize:"12px" }}>
                 <thead><tr style={{ background:"#F6F7F9" }}>
-                  {["日時","内容 / Sự kiện","対象","ステータス"].map(h => (
+                  {[t("dashboard.colTime"), t("dashboard.colContent"), t("dashboard.colTarget"), t("dashboard.colStatus")].map(h => (
                     <th key={h} style={{ padding:"8px 14px",textAlign:"left",fontSize:"10px",color:"#6B6B6B",fontWeight:600,borderBottom:"0.5px solid rgba(11,31,58,0.1)" }}>{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
                   {(d?.activity || []).map((a, i) => (
                     <tr key={i} style={{ borderBottom:"0.5px solid rgba(11,31,58,0.05)" }}>
-                      <td style={{ padding:"10px 14px",color:"#6B6B6B",fontSize:"10px",whiteSpace:"nowrap" }}>{a.time}</td>
+                      <td style={{ padding:"10px 14px",color:"#6B6B6B",fontSize:"10px",whiteSpace:"nowrap" }}>{dashTime(a.time, lang)}</td>
                       <td style={{ padding:"10px 14px" }}>
-                        <div style={{ fontSize:"12px",color:navy }}>{a.ja}</div>
-                        <div style={{ fontSize:"10px",color:"#6B6B6B" }}>{a.vn}</div>
+                        <div style={{ fontSize:"12px",color:navy }}>{dashLabel(a.ja, lang, a.vn)}</div>
                       </td>
                       <td style={{ padding:"10px 14px",fontWeight:600,color:navy,fontSize:"12px" }}>{a.obj}</td>
                       <td style={{ padding:"10px 14px" }}>
-                        <span style={{ background:a.tb,color:a.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px" }}>{a.vn}</span>
+                        <span style={{ background:a.tb,color:a.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px" }}>{dashLabel(a.ja, lang, a.vn)}</span>
                       </td>
                     </tr>
                   ))}

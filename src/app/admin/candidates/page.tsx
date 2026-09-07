@@ -3,6 +3,7 @@ import React from 'react';
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import JSZip from "jszip";
+import { useAdminLang } from "@/lib/adminI18n";
 
 /* ─── Types ─────────────────────────────────────────────── */
 type Edu  = { year:string; month:string; school:string; event:string };
@@ -32,12 +33,12 @@ type FileItem = {
 };
 
 /* ─── Constants ──────────────────────────────────────────── */
-const ST: Record<string,{ja:string;vn:string;tc:string;tb:string}> = {
-  new:      {ja:"新規",   vn:"Mới",       tc:"#0C447C",tb:"#E6F1FB"},
-  interview:{ja:"面接中", vn:"Phỏng vấn", tc:"#633806",tb:"#FAEEDA"},
-  offered:  {ja:"内定済", vn:"Đã offer",  tc:"#534AB7",tb:"#EEEDFE"},
-  working:  {ja:"就業中", vn:"Đang làm",  tc:"#27500A",tb:"#EAF3DE"},
-  quit:     {ja:"退職",   vn:"Nghỉ",      tc:"#444441",tb:"#F1EFE8"},
+const ST: Record<string,{ja:string;vn:string;tc:string;tb:string;labelKey:string}> = {
+  new:      {ja:"新規",   vn:"Mới",       tc:"#0C447C",tb:"#E6F1FB",labelKey:"candidates.statusNew"},
+  interview:{ja:"面接中", vn:"Phỏng vấn", tc:"#633806",tb:"#FAEEDA",labelKey:"candidates.statusInterview"},
+  offered:  {ja:"内定済", vn:"Đã offer",  tc:"#534AB7",tb:"#EEEDFE",labelKey:"candidates.statusOffered"},
+  working:  {ja:"就業中", vn:"Đang làm",  tc:"#27500A",tb:"#EAF3DE",labelKey:"candidates.statusWorking"},
+  quit:     {ja:"退職",   vn:"Nghỉ",      tc:"#444441",tb:"#F1EFE8",labelKey:"candidates.statusQuit"},
 };
 const JC: Record<string,{tc:string;tb:string}> = {
   N1:{tc:"#A32D2D",tb:"#FCEBEB"},N2:{tc:"#633806",tb:"#FAEEDA"},
@@ -123,6 +124,7 @@ ${c.self_pr?`<div class="section">自己PR</div><p style="font-size:13px;line-he
 /* ─── Main Component ─────────────────────────────────────── */
 export default function CandidatesPage() {
   const router = useRouter();
+  const { t } = useAdminLang();
   const [cands, setCands] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Candidate|null>(null);
@@ -200,7 +202,7 @@ export default function CandidatesPage() {
   };
 
   const deleteCandidate = async (id:string) => {
-    if (!confirm("削除しますか？/ Xóa ứng viên này?")) return;
+    if (!confirm(t("candidates.deleteConfirm"))) return;
     await fetch(`/api/admin/candidates?id=${id}`,{method:"DELETE"});
     setCands((p: Candidate[]) => p.filter((c: Candidate) => c.id !== id));
     setSelected(null);
@@ -388,7 +390,7 @@ export default function CandidatesPage() {
       await load();
     } else {
       const err = await res.json();
-      alert("保存失敗: " + err.error);
+      alert(t("common.saveFailed") + ": " + err.error);
     }
     setSaving(false);
   };
@@ -398,8 +400,8 @@ export default function CandidatesPage() {
     <div>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
-          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>人材管理 <span style={{color:"#B4B2A9",fontWeight:400}}>/ Quản lý Ứng viên</span></div>
-          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>RDS DB · Groq AI · Export CV · Job Matching</div>
+          <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("candidates.title")}</div>
+          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>{t("candidates.subtitle")}</div>
         </div>
         <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           {/* Form share button + popup */}
@@ -407,14 +409,14 @@ export default function CandidatesPage() {
             <button onClick={()=>setShowFormPopup(p=>!p)}
               style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:showFormPopup?"#E6F1FB":"#fff",color:navy,border:`1px solid ${showFormPopup?navy:"rgba(11,31,58,0.2)"}`,cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-              登録フォームを共有
+              {t("candidates.shareForm")}
             </button>
 
             {showFormPopup && (
               <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:"12px",padding:"16px",boxShadow:"0 8px 32px rgba(11,31,58,0.14)",zIndex:200,width:"300px",border:"0.5px solid rgba(11,31,58,0.1)"}}>
-                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"6px"}}>📋 ứng viên tự đăng ký qua link này</div>
+                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"6px"}}>📋 {t("candidates.shareFormDesc")}</div>
                 <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"10px"}}>
-                  Gửi link qua Zalo / LINE / Email — ứng viên điền form → tự vào BO
+                  {t("candidates.shareFormHint")}
                 </div>
                 <div style={{background:"#F6F7F9",borderRadius:"8px",padding:"8px 10px",fontFamily:"monospace",fontSize:"10px",color:"#185FA5",wordBreak:"break-all",marginBottom:"10px",userSelect:"all"}}>
                   {FORM_URL}
@@ -422,12 +424,12 @@ export default function CandidatesPage() {
                 <div style={{display:"flex",gap:"6px"}}>
                   <button onClick={()=>{navigator.clipboard.writeText(FORM_URL);setLinkCopied(true);setTimeout(()=>setLinkCopied(false),2000);}}
                     style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:700,background:linkCopied?"#27500A":navy,color:"#fff",border:"none",cursor:"pointer"}}>
-                    {linkCopied?"✓ コピー済み":"🔗 URLをコピー"}
+                    {linkCopied?`✓ ${t("candidates.linkCopied")}`:`🔗 ${t("candidates.copyLink")}`}
                   </button>
                   <a href={FORM_URL} target="_blank" rel="noreferrer"
                     style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:700,background:"#E6F1FB",color:navy,border:"none",cursor:"pointer",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px"}}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    フォームを開く
+                    {t("candidates.openForm")}
                   </a>
                 </div>
               </div>
@@ -436,7 +438,7 @@ export default function CandidatesPage() {
 
           <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            CV取込 (最大5件)
+            {t("candidates.importCV")}
           </button>
         </div>
       </div>
@@ -446,34 +448,34 @@ export default function CandidatesPage() {
         <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
           <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="氏名・メール・希望職種で検索 / Tìm tên, email, vị trí..." value={searchInput}
+            <input type="text" placeholder={t("candidates.searchPlaceholder")} value={searchInput}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
               style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
           </div>
           <select value={skillFilter} onChange={e=>setSkillFilter(e.target.value)}
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
-            <option value="all">業種すべて / Mọi ngành</option>
+            <option value="all">{t("candidates.allIndustries")}</option>
             {skillOptions.map(s=><option key={s} value={s}>{s}</option>)}
           </select>
           <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
-            <option value="all">日本語すべて / Mọi JLPT</option>
+            <option value="all">{t("candidates.allJlpt")}</option>
             {["N1","N2","N3","N4","N5"].map(j=><option key={j} value={j}>{j}</option>)}
           </select>
           {activeFilterCount>0&&(
             <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
-              ✕ フィルター解除 ({activeFilterCount})
+              ✕ {t("common.clearFilters")} ({activeFilterCount})
             </button>
           )}
           <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
-            {loading?"読み込み中...":`${cands.length}件 · ${cands.length} kết quả`}
+            {loading?t("common.loading"):`${cands.length} ${t("common.results")}`}
           </div>
         </div>
 
         <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
-          {[{key:"all",ja:"全件",vn:"Tất cả"},...Object.entries(ST).map(([k,v])=>({key:k,ja:v.ja,vn:v.vn}))].map(t=>(
-            <button key={t.key} onClick={()=>setFilter(t.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===t.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===t.key?navy:"#fff",color:filter===t.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
-              {t.ja} · {t.vn} ({counts[t.key]||0})
+          {[{key:"all",labelKey:"common.all"},...Object.entries(ST).map(([k,v])=>({key:k,labelKey:v.labelKey}))].map(f=>(
+            <button key={f.key} onClick={()=>setFilter(f.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.key?navy:"#fff",color:filter===f.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
+              {t(f.labelKey)} ({counts[f.key]||0})
             </button>
           ))}
         </div>
@@ -481,23 +483,23 @@ export default function CandidatesPage() {
         <div style={{display:"grid",gridTemplateColumns:selected?"1fr 420px":"1fr",gap:"12px"}}>
           {/* Table */}
           <div style={{background:"#fff",...B,borderRadius:"10px",overflow:"hidden"}}>
-            {loading?<div style={{padding:"40px",textAlign:"center",color:"#6B6B6B"}}>読み込み中...</div>
+            {loading?<div style={{padding:"40px",textAlign:"center",color:"#6B6B6B"}}>{t("common.loading")}</div>
             :cands.length===0?<div style={{padding:"48px",textAlign:"center"}}>
               <div style={{fontSize:"32px",marginBottom:"12px"}}>👤</div>
-              <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>ứng viên chưa có</div>
-              <button onClick={()=>setView("import")} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>CV取込で追加 →</button>
+              <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.empty")}</div>
+              <button onClick={()=>setView("import")} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.addViaImport")}</button>
             </div>:(
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:"12px"}}>
                 <thead><tr style={{background:"#F6F7F9"}}>
                   {[
-                    {h:"候補者",key:"name" as const},
-                    {h:"業種",key:null},
-                    {h:"日本語",key:"jlpt" as const},
-                    {h:"希望職種",key:null},
-                    {h:"マッチ先",key:null},
-                    {h:"CV",key:null},
-                    {h:"ステータス",key:null},
-                    {h:"更新",key:"updated_at" as const},
+                    {h:t("candidates.colCandidate"),key:"name" as const},
+                    {h:t("candidates.colIndustry"),key:null},
+                    {h:t("candidates.colJlpt"),key:"jlpt" as const},
+                    {h:t("candidates.colPreferredJob"),key:null},
+                    {h:t("candidates.colMatch"),key:null},
+                    {h:t("candidates.colCV"),key:null},
+                    {h:t("candidates.colStatus"),key:null},
+                    {h:t("candidates.colUpdated"),key:"updated_at" as const},
                   ].map(col=>(
                     <th key={col.h} onClick={col.key?()=>toggleSort(col.key!):undefined}
                       style={{padding:"9px 10px",textAlign:"left",fontSize:"10px",color:"#6B6B6B",fontWeight:600,borderBottom:"0.5px solid rgba(11,31,58,0.1)",whiteSpace:"nowrap",cursor:col.key?"pointer":"default",userSelect:"none"}}>
@@ -526,9 +528,9 @@ export default function CandidatesPage() {
                         <td style={{padding:"10px 10px"}}><span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{c.skill||"—"}</span></td>
                         <td style={{padding:"10px 10px"}}><span style={{background:jc.tb,color:jc.tc,fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{c.jlpt||"—"}</span></td>
                         <td style={{padding:"10px 10px",fontSize:"11px",color:"#444",maxWidth:"100px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.preferred_job||"—"}</td>
-                        <td style={{padding:"10px 10px",fontSize:"11px",color:c.match_job_name&&c.match_job_name!=="未定"?"#185FA5":"#6B6B6B",fontWeight:600}}>{c.match_job_name||"未定"}</td>
+                        <td style={{padding:"10px 10px",fontSize:"11px",color:c.match_job_name&&c.match_job_name!=="未定"?"#185FA5":"#6B6B6B",fontWeight:600}}>{c.match_job_name&&c.match_job_name!=="未定"?c.match_job_name:t("candidates.noMatch")}</td>
                         <td style={{padding:"10px 10px"}}>{c.cv_filename?<span style={{fontSize:"10px",color:"#C8002A",fontWeight:700}}>📄</span>:<span style={{fontSize:"10px",color:"#B4B2A9"}}>—</span>}</td>
-                        <td style={{padding:"10px 10px"}}><span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{st.ja}</span></td>
+                        <td style={{padding:"10px 10px"}}><span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{t(st.labelKey)}</span></td>
                         <td style={{padding:"10px 10px",fontSize:"10px",color:"#6B6B6B"}}>{c.updated_at?new Date(c.updated_at).toLocaleDateString("ja-JP"):"—"}</td>
                       </tr>
                     );
@@ -557,9 +559,9 @@ export default function CandidatesPage() {
 
               {/* Tabs */}
               <div style={{display:"flex",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>
-                {[{k:"basic",l:"基本情報"},{k:"history",l:"学歴・職歴"},{k:"pr",l:"PR・資格"},{k:"match",l:"マッチング"}].map(t=>(
-                  <button key={t.k} onClick={()=>setDetailTab(t.k as "basic"|"history"|"pr"|"match")} style={{flex:1,padding:"8px 4px",fontSize:"10px",fontWeight:detailTab===t.k?700:400,color:detailTab===t.k?navy:"#6B6B6B",border:"none",background:detailTab===t.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===t.k?navy:"transparent"}`,cursor:"pointer"}}>
-                    {t.l}
+                {[{k:"basic",lk:"candidates.tabBasic"},{k:"history",lk:"candidates.tabHistory"},{k:"pr",lk:"candidates.tabPr"},{k:"match",lk:"candidates.tabMatch"}].map(tb=>(
+                  <button key={tb.k} onClick={()=>setDetailTab(tb.k as "basic"|"history"|"pr"|"match")} style={{flex:1,padding:"8px 4px",fontSize:"10px",fontWeight:detailTab===tb.k?700:400,color:detailTab===tb.k?navy:"#6B6B6B",border:"none",background:detailTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+                    {t(tb.lk)}
                   </button>
                 ))}
               </div>
@@ -569,24 +571,24 @@ export default function CandidatesPage() {
                 {detailTab==="basic"&&(
                   <div>
                     {[
-                      {l:"氏名",v:`${selected.name} / ${selected.name_kana||"—"}`},
-                      {l:"性別",v:selected.gender||"—"},
-                      {l:"生年月日",v:selected.date_of_birth?new Date(selected.date_of_birth).toLocaleDateString("ja-JP"):"—"},
-                      {l:"連絡先",v:selected.email||selected.phone||"—"},
-                      {l:"電話",v:selected.phone||"—"},
-                      {l:"住所",v:selected.address||"ベトナム"},
-                      {l:"在留資格",v:selected.visa_type||"—"},
-                      {l:"在留期限",v:fmtDate(selected.visa_expiry)},
-                      {l:"日本語",v:`${selected.jlpt||"—"} (${selected.jlpt_actual||"—"})`},
-                      {l:"身長/体重",v:`${selected.height_cm||"—"}cm / ${selected.weight_kg||"—"}kg`},
-                      {l:"婚姻",v:selected.marital_status||"—"},
-                      {l:"扶養家族",v:`${selected.dependents||0}人`},
-                      {l:"希望職種",v:selected.preferred_job||"—"},
-                      {l:"勤務時間",v:selected.work_hours||"—"},
-                      {l:"就業可能日",v:selected.availability||"即日"},
+                      {lk:"candidates.name",v:`${selected.name} / ${selected.name_kana||"—"}`},
+                      {lk:"candidates.gender",v:selected.gender||"—"},
+                      {lk:"candidates.dob",v:selected.date_of_birth?new Date(selected.date_of_birth).toLocaleDateString("ja-JP"):"—"},
+                      {lk:"candidates.contact",v:selected.email||selected.phone||"—"},
+                      {lk:"candidates.phone",v:selected.phone||"—"},
+                      {lk:"candidates.address",v:selected.address||"ベトナム"},
+                      {lk:"candidates.visaType",v:selected.visa_type||"—"},
+                      {lk:"candidates.visaExpiry",v:fmtDate(selected.visa_expiry)},
+                      {lk:"candidates.colJlpt",v:`${selected.jlpt||"—"} (${selected.jlpt_actual||"—"})`},
+                      {lk:"candidates.heightWeight",v:`${selected.height_cm||"—"}cm / ${selected.weight_kg||"—"}kg`},
+                      {lk:"candidates.marital",v:selected.marital_status||"—"},
+                      {lk:"candidates.dependents",v:`${selected.dependents||0}`},
+                      {lk:"candidates.colPreferredJob",v:selected.preferred_job||"—"},
+                      {lk:"candidates.workHours",v:selected.work_hours||"—"},
+                      {lk:"candidates.availability",v:selected.availability||t("candidates.immediate")},
                     ].map(r=>(
-                      <div key={r.l} style={{display:"flex",gap:"8px",padding:"5px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)",fontSize:"12px"}}>
-                        <span style={{color:"#6B6B6B",width:"80px",flexShrink:0,fontSize:"11px"}}>{r.l}</span>
+                      <div key={r.lk} style={{display:"flex",gap:"8px",padding:"5px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)",fontSize:"12px"}}>
+                        <span style={{color:"#6B6B6B",width:"80px",flexShrink:0,fontSize:"11px"}}>{t(r.lk)}</span>
                         <span style={{color:navy,fontWeight:500,flex:1,wordBreak:"break-word"}}>{r.v}</span>
                       </div>
                     ))}
@@ -597,7 +599,7 @@ export default function CandidatesPage() {
                 {detailTab==="history"&&(
                   <div>
                     {(selected.education||[]).length>0&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>学歴 / Học vấn</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.education")}</div>
                       {(selected.education||[]).map((e,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
                           <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{e.year}年{e.month}月</span>
@@ -607,7 +609,7 @@ export default function CandidatesPage() {
                       ))}
                     </>}
                     {(selected.work_history||[]).length>0&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>職歴 / Kinh nghiệm</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.workHistory")}</div>
                       {(selected.work_history||[]).map((w,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
                           <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{w.year}年{w.month}月</span>
@@ -623,7 +625,7 @@ export default function CandidatesPage() {
                 {detailTab==="pr"&&(
                   <div>
                     {(selected.certifications||[]).length>0&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>免許・資格</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.certifications")}</div>
                       {(selected.certifications||[]).map((ct,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
                           <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{ct.year}年{ct.month}月</span>
@@ -633,15 +635,15 @@ export default function CandidatesPage() {
                       ))}
                     </>}
                     {selected.motivation&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>志望動機</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.motivation")}</div>
                       <div style={{fontSize:"11px",color:"#444",lineHeight:1.7,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{selected.motivation}</div>
                     </>}
                     {selected.self_pr&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>自己PR</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.selfPr")}</div>
                       <div style={{fontSize:"11px",color:"#444",lineHeight:1.7,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{selected.self_pr}</div>
                     </>}
                     {selected.ai_data&&(selected.ai_data.strengths as string[])?.length>0&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>AI分析 · Strengths</div>
+                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.aiStrengths")}</div>
                       <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                         {(selected.ai_data.strengths as string[]).map((s,i)=>(
                           <span key={i} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>
@@ -656,11 +658,11 @@ export default function CandidatesPage() {
                   <div>
                     {matchResults.length===0&&!matching&&(
                       <div style={{textAlign:"center",padding:"20px"}}>
-                        <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>Groq AIで求人マッチングを実行</div>
-                        <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>AIマッチング開始</button>
+                        <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>{t("candidates.runMatching")}</div>
+                        <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.startMatching")}</button>
                       </div>
                     )}
-                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>🤖 Groq分析中...</div>}
+                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>{t("candidates.matching")}</div>}
                     {matchResults.map((job,i)=>(
                       <div key={job.id} style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",background:i===0?"#F0F7FF":"#fff"}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
@@ -686,13 +688,13 @@ export default function CandidatesPage() {
               <div style={{padding:"12px 16px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"4px",marginBottom:"8px"}}>
                   {Object.entries(ST).map(([k,v])=>(
-                    <button key={k} onClick={()=>updateStatus(selected.id,k)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"10px",fontWeight:600,cursor:"pointer",background:selected.status===k?v.tc:v.tb,color:selected.status===k?"#fff":v.tc,border:`1px solid ${v.tc}`}}>{v.ja}</button>
+                    <button key={k} onClick={()=>updateStatus(selected.id,k)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"10px",fontWeight:600,cursor:"pointer",background:selected.status===k?v.tc:v.tb,color:selected.status===k?"#fff":v.tc,border:`1px solid ${v.tc}`}}>{t(v.labelKey)}</button>
                   ))}
                 </div>
                 <div style={{display:"flex",gap:"6px"}}>
-                  <button onClick={()=>exportCV(selected)} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#EAF3DE",color:"#27500A",border:"0.5px solid #27500A",cursor:"pointer"}}>📄 Export CV</button>
-                  {selected.email&&<a href={`mailto:${selected.email}`} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>メール送信</a>}
-                  <button onClick={()=>deleteCandidate(selected.id)} style={{padding:"7px 10px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer"}}>削除</button>
+                  <button onClick={()=>exportCV(selected)} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#EAF3DE",color:"#27500A",border:"0.5px solid #27500A",cursor:"pointer"}}>📄 {t("common.export")}</button>
+                  {selected.email&&<a href={`mailto:${selected.email}`} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>{t("common.sendEmail")}</a>}
+                  <button onClick={()=>deleteCandidate(selected.id)} style={{padding:"7px 10px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer"}}>{t("common.delete")}</button>
                 </div>
               </div>
             </div>
@@ -706,8 +708,8 @@ export default function CandidatesPage() {
   if (view==="import") return (
     <div>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>CV AI取込 / Import CV</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>最大5件同時 · PDF/Word · Groq AI全情報抽出</div></div>
-        <button onClick={()=>{setView("list");setFileItems([]);}} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← 一覧へ</button>
+        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.importTitle")}</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>{t("candidates.importSubtitle")}</div></div>
+        <button onClick={()=>{setView("list");setFileItems([]);}} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← {t("common.backToList")}</button>
       </div>
       <div style={{padding:"20px",maxWidth:"780px",margin:"0 auto"}}>
         {/* Drop zone */}
@@ -719,9 +721,9 @@ export default function CandidatesPage() {
           <div style={{width:"48px",height:"48px",borderRadius:"12px",background:"#E6F1FB",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={navy} strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
-          <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"4px"}}>CVをドラッグ＆ドロップ / Kéo thả CV</div>
-          <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>PDF · Word (.doc/.docx) · 最大5件同時</div>
-          <div style={{display:"inline-block",padding:"7px 18px",borderRadius:"7px",background:navy,color:"#fff",fontSize:"12px",fontWeight:600}}>ファイルを選択 ({fileItems.length}/5)</div>
+          <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.dropzoneTitle")}</div>
+          <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>{t("candidates.dropzoneHint")}</div>
+          <div style={{display:"inline-block",padding:"7px 18px",borderRadius:"7px",background:navy,color:"#fff",fontSize:"12px",fontWeight:600}}>{t("candidates.chooseFile")} ({fileItems.length}/5)</div>
         </div>
         <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" multiple style={{display:"none"}} onChange={e=>{if(e.target.files)addFiles(e.target.files);e.target.value="";}}/>
 
@@ -747,17 +749,17 @@ export default function CandidatesPage() {
                           <div style={{height:"100%",borderRadius:"3px",transition:"width 0.3s",background:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#378ADD",width:`${item.progress}%`}}/>
                         </div>
                         <div style={{fontSize:"10px",color:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#6B6B6B"}}>
-                          {item.status==="analyzing"?`${item.progress}% — Groq AI抽出中...`
-                          :item.status==="done"?"✓ 分析完了 · Click「確認・保存」"
-                          :`✗ エラー${item.result?.error?` · ${item.result.error.slice(0,80)}`:""}`}
+                          {item.status==="analyzing"?`${item.progress}% — ${t("candidates.analyzing")}`
+                          :item.status==="done"?t("candidates.done")
+                          :`${t("candidates.errorPrefix")}${item.result?.error?` · ${item.result.error.slice(0,80)}`:""}`}
                         </div>
                       </div>
                     )}
-                    {item.status==="waiting"&&<div style={{fontSize:"10px",color:"#B4B2A9"}}>待機中...</div>}
+                    {item.status==="waiting"&&<div style={{fontSize:"10px",color:"#B4B2A9"}}>{t("candidates.waiting")}</div>}
                   </div>
                   <div style={{display:"flex",gap:"5px",flexShrink:0}}>
                     {item.status==="done"&&item.result?.candidate&&(
-                      <button onClick={()=>openReview(item)} style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>確認・保存</button>
+                      <button onClick={()=>openReview(item)} style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.reviewSave")}</button>
                     )}
                     {!isAnalyzing&&(
                       <button onClick={()=>setFileItems(p=>p.filter(f=>f.id!==item.id))} style={{padding:"5px 7px",borderRadius:"6px",fontSize:"11px",background:"transparent",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>×</button>
@@ -773,8 +775,8 @@ export default function CandidatesPage() {
           <div style={{background:"#FAEEDA",border:"1px solid #EF9F27",borderRadius:"9px",padding:"12px 16px",marginBottom:"10px",display:"flex",alignItems:"center",gap:"10px"}}>
             <span style={{fontSize:"20px"}}>⏱</span>
             <div style={{flex:1}}>
-              <div style={{fontSize:"13px",fontWeight:700,color:"#633806"}}>Groq API rate limit — tự động thử lại sau {retryCountdown}s</div>
-              <div style={{fontSize:"11px",color:"#633806",marginTop:"2px"}}>Quota vượt giới hạn phút. Đang chờ reset...</div>
+              <div style={{fontSize:"13px",fontWeight:700,color:"#633806"}}>{t("candidates.rateLimited", { s: retryCountdown })}</div>
+              <div style={{fontSize:"11px",color:"#633806",marginTop:"2px"}}>{t("candidates.rateLimitedDesc")}</div>
             </div>
             <div style={{width:"44px",height:"44px",borderRadius:"50%",background:"#fff",border:"2px solid #EF9F27",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"14px",fontWeight:700,color:"#633806",flexShrink:0}}>{retryCountdown}</div>
           </div>
@@ -782,18 +784,18 @@ export default function CandidatesPage() {
 
         {fileItems.length>0&&!isAnalyzing&&fileItems.some(f=>f.status==="waiting")&&retryCountdown===0&&(
           <button onClick={analyzeAll} style={{width:"100%",padding:"12px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
-            🤖 Groq AIで全情報を抽出 · Phân tích toàn bộ ({fileItems.filter(f=>f.status==="waiting").length}件)
+            {t("candidates.runExtract")} ({fileItems.filter(f=>f.status==="waiting").length})
           </button>
         )}
 
         {fileItems.length===0&&(
           <div style={{background:"#F6F7F9",borderRadius:"10px",padding:"14px 16px"}}>
-            <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>💡 Groq AIが抽出する情報 / AI tự động trích xuất:</div>
+            <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>{t("candidates.extractInfo")}</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px"}}>
-              {["氏名・フリガナ・連絡先","生年月日・性別","在留資格・期限","日本語能力 (JLPT)","身長・体重","学歴（入学・卒業年月）","職歴（会社名・期間）","免許・資格一覧","志望動機・自己PR","希望職種・勤務条件","婚姻・扶養家族","AIによる求人マッチング"].map((t,i)=>(
+              {Array.from({length:12},(_,i)=>t(`candidates.extractItem${i+1}`)).map((it,i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",gap:"6px",fontSize:"11px",color:"#444"}}>
                   <div style={{width:"5px",height:"5px",borderRadius:"50%",background:"#27500A",flexShrink:0}}/>
-                  {t}
+                  {it}
                 </div>
               ))}
             </div>
@@ -809,41 +811,41 @@ export default function CandidatesPage() {
     return (
       <div>
         <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>確認・DB保存 / Xác nhận & Lưu DB</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>{currentReview.fileName}</div></div>
-          <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← 戻る</button>
+          <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.reviewHeaderTitle")}</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>{currentReview.fileName}</div></div>
+          <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← {t("common.back")}</button>
         </div>
         <div style={{padding:"16px 20px",maxWidth:"920px",margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px"}}>
           {/* Left: Edit form */}
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
               <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"12px",display:"flex",alignItems:"center",gap:"7px"}}>
-                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>Groq AI抽出済</span>
-                基本情報を確認・修正
+                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>{t("candidates.groqExtracted")}</span>
+                {t("candidates.reviewFormTitle")}
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
                 {[
-                  {f:"name",l:"氏名 *",t:"text"},{f:"name_kana",l:"フリガナ",t:"text"},
-                  {f:"email",l:"Email",t:"email"},{f:"phone",l:"電話",t:"text"},
-                  {f:"gender",l:"性別",t:"text"},{f:"date_of_birth",l:"生年月日",t:"text"},
-                  {f:"visa_type",l:"在留資格",t:"text"},{f:"visa_expiry",l:"在留期限",t:"text"},
-                  {f:"height_cm",l:"身長(cm)",t:"number"},{f:"weight_kg",l:"体重(kg)",t:"number"},
-                  {f:"preferred_job",l:"希望職種",t:"text"},{f:"work_hours",l:"勤務時間",t:"text"},
+                  {f:"name",lk:"candidates.name",req:true,t:"text"},{f:"name_kana",lk:"candidates.nameKana",t:"text"},
+                  {f:"email",lk:"candidates.email",t:"email"},{f:"phone",lk:"candidates.phone",t:"text"},
+                  {f:"gender",lk:"candidates.gender",t:"text"},{f:"date_of_birth",lk:"candidates.dob",t:"text"},
+                  {f:"visa_type",lk:"candidates.visaType",t:"text"},{f:"visa_expiry",lk:"candidates.visaExpiry",t:"text"},
+                  {f:"height_cm",lk:"candidates.heightCm",t:"number"},{f:"weight_kg",lk:"candidates.weightKg",t:"number"},
+                  {f:"preferred_job",lk:"candidates.colPreferredJob",t:"text"},{f:"work_hours",lk:"candidates.workHours",t:"text"},
                 ].map(x=>(
                   <div key={x.f}>
-                    <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{x.l}</label>
+                    <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t(x.lk)}{x.req?" *":""}</label>
                     <input type={x.t} value={editForm[x.f]||""} onChange={e=>setEditForm({...editForm,[x.f]:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
                   </div>
                 ))}
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px",marginTop:"10px"}}>
                 <div>
-                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>日本語 / Tiếng Nhật</label>
+                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colJlpt")}</label>
                   <select value={editForm.jlpt||"N4"} onChange={e=>setEditForm({...editForm,jlpt:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                     {["N1","N2","N3","N4","N5","N3相当","N4相当","なし"].map(j=><option key={j}>{j}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>業種 / Ngành</label>
+                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colIndustry")}</label>
                   <select value={editForm.skill||"飲食"} onChange={e=>setEditForm({...editForm,skill:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                     {["飲食","製造","農業","ホテル","宿泊業","IT","その他"].map(i=><option key={i}>{i}</option>)}
                   </select>
@@ -859,17 +861,17 @@ export default function CandidatesPage() {
               if (!edu?.length && !wh?.length && !crt?.length) return null;
               return (
                 <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
-                  <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>抽出データ / Dữ liệu đã trích xuất</div>
+                  <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>{t("candidates.extractedData")}</div>
                   {edu && edu.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>学歴 ({edu.length}件)</div>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>{t("candidates.education")} ({edu.length})</div>
                     {edu.map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
                   </>}
                   {wh && wh.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>職歴 ({wh.length}件)</div>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.workHistory")} ({wh.length})</div>
                     {wh.map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
                   </>}
                   {crt && crt.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>資格 ({crt.length}件)</div>
+                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.certifications")} ({crt.length})</div>
                     {crt.map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
                   </>}
                 </div>
@@ -883,8 +885,8 @@ export default function CandidatesPage() {
               if (!mot && !pr) return null;
               return (
                 <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
-                  {mot&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>志望動機</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
-                  {pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>自己PR</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
+                  {mot&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.motivation")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
+                  {pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.selfPr")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
                 </div>
               );
             })()}
@@ -893,13 +895,13 @@ export default function CandidatesPage() {
           {/* Right: Job matching */}
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
-              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>🎯 Groq AIマッチング求人</div>
+              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.aiMatchedJobs")}</div>
               <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"12px"}}>
-                希望: <strong>{String(c.preferred_job||"未記入")}</strong> · 
-                日本語: <strong>{String(c.jlpt||"—")}</strong> · 
-                業種: <strong>{String(c.skill||"—")}</strong>
+                {t("candidates.desiredLabel")}: <strong>{String(c.preferred_job||t("candidates.notFilled"))}</strong> ·
+                {t("candidates.colJlpt")}: <strong>{String(c.jlpt||"—")}</strong> ·
+                {t("candidates.colIndustry")}: <strong>{String(c.skill||"—")}</strong>
               </div>
-              {currentReview.suggestions.length===0&&<div style={{padding:"16px",textAlign:"center",color:"#6B6B6B",fontSize:"12px"}}>求人データなし — 先に求人を登録してください</div>}
+              {currentReview.suggestions.length===0&&<div style={{padding:"16px",textAlign:"center",color:"#6B6B6B",fontSize:"12px"}}>{t("candidates.noJobData")}</div>}
               {currentReview.suggestions.map((job,i)=>(
                 <div key={job.id} onClick={()=>setSelectedJobId(job.id)} style={{border:`1.5px solid ${selectedJobId===job.id?navy:"rgba(11,31,58,0.1)"}`,borderRadius:"10px",padding:"12px",marginBottom:"8px",cursor:"pointer",background:selectedJobId===job.id?"#E6F1FB":"#fff",transition:"all 0.15s"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
@@ -922,18 +924,18 @@ export default function CandidatesPage() {
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span style={{fontSize:"11px",fontWeight:700,color:"#27500A"}}>{job.salary}</span>
-                    <span style={{background:job.status==="urgent"?"#FCEBEB":"#E6F1FB",color:job.status==="urgent"?"#A32D2D":"#0C447C",fontSize:"9px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{job.status==="urgent"?"⚡ 緊急":"募集中"}</span>
+                    <span style={{background:job.status==="urgent"?"#FCEBEB":"#E6F1FB",color:job.status==="urgent"?"#A32D2D":"#0C447C",fontSize:"9px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{job.status==="urgent"?`⚡ ${t("jobs.statusUrgent")}`:t("dashboard.subRecruiting")}</span>
                   </div>
-                  {selectedJobId===job.id&&<div style={{marginTop:"6px",paddingTop:"6px",borderTop:"0.5px solid rgba(11,31,58,0.08)",fontSize:"10px",color:"#27500A",fontWeight:700}}>✓ この求人に登録します</div>}
+                  {selectedJobId===job.id&&<div style={{marginTop:"6px",paddingTop:"6px",borderTop:"0.5px solid rgba(11,31,58,0.08)",fontSize:"10px",color:"#27500A",fontWeight:700}}>{t("candidates.registerToThisJob")}</div>}
                 </div>
               ))}
               <button onClick={()=>setSelectedJobId(null)} style={{width:"100%",padding:"7px",borderRadius:"7px",fontSize:"11px",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",background:"transparent",cursor:"pointer",marginTop:"4px"}}>
-                マッチなし / Chưa match
+                {t("candidates.noMatchOption")}
               </button>
             </div>
 
             <button onClick={saveCandidate} disabled={!editForm.name||saving} style={{width:"100%",padding:"13px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:editForm.name&&!saving?navy:"#B4B2A9",color:"#fff",border:"none",cursor:editForm.name?"pointer":"not-allowed",transition:"background 0.2s"}}>
-              {saving?"DB保存中...":"💾 DBに保存 / Lưu vào database"}
+              {saving?t("candidates.savingDb"):t("candidates.saveToDbBtn")}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useAdminLang } from "@/lib/adminI18n";
 
 const navy = "#0B1F3A";
 const B = { border: "0.5px solid rgba(11,31,58,0.1)" };
@@ -94,6 +95,7 @@ function testConnection() {
 }`;
 
 export default function SettingsPage() {
+  const { t } = useAdminLang();
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = (text: string, key: string) => {
@@ -107,8 +109,8 @@ export default function SettingsPage() {
       {/* Header */}
       <div style={{ background: "#fff", ...B, borderTop: "none", borderLeft: "none", borderRight: "none", padding: "0 20px", height: "52px", display: "flex", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: "14px", fontWeight: 700, color: navy }}>設定 / Cài đặt</div>
-          <div style={{ fontSize: "10px", color: "#6B6B6B" }}>Google Form 連携 · Kết nối Google Form</div>
+          <div style={{ fontSize: "14px", fontWeight: 700, color: navy }}>{t("sidebar.settings")}</div>
+          <div style={{ fontSize: "10px", color: "#6B6B6B" }}>{t("settings.subtitle")}</div>
         </div>
       </div>
 
@@ -117,17 +119,17 @@ export default function SettingsPage() {
         {/* Flow diagram */}
         <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "16px" }}>
-            📋 Google Form → BO 自動連携フロー / Luồng tự động
+            {t("settings.flowTitle")}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             {[
-              { icon: "📝", label: "ứng viên điền form", sub: "Google Form" },
+              { icon: "📝", label: t("settings.flowStep1"), sub: "Google Form" },
               { icon: "→" },
-              { icon: "⚙️", label: "Apps Script gửi data", sub: "tự động khi submit" },
+              { icon: "⚙️", label: t("settings.flowStep2"), sub: t("settings.flowStep2Sub") },
               { icon: "→" },
-              { icon: "🔗", label: "Webhook API nhận", sub: "/api/webhook/google-form" },
+              { icon: "🔗", label: t("settings.flowStep3"), sub: "/api/webhook/google-form" },
               { icon: "→" },
-              { icon: "✅", label: "Tự vào danh sách", sub: "nhân vật quản lý / BO" },
+              { icon: "✅", label: t("settings.flowStep4"), sub: t("settings.flowStep4Sub") },
             ].map((s, i) => (
               "icon" in s && s.label ? (
                 <div key={i} style={{ background: "#F6F7F9", borderRadius: "10px", padding: "10px 14px", textAlign: "center", minWidth: "120px" }}>
@@ -146,31 +148,31 @@ export default function SettingsPage() {
           {/* Webhook URL */}
           <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
             <div style={{ fontSize: "12px", fontWeight: 700, color: navy, marginBottom: "12px" }}>
-              🔗 Webhook URL
+              {t("settings.webhookUrlLabel")}
             </div>
             <div style={{ background: "#F6F7F9", borderRadius: "8px", padding: "10px 12px", fontFamily: "monospace", fontSize: "11px", color: "#185FA5", wordBreak: "break-all", marginBottom: "8px" }}>
               {WEBHOOK_URL}
             </div>
             <button onClick={() => copy(WEBHOOK_URL, "url")}
               style={{ padding: "6px 14px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, background: copied === "url" ? "#27500A" : navy, color: "#fff", border: "none", cursor: "pointer", width: "100%" }}>
-              {copied === "url" ? "✓ Copied!" : "コピー / Copy URL"}
+              {copied === "url" ? t("settings.copiedBtn") : t("settings.copyUrlBtn")}
             </button>
           </div>
 
           {/* Webhook Secret */}
           <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
             <div style={{ fontSize: "12px", fontWeight: 700, color: navy, marginBottom: "12px" }}>
-              🔑 Webhook Secret (bảo mật)
+              {t("settings.webhookSecretLabel")}
             </div>
             <div style={{ background: "#FFF8E6", border: "0.5px solid #EF9F27", borderRadius: "8px", padding: "10px 12px", fontFamily: "monospace", fontSize: "13px", fontWeight: 700, color: "#633806", marginBottom: "8px" }}>
               {WEBHOOK_SECRET}
             </div>
             <div style={{ fontSize: "10px", color: "#6B6B6B", marginBottom: "8px" }}>
-              ⚠️ Thêm vào Vercel: Settings → Environment Variables → WEBHOOK_SECRET
+              {t("settings.secretWarning")}
             </div>
             <button onClick={() => copy(WEBHOOK_SECRET, "secret")}
               style={{ padding: "6px 14px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, background: copied === "secret" ? "#27500A" : "#633806", color: "#fff", border: "none", cursor: "pointer", width: "100%" }}>
-              {copied === "secret" ? "✓ Copied!" : "Secret をコピー"}
+              {copied === "secret" ? t("settings.copiedBtn") : t("settings.copySecretBtn")}
             </button>
           </div>
         </div>
@@ -178,48 +180,23 @@ export default function SettingsPage() {
         {/* Setup steps */}
         <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "16px" }}>
-            📌 セットアップ手順 / Các bước cài đặt
+            {t("settings.setupStepsTitle")}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {[
-              {
-                step: "1",
-                title: "Google Form mở Script editor",
-                desc: "Mở Google Form → click ⋮ (3 chấm) ở góc trên phải → chọn \"Script editor\"",
-                color: "#185FA5",
-              },
-              {
-                step: "2",
-                title: "Paste Google Apps Script",
-                desc: "Copy toàn bộ code bên dưới → paste vào Script editor → Lưu (Ctrl+S)",
-                color: "#7C6FF7",
-              },
-              {
-                step: "3",
-                title: "Chạy setupTrigger() một lần",
-                desc: "Trong Script editor → chọn hàm \"setupTrigger\" → nhấn Run ▶ → cấp quyền khi Google hỏi",
-                color: "#EF9F27",
-              },
-              {
-                step: "4",
-                title: "Thêm WEBHOOK_SECRET vào Vercel",
-                desc: "Vercel Dashboard → Project → Settings → Environment Variables → thêm WEBHOOK_SECRET = aseka-webhook-2026",
-                color: "#5DCAA5",
-              },
-              {
-                step: "5",
-                title: "Test kết nối",
-                desc: "Trong Script editor → chọn hàm \"testConnection\" → Run ▶ → kiểm tra log (View → Logs). Nếu thấy ✅ là thành công!",
-                color: "#27500A",
-              },
+              { step: "1", titleKey: "settings.step1Title", descKey: "settings.step1Desc", color: "#185FA5" },
+              { step: "2", titleKey: "settings.step2Title", descKey: "settings.step2Desc", color: "#7C6FF7" },
+              { step: "3", titleKey: "settings.step3Title", descKey: "settings.step3Desc", color: "#EF9F27" },
+              { step: "4", titleKey: "settings.step4Title", descKey: "settings.step4Desc", color: "#5DCAA5" },
+              { step: "5", titleKey: "settings.step5Title", descKey: "settings.step5Desc", color: "#27500A" },
             ].map(s => (
               <div key={s.step} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: s.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, flexShrink: 0 }}>
                   {s.step}
                 </div>
                 <div>
-                  <div style={{ fontSize: "12px", fontWeight: 600, color: navy }}>{s.title}</div>
-                  <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{s.desc}</div>
+                  <div style={{ fontSize: "12px", fontWeight: 600, color: navy }}>{t(s.titleKey)}</div>
+                  <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{t(s.descKey)}</div>
                 </div>
               </div>
             ))}
@@ -229,10 +206,10 @@ export default function SettingsPage() {
         {/* Field mapping */}
         <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "4px" }}>
-            🗂 Tên field trong Google Form → BO (tự động nhận diện)
+            {t("settings.fieldMapTitle")}
           </div>
           <div style={{ fontSize: "11px", color: "#6B6B6B", marginBottom: "14px" }}>
-            Đặt tên câu hỏi trong Form khớp với 1 trong các tên dưới đây (không phân biệt hoa/thường)
+            {t("settings.fieldMapDesc")}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             {[
@@ -261,12 +238,12 @@ export default function SettingsPage() {
         <div style={{ background: "#fff", ...B, borderRadius: "12px", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px", borderBottom: "0.5px solid rgba(11,31,58,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: navy }}>⚙️ Google Apps Script Code</div>
-              <div style={{ fontSize: "10px", color: "#6B6B6B", marginTop: "1px" }}>Copy toàn bộ và paste vào Script editor của Google Form</div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: navy }}>{t("settings.gasCodeTitle")}</div>
+              <div style={{ fontSize: "10px", color: "#6B6B6B", marginTop: "1px" }}>{t("settings.gasCodeDesc")}</div>
             </div>
             <button onClick={() => copy(GAS_CODE, "gas")}
               style={{ padding: "7px 16px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, background: copied === "gas" ? "#27500A" : navy, color: "#fff", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
-              {copied === "gas" ? "✓ Copied!" : "📋 全てコピー / Copy tất cả"}
+              {copied === "gas" ? t("settings.copiedBtn") : t("settings.copyAllBtn")}
             </button>
           </div>
           <pre style={{ margin: 0, padding: "16px 20px", background: "#0B1F3A", color: "#E8F4FD", fontSize: "11px", lineHeight: "1.6", overflowX: "auto", maxHeight: "400px", overflowY: "auto" }}>

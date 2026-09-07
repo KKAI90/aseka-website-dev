@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAdminLang } from "@/lib/adminI18n";
+import AdminLangSwitcher from "@/components/AdminLangSwitcher";
 
 export default function AdminLogin() {
   const router = useRouter();
+  const { t } = useAdminLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -21,7 +24,7 @@ export default function AdminLogin() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error || "ログインに失敗しました");
+      setError(data.error || t("login.genericError"));
       setLoading(false);
       return;
     }
@@ -61,6 +64,7 @@ export default function AdminLogin() {
           .login-left { display:none; }
           .login-right { background:#fff; padding:24px 20px; }
           .login-card { box-shadow:none; padding:32px 24px; }
+          .login-lang-mobile { display:flex !important; }
         }
       `}</style>
 
@@ -69,24 +73,31 @@ export default function AdminLogin() {
         <div className="login-left">
           <div>
             {/* Logo */}
-            <div style={{ display:"flex", alignItems:"center", gap:"12px", marginBottom:"48px" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:"12px", marginBottom:"28px" }}>
               <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, boxShadow:"0 2px 12px rgba(0,0,0,0.2)" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"32px", height:"32px", objectFit:"contain" }} />
               </div>
               <div>
                 <div style={{ fontSize:"20px", fontWeight:800, color:"#fff", letterSpacing:"0.1em" }}>ASEKA</div>
-                <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.5)", marginTop:"1px" }}>Back Office</div>
+                <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.5)", marginTop:"1px" }}>{t("common.backOffice")}</div>
               </div>
+            </div>
+
+            <div style={{ marginBottom:"20px" }}>
+              <AdminLangSwitcher variant="dark" />
             </div>
 
             {/* Tagline */}
             <div style={{ fontSize:"26px", fontWeight:700, color:"#fff", lineHeight:1.35, letterSpacing:"-0.01em", marginBottom:"16px" }}>
-              管理画面へ<br />ようこそ
+              {t("login.welcomeTitle").split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
             </div>
             <div style={{ fontSize:"13px", color:"rgba(255,255,255,0.5)", lineHeight:1.7 }}>
-              ASEKAのバックオフィス管理システムです。<br />
-              承認されたアカウントでログインしてください。
+              {t("login.welcomeDesc").split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
             </div>
           </div>
 
@@ -100,26 +111,30 @@ export default function AdminLogin() {
         <div className="login-right">
           <div className="login-card">
             {/* Mobile logo (shown only on mobile) */}
-            <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"32px" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"20px" }}>
               <div style={{ width:"40px", height:"40px", borderRadius:"11px", background:"linear-gradient(135deg,#0d2444,#2563EB)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"26px", height:"26px", objectFit:"contain", filter:"brightness(10)" }} />
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <div style={{ fontSize:"16px", fontWeight:800, color:"#111827", letterSpacing:"0.06em" }}>ASEKA</div>
-                <div style={{ fontSize:"11px", color:"#9CA3AF" }}>Back Office · 管理画面</div>
+                <div style={{ fontSize:"11px", color:"#9CA3AF" }}>{t("common.backOffice")}</div>
               </div>
             </div>
 
+            <div className="login-lang-mobile" style={{ marginBottom:"20px", display: "none" }}>
+              <AdminLangSwitcher variant="light" />
+            </div>
+
             <div style={{ marginBottom:"28px" }}>
-              <h1 style={{ fontSize:"22px", fontWeight:800, color:"#111827", margin:0, letterSpacing:"-0.02em" }}>ログイン</h1>
-              <p style={{ fontSize:"13px", color:"#9CA3AF", marginTop:"6px" }}>アカウント情報を入力してください</p>
+              <h1 style={{ fontSize:"22px", fontWeight:800, color:"#111827", margin:0, letterSpacing:"-0.02em" }}>{t("login.title")}</h1>
+              <p style={{ fontSize:"13px", color:"#9CA3AF", marginTop:"6px" }}>{t("login.subtitle")}</p>
             </div>
 
             <form onSubmit={handleLogin}>
               {/* Email */}
               <div className="field">
-                <label className="field-label">メールアドレス</label>
+                <label className="field-label">{t("login.email")}</label>
                 <div className="field-wrap">
                   <input
                     className="field-input"
@@ -138,7 +153,7 @@ export default function AdminLogin() {
 
               {/* Password */}
               <div className="field">
-                <label className="field-label">パスワード</label>
+                <label className="field-label">{t("login.password")}</label>
                 <div className="field-wrap">
                   <input
                     className="field-input"
@@ -172,9 +187,9 @@ export default function AdminLogin() {
               {/* Submit */}
               <button type="submit" className="login-btn" disabled={loading} style={{ marginTop: error ? "0" : "8px" }}>
                 {loading ? (
-                  <><div className="spinner" /> ログイン中...</>
+                  <><div className="spinner" /> {t("login.signingIn")}</>
                 ) : (
-                  <>ログイン
+                  <>{t("login.signIn")}
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </>
                 )}

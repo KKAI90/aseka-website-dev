@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useAdminLang } from "@/lib/adminI18n";
 
 type Msg = {
   id: string; type: string; name: string; company: string | null;
@@ -8,17 +9,17 @@ type Msg = {
   message: string | null; status: string; created_at: string;
 };
 
-const SVC: Record<string, { ja: string; color: string; bg: string; border: string }> = {
-  hr:     { ja: "人材紹介",   color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE" },
-  nenkin: { ja: "年金",       color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
-  visa:   { ja: "ビザ",       color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
-  zairyu: { ja: "在留手続き", color: "#059669", bg: "#ECFDF5", border: "#A7F3D0" },
-  other:  { ja: "その他",     color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB" },
+const SVC: Record<string, { ja: string; color: string; bg: string; border: string; labelKey: string }> = {
+  hr:     { ja: "人材紹介",   color: "#2563EB", bg: "#EFF6FF", border: "#BFDBFE", labelKey: "messages.svcHr" },
+  nenkin: { ja: "年金",       color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE", labelKey: "messages.svcNenkin" },
+  visa:   { ja: "ビザ",       color: "#D97706", bg: "#FFFBEB", border: "#FDE68A", labelKey: "messages.svcVisa" },
+  zairyu: { ja: "在留手続き", color: "#059669", bg: "#ECFDF5", border: "#A7F3D0", labelKey: "messages.svcZairyu" },
+  other:  { ja: "その他",     color: "#6B7280", bg: "#F9FAFB", border: "#E5E7EB", labelKey: "messages.svcOther" },
 };
-const ST: Record<string, { ja: string; vn: string; tc: string; tb: string; border: string; dot: string }> = {
-  new:       { ja: "新規",     vn: "Mới",        tc: "#1D4ED8", tb: "#EFF6FF", border: "#BFDBFE", dot: "#3B82F6" },
-  contacted: { ja: "連絡済み", vn: "Đã liên hệ", tc: "#065F46", tb: "#ECFDF5", border: "#A7F3D0", dot: "#10B981" },
-  closed:    { ja: "完了",     vn: "Xong",       tc: "#374151", tb: "#F9FAFB", border: "#D1D5DB", dot: "#9CA3AF" },
+const ST: Record<string, { ja: string; vn: string; tc: string; tb: string; border: string; dot: string; labelKey: string }> = {
+  new:       { ja: "新規",     vn: "Mới",        tc: "#1D4ED8", tb: "#EFF6FF", border: "#BFDBFE", dot: "#3B82F6", labelKey: "messages.statusNew" },
+  contacted: { ja: "連絡済み", vn: "Đã liên hệ", tc: "#065F46", tb: "#ECFDF5", border: "#A7F3D0", dot: "#10B981", labelKey: "messages.statusContacted" },
+  closed:    { ja: "完了",     vn: "Xong",       tc: "#374151", tb: "#F9FAFB", border: "#D1D5DB", dot: "#9CA3AF", labelKey: "messages.statusClosed" },
 };
 
 function fmt(iso: string) {
@@ -58,6 +59,7 @@ function KpiNum({ value }: { value: number }) {
 
 export default function MessagesPage() {
   const router = useRouter();
+  const { t } = useAdminLang();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -86,9 +88,9 @@ export default function MessagesPage() {
     setMsgs(d.data || []);
     setLoading(false);
     if (spin) {
-      setTimeout(() => { setRefreshing(false); showToast("データを更新しました", "info"); }, 400);
+      setTimeout(() => { setRefreshing(false); showToast(t("messages.refreshedToast"), "info"); }, 400);
     }
-  }, [router, showToast]);
+  }, [router, showToast, t]);
 
   useEffect(() => { load().then(() => setTimeout(() => setPageReady(true), 50)); }, [load]);
 
@@ -109,8 +111,8 @@ export default function MessagesPage() {
     setMsgs(p => p.map(m => m.id === id ? { ...m, status } : m));
     setSelected(p => p?.id === id ? { ...p, status } : p);
     setUpdatingId(null);
-    const label = ST[status]?.ja || status;
-    showToast(`ステータスを「${label}」に変更しました`);
+    const label = ST[status]?.labelKey ? t(ST[status].labelKey) : status;
+    showToast(t("messages.statusChangedToast", { label }));
   };
 
   const monthlyStats = useMemo(() => {
@@ -118,7 +120,7 @@ export default function MessagesPage() {
     msgs.forEach(m => { const k = fmtMonth(m.created_at); map[k] = (map[k] || 0) + 1; });
     return Array.from({ length: 12 }, (_, i) => {
       const key = `${chartYear}/${String(i+1).padStart(2,"0")}`;
-      return { month: key, count: map[key] || 0, label: `${i+1}月` };
+      return { month: key, count: map[key] || 0, label: `${i+1}` };
     });
   }, [msgs, chartYear]);
 
@@ -147,10 +149,10 @@ export default function MessagesPage() {
   const hasFilter = !!(search || dateFrom || dateTo || filterStatus !== "all");
 
   const KPI_CARDS = [
-    { key: "all",       icon: "📥", label: "合計",     sub: "すべての問い合わせ", color: "#374151", activeBg: "#1F2937", activeBd: "#374151", idleBd: "#E5E7EB",  pulse: false },
-    { key: "new",       icon: "🔔", label: "新規",     sub: "未対応",             color: "#1D4ED8", activeBg: "#1D4ED8", activeBd: "#2563EB", idleBd: "#BFDBFE",  pulse: counts.new > 0 },
-    { key: "contacted", icon: "💬", label: "連絡済み", sub: "対応中",             color: "#065F46", activeBg: "#059669", activeBd: "#10B981", idleBd: "#A7F3D0",  pulse: false },
-    { key: "closed",    icon: "✅", label: "完了",     sub: "クローズ済み",       color: "#374151", activeBg: "#4B5563", activeBd: "#6B7280", idleBd: "#D1D5DB",  pulse: false },
+    { key: "all",       icon: "📥", labelKey: "messages.kpiAllLabel",       subKey: "messages.kpiAllSub",       color: "#374151", activeBg: "#1F2937", activeBd: "#374151", idleBd: "#E5E7EB",  pulse: false },
+    { key: "new",       icon: "🔔", labelKey: "messages.kpiNewLabel",       subKey: "messages.kpiNewSub",       color: "#1D4ED8", activeBg: "#1D4ED8", activeBd: "#2563EB", idleBd: "#BFDBFE",  pulse: counts.new > 0 },
+    { key: "contacted", icon: "💬", labelKey: "messages.kpiContactedLabel", subKey: "messages.kpiContactedSub", color: "#065F46", activeBg: "#059669", activeBd: "#10B981", idleBd: "#A7F3D0",  pulse: false },
+    { key: "closed",    icon: "✅", labelKey: "messages.kpiClosedLabel",    subKey: "messages.kpiClosedSub",    color: "#374151", activeBg: "#4B5563", activeBd: "#6B7280", idleBd: "#D1D5DB",  pulse: false },
   ];
 
   return (
@@ -334,19 +336,19 @@ export default function MessagesPage() {
               💬
             </div>
             <div>
-              <div className="topbar-title" style={{ fontSize:"14px", fontWeight:700, color:"#111827", letterSpacing:"-0.01em" }}>メッセージ管理</div>
-              <div className="topbar-sub" style={{ fontSize:"11px", color:"#9CA3AF" }}>Webフォームからのお問い合わせ</div>
+              <div className="topbar-title" style={{ fontSize:"14px", fontWeight:700, color:"#111827", letterSpacing:"-0.01em" }}>{t("messages.title")}</div>
+              <div className="topbar-sub" style={{ fontSize:"11px", color:"#9CA3AF" }}>{t("messages.subtitle")}</div>
             </div>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
             {counts.new > 0 && (
               <span style={{ fontSize:"11px", color:"#1D4ED8", background:"#EFF6FF", border:"1px solid #BFDBFE", padding:"3px 10px", borderRadius:"20px", fontWeight:700 }}>
-                未対応 {counts.new}件
+                {t("messages.unreadCount", { n: counts.new })}
               </span>
             )}
             <button className="refresh-btn" onClick={() => load(true)}>
               <span className={`spin-icon ${refreshing ? "spinning" : ""}`} style={{ fontSize:"15px" }}>↻</span>
-              <span>更新</span>
+              <span>{t("messages.refresh")}</span>
             </button>
           </div>
         </div>
@@ -373,8 +375,8 @@ export default function MessagesPage() {
                       <div className="kpi-num" style={{ color: isActive ? "#fff" : c.color }}>
                         <KpiNum value={cnt} />
                       </div>
-                      <div className="kpi-label" style={{ color: isActive ? "rgba(255,255,255,0.9)" : c.color }}>{c.label}</div>
-                      <div className="kpi-sub" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "#9CA3AF" }}>{c.sub}</div>
+                      <div className="kpi-label" style={{ color: isActive ? "rgba(255,255,255,0.9)" : c.color }}>{t(c.labelKey)}</div>
+                      <div className="kpi-sub" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "#9CA3AF" }}>{t(c.subKey)}</div>
                     </div>
                     <div style={{ width:"40px", height:"40px", borderRadius:"11px", background: isActive ? "rgba(255,255,255,0.15)" : "#F3F4F6", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"19px", transition:"transform 0.2s" }}>
                       {c.icon}
@@ -389,8 +391,8 @@ export default function MessagesPage() {
           <div className="card chart-wrap section-appear" style={{ animationDelay:"0.15s" }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:showChart ? "20px" : "0", gap:"10px", flexWrap:"wrap" }}>
               <div>
-                <div style={{ fontSize:"13px", fontWeight:700, color:"#111827" }}>月別メッセージ数</div>
-                <div style={{ fontSize:"11px", color:"#9CA3AF", marginTop:"2px" }}>{chartYear}年のお問い合わせ推移</div>
+                <div style={{ fontSize:"13px", fontWeight:700, color:"#111827" }}>{t("messages.chartTitle")}</div>
+                <div style={{ fontSize:"11px", color:"#9CA3AF", marginTop:"2px" }}>{t("messages.chartSubtitle", { year: chartYear })}</div>
               </div>
               <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
                 <div className="year-nav">
@@ -400,7 +402,7 @@ export default function MessagesPage() {
                 </div>
                 <button onClick={() => setShowChart(!showChart)}
                   style={{ fontSize:"11px", color:"#6B7280", background:"#F3F4F6", border:"none", borderRadius:"7px", padding:"6px 12px", cursor:"pointer", fontWeight:500, transition:"all 0.15s", whiteSpace:"nowrap" }}>
-                  {showChart ? "非表示" : "表示"}
+                  {showChart ? t("messages.hide") : t("messages.show")}
                 </button>
               </div>
             </div>
@@ -424,7 +426,7 @@ export default function MessagesPage() {
                         onMouseLeave={() => setHoveredBar(null)}>
                         {/* Tooltip */}
                         {isHovered && count > 0 && (
-                          <div className="bar-tooltip">{count}件 · {label}</div>
+                          <div className="bar-tooltip">{count} {t("common.results")} · {label}</div>
                         )}
                         <div style={{ fontSize:"11px", fontWeight:700, color: count>0 ? "#1D4ED8" : "transparent", minHeight:"18px", textAlign:"center", transition:"color 0.15s" }}>
                           {count || ""}
@@ -459,10 +461,10 @@ export default function MessagesPage() {
               <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
                 <path d="M17 17L13 13M15 8.5A6.5 6.5 0 112 8.5a6.5 6.5 0 0113 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               </svg>
-              <input className="search-input" type="text" placeholder="名前・会社名・メールで検索..." value={search} onChange={e => setSearch(e.target.value)} />
+              <input className="search-input" type="text" placeholder={t("messages.searchPlaceholder")} value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <div className="toolbar-date-wrap">
-              <span className="toolbar-date-label">期間</span>
+              <span className="toolbar-date-label">{t("messages.periodLabel")}</span>
               <input className="date-input" type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
               <span className="date-sep">—</span>
               <input className="date-input" type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
@@ -471,11 +473,11 @@ export default function MessagesPage() {
               {hasFilter && (
                 <button className="clear-btn" onClick={() => { setSearch(""); setDateFrom(""); setDateTo(""); setFilterStatus("all"); }}>
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                  クリア
+                  {t("messages.clear")}
                 </button>
               )}
               <div style={{ fontSize:"12px", color:"#6B7280", fontWeight:500, whiteSpace:"nowrap" }}>
-                <span style={{ fontWeight:700, color:"#111827" }}>{filtered.length}</span> 件
+                <span style={{ fontWeight:700, color:"#111827" }}>{filtered.length}</span> {t("common.results")}
               </div>
             </div>
           </div>
@@ -503,19 +505,19 @@ export default function MessagesPage() {
             ) : filtered.length === 0 ? (
               <div className="empty-state">
                 <div style={{ fontSize:"48px", marginBottom:"12px", opacity:0.25 }}>📭</div>
-                <div style={{ fontSize:"14px", color:"#6B7280", fontWeight:600 }}>データが見つかりません</div>
-                {hasFilter && <div style={{ fontSize:"12px", color:"#9CA3AF", marginTop:"6px" }}>フィルターを変更してください</div>}
+                <div style={{ fontSize:"14px", color:"#6B7280", fontWeight:600 }}>{t("messages.emptyTitle")}</div>
+                {hasFilter && <div style={{ fontSize:"12px", color:"#9CA3AF", marginTop:"6px" }}>{t("messages.emptyFilterHint")}</div>}
               </div>
             ) : (
               <div className="msg-table-wrap">
                 <table className="msg-table">
                   <thead className="msg-thead">
                     <tr>
-                      <th className="msg-th" style={{ width:"130px" }}>日時</th>
-                      <th className="msg-th">送信者</th>
-                      <th className="msg-th msg-th-service" style={{ width:"108px" }}>サービス</th>
-                      <th className="msg-th msg-th-content">内容プレビュー</th>
-                      <th className="msg-th" style={{ width:"96px" }}>ステータス</th>
+                      <th className="msg-th" style={{ width:"130px" }}>{t("messages.colDate")}</th>
+                      <th className="msg-th">{t("messages.colSender")}</th>
+                      <th className="msg-th msg-th-service" style={{ width:"108px" }}>{t("messages.colService")}</th>
+                      <th className="msg-th msg-th-content">{t("messages.colPreview")}</th>
+                      <th className="msg-th" style={{ width:"96px" }}>{t("messages.colStatus")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -537,7 +539,7 @@ export default function MessagesPage() {
                           </td>
                           <td className="msg-td msg-td-service">
                             {svc
-                              ? <span className="badge" style={{ color:svc.color, background:svc.bg, borderColor:svc.border }}>{svc.ja}</span>
+                              ? <span className="badge" style={{ color:svc.color, background:svc.bg, borderColor:svc.border }}>{t(svc.labelKey)}</span>
                               : <span style={{ color:"#D1D5DB", fontSize:"12px" }}>—</span>}
                           </td>
                           <td className="msg-td msg-td-content" style={{ maxWidth:"260px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontSize:"12px", color:"#6B7280" }}>
@@ -546,7 +548,7 @@ export default function MessagesPage() {
                           <td className="msg-td">
                             <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border }}>
                               <span className={`dot${m.status==="new" ? " dot-pulse" : ""}`} style={{ background:st.dot }} />
-                              {st.ja}
+                              {t(st.labelKey)}
                             </span>
                           </td>
                         </tr>
@@ -580,7 +582,7 @@ export default function MessagesPage() {
                     <span style={{ fontSize:"17px", fontWeight:800, color:"#0F172A", letterSpacing:"-0.02em" }}>{selected.name}</span>
                     <span className="badge" style={{ color:st.tc, background:st.tb, borderColor:st.border, fontSize:"11px", padding:"4px 11px" }}>
                       <span className={`dot${selected.status==="new" ? " dot-pulse" : ""}`} style={{ width:"6px", height:"6px", background:st.dot }} />
-                      {st.ja}
+                      {t(st.labelKey)}
                     </span>
                   </div>
                   <div style={{ marginTop:"4px", display:"flex", gap:"12px", flexWrap:"wrap" }}>
@@ -588,7 +590,7 @@ export default function MessagesPage() {
                     <span style={{ fontSize:"12px", color:"#94A3B8" }}>{fmt(selected.created_at)}</span>
                   </div>
                 </div>
-                <button className="close-btn" onClick={() => setSelected(null)} title="閉じる (ESC)">
+                <button className="close-btn" onClick={() => setSelected(null)} title={t("messages.close")}>
                   <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
                 </button>
               </div>
@@ -598,14 +600,14 @@ export default function MessagesPage() {
 
                 {/* Left: Contact Info */}
                 <div className="modal-left">
-                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"12px" }}>連絡先情報</div>
+                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"12px" }}>{t("messages.contactInfo")}</div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"2px" }}>
                     {[
-                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, label:"メール", value:selected.email },
-                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, label:"電話番号", value:selected.phone||"—" },
-                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>, label:"種別", value:selected.type==="business" ? "企業" : "個人" },
-                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>, label:"サービス", value:svc?.ja||"—" },
-                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>, label:"受信日時", value:fmt(selected.created_at) },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, label:t("messages.fieldEmail"), value:selected.email },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>, label:t("messages.fieldPhone"), value:selected.phone||"—" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>, label:t("messages.fieldType"), value:selected.type==="business" ? t("messages.typeBusiness") : t("messages.typePersonal") },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>, label:t("messages.fieldService"), value:svc?t(svc.labelKey):"—" },
+                      { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>, label:t("messages.fieldReceivedAt"), value:fmt(selected.created_at) },
                     ].map(r => (
                       <div key={r.label} className="info-row">
                         <span style={{ width:"20px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{r.icon}</span>
@@ -618,7 +620,7 @@ export default function MessagesPage() {
                   <div style={{ height:"1px", background:"#EEF0F4", margin:"16px 0" }} />
 
                   {/* Status change in left panel */}
-                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"10px" }}>ステータス変更</div>
+                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"10px" }}>{t("messages.statusChangeLabel")}</div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"6px" }}>
                     {Object.entries(ST).map(([k, v]) => {
                       const isAct = selected.status === k;
@@ -629,7 +631,7 @@ export default function MessagesPage() {
                           onClick={() => updateStatus(selected.id, k)}
                           style={{ display:"flex", alignItems:"center", gap:"8px", textAlign:"left", background: isAct ? v.tc : v.tb, color: isAct ? "#fff" : v.tc, borderColor: isAct ? v.tc : v.border, boxShadow: isAct ? `0 3px 10px ${v.tc}44` : "none", flex:"unset" }}>
                           <span style={{ width:"8px", height:"8px", borderRadius:"50%", background: isAct ? "rgba(255,255,255,0.7)" : v.dot, flexShrink:0 }} />
-                          {isLoading && isAct ? "更新中…" : v.ja}
+                          {isLoading && isAct ? t("messages.updating") : t(v.labelKey)}
                           {isAct && <svg style={{ marginLeft:"auto" }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>}
                         </button>
                       );
@@ -641,9 +643,9 @@ export default function MessagesPage() {
                 <div className="modal-right">
                   <div>
                     <div className="sec-title">
-                      メッセージ内容
+                      {t("messages.messageContent")}
                       <span style={{ marginLeft:"auto", fontSize:"10px", color:"#94A3B8", fontWeight:400, textTransform:"none", letterSpacing:0 }}>
-                        {selected.message ? `${selected.message.length}文字` : ""}
+                        {selected.message ? t("messages.charCount", { n: selected.message.length }) : ""}
                       </span>
                     </div>
                     {selected.message ? (
@@ -652,7 +654,7 @@ export default function MessagesPage() {
                         {selected.message}
                       </div>
                     ) : (
-                      <div style={{ padding:"32px", textAlign:"center", color:"#D1D5DB", fontSize:"13px" }}>メッセージなし</div>
+                      <div style={{ padding:"32px", textAlign:"center", color:"#D1D5DB", fontSize:"13px" }}>{t("messages.noMessage")}</div>
                     )}
                   </div>
                 </div>
@@ -663,23 +665,23 @@ export default function MessagesPage() {
                 <a href={`mailto:${selected.email}`} className="action-a"
                   style={{ flex:"none", padding:"10px 20px", background:"linear-gradient(135deg,#1E3A5F,#2563EB)", color:"#fff", boxShadow:"0 2px 10px rgba(37,99,235,0.3)", borderRadius:"11px" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  メール送信
+                  {t("common.sendEmail")}
                 </a>
                 {selected.phone && (
                   <a href={`tel:${selected.phone}`} className="action-a"
                     style={{ flex:"none", padding:"10px 18px", background:"#ECFDF5", color:"#065F46", border:"1px solid #A7F3D0", borderRadius:"11px" }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                    電話
+                    {t("messages.callBtn")}
                   </a>
                 )}
                 <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:"6px" }}>
                   <span style={{ fontSize:"11px", color:"#94A3B8", marginRight:"4px" }}>
                     {selIdx + 1} / {filtered.length}
                   </span>
-                  <button className="nav-btn" disabled={!hasPrev} onClick={() => setSelected(filtered[selIdx - 1])} title="前へ">
+                  <button className="nav-btn" disabled={!hasPrev} onClick={() => setSelected(filtered[selIdx - 1])} title={t("messages.prevBtn")}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="15 18 9 12 15 6"/></svg>
                   </button>
-                  <button className="nav-btn" disabled={!hasNext} onClick={() => setSelected(filtered[selIdx + 1])} title="次へ">
+                  <button className="nav-btn" disabled={!hasNext} onClick={() => setSelected(filtered[selIdx + 1])} title={t("messages.nextBtn")}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6"/></svg>
                   </button>
                 </div>
