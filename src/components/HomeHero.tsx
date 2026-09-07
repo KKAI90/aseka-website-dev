@@ -130,7 +130,7 @@ export default function HomeHero() {
           >
             {t.btn1} →
           </Link>
-          <Link href="/" style={{
+          <Link href="https://mypage.dev.aseka.co.jp/mypage/login" style={{
             display: "inline-flex", alignItems: "center", gap: "8px",
             padding: "16px 32px",
             background: "transparent",
