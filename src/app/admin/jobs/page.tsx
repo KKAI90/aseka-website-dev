@@ -169,7 +169,7 @@ export default function JobsPage() {
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div>
           <div style={{fontSize:"14px",fontWeight:700,color:navy}}>求人管理 / Quản lý Công việc</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B"}}>クリックで求人詳細・Geminiマッチング</div>
+          <div style={{fontSize:"10px",color:"#6B6B6B"}}>クリックで求人詳細・Groqマッチング</div>
         </div>
         <button onClick={()=>openForm()} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>
           + 求人追加
@@ -335,7 +335,7 @@ export default function JobsPage() {
                 {matching&&(
                   <div style={{textAlign:"center",padding:"32px",color:"#6B6B6B"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🤖</div>
-                    <div style={{fontSize:"13px",fontWeight:600,color:navy}}>Gemini AIが候補者を分析中...</div>
+                    <div style={{fontSize:"13px",fontWeight:600,color:navy}}>Groq AIが候補者を分析中...</div>
                     <div style={{fontSize:"11px",color:"#6B6B6B",marginTop:"4px"}}>全候補者との適合度を計算しています</div>
                   </div>
                 )}
@@ -343,7 +343,7 @@ export default function JobsPage() {
                   <div style={{textAlign:"center",padding:"32px"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🎯</div>
                     <div style={{fontSize:"13px",fontWeight:600,color:navy,marginBottom:"6px"}}>AIマッチングを実行してください</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>求人内容をもとにGemini AIが最適な候補者を提案します</div>
+                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>求人内容をもとにGroq AIが最適な候補者を提案します</div>
                     <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>AIマッチング開始</button>
                   </div>
                 )}

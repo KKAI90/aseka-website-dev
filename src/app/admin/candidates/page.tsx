@@ -367,7 +367,7 @@ export default function CandidatesPage() {
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div>
           <div style={{fontSize:"14px",fontWeight:700,color:navy}}>人材管理 / Quản lý Ứng viên</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B"}}>Supabase DB · Gemini AI · Export CV · Job Matching</div>
+          <div style={{fontSize:"10px",color:"#6B6B6B"}}>Supabase DB · Groq AI · Export CV · Job Matching</div>
         </div>
         <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           <input type="text" placeholder="名前・メールで検索..." value={search}
@@ -585,11 +585,11 @@ export default function CandidatesPage() {
                   <div>
                     {matchResults.length===0&&!matching&&(
                       <div style={{textAlign:"center",padding:"20px"}}>
-                        <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>Gemini AIで求人マッチングを実行</div>
+                        <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>Groq AIで求人マッチングを実行</div>
                         <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>AIマッチング開始</button>
                       </div>
                     )}
-                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>🤖 Gemini分析中...</div>}
+                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>🤖 Groq分析中...</div>}
                     {matchResults.map((job,i)=>(
                       <div key={job.id} style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",background:i===0?"#F0F7FF":"#fff"}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
@@ -635,7 +635,7 @@ export default function CandidatesPage() {
   if (view==="import") return (
     <div>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>CV AI取込 / Import CV</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>最大5件同時 · PDF/Word · Gemini AI全情報抽出</div></div>
+        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>CV AI取込 / Import CV</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>最大5件同時 · PDF/Word · Groq AI全情報抽出</div></div>
         <button onClick={()=>{setView("list");setFileItems([]);}} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← 一覧へ</button>
       </div>
       <div style={{padding:"20px",maxWidth:"780px",margin:"0 auto"}}>
@@ -676,7 +676,7 @@ export default function CandidatesPage() {
                           <div style={{height:"100%",borderRadius:"3px",transition:"width 0.3s",background:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#378ADD",width:`${item.progress}%`}}/>
                         </div>
                         <div style={{fontSize:"10px",color:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#6B6B6B"}}>
-                          {item.status==="analyzing"?`${item.progress}% — Gemini AI抽出中...`
+                          {item.status==="analyzing"?`${item.progress}% — Groq AI抽出中...`
                           :item.status==="done"?"✓ 分析完了 · Click「確認・保存」"
                           :`✗ エラー${item.result?.error?` · ${item.result.error.slice(0,80)}`:""}`}
                         </div>
@@ -702,7 +702,7 @@ export default function CandidatesPage() {
           <div style={{background:"#FAEEDA",border:"1px solid #EF9F27",borderRadius:"9px",padding:"12px 16px",marginBottom:"10px",display:"flex",alignItems:"center",gap:"10px"}}>
             <span style={{fontSize:"20px"}}>⏱</span>
             <div style={{flex:1}}>
-              <div style={{fontSize:"13px",fontWeight:700,color:"#633806"}}>Gemini API rate limit — tự động thử lại sau {retryCountdown}s</div>
+              <div style={{fontSize:"13px",fontWeight:700,color:"#633806"}}>Groq API rate limit — tự động thử lại sau {retryCountdown}s</div>
               <div style={{fontSize:"11px",color:"#633806",marginTop:"2px"}}>Quota vượt giới hạn phút. Đang chờ reset...</div>
             </div>
             <div style={{width:"44px",height:"44px",borderRadius:"50%",background:"#fff",border:"2px solid #EF9F27",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"14px",fontWeight:700,color:"#633806",flexShrink:0}}>{retryCountdown}</div>
@@ -711,13 +711,13 @@ export default function CandidatesPage() {
 
         {fileItems.length>0&&!isAnalyzing&&fileItems.some(f=>f.status==="waiting")&&retryCountdown===0&&(
           <button onClick={analyzeAll} style={{width:"100%",padding:"12px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"8px"}}>
-            🤖 Gemini AIで全情報を抽出 · Phân tích toàn bộ ({fileItems.filter(f=>f.status==="waiting").length}件)
+            🤖 Groq AIで全情報を抽出 · Phân tích toàn bộ ({fileItems.filter(f=>f.status==="waiting").length}件)
           </button>
         )}
 
         {fileItems.length===0&&(
           <div style={{background:"#F6F7F9",borderRadius:"10px",padding:"14px 16px"}}>
-            <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>💡 Gemini AIが抽出する情報 / AI tự động trích xuất:</div>
+            <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>💡 Groq AIが抽出する情報 / AI tự động trích xuất:</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px"}}>
               {["氏名・フリガナ・連絡先","生年月日・性別","在留資格・期限","日本語能力 (JLPT)","身長・体重","学歴（入学・卒業年月）","職歴（会社名・期間）","免許・資格一覧","志望動機・自己PR","希望職種・勤務条件","婚姻・扶養家族","AIによる求人マッチング"].map((t,i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",gap:"6px",fontSize:"11px",color:"#444"}}>
@@ -746,7 +746,7 @@ export default function CandidatesPage() {
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
               <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"12px",display:"flex",alignItems:"center",gap:"7px"}}>
-                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>Gemini AI抽出済</span>
+                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>Groq AI抽出済</span>
                 基本情報を確認・修正
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
@@ -822,7 +822,7 @@ export default function CandidatesPage() {
           {/* Right: Job matching */}
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
-              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>🎯 Gemini AIマッチング求人</div>
+              <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>🎯 Groq AIマッチング求人</div>
               <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"12px"}}>
                 希望: <strong>{String(c.preferred_job||"未記入")}</strong> · 
                 日本語: <strong>{String(c.jlpt||"—")}</strong> · 
