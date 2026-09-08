@@ -56,14 +56,20 @@ model job_listings {
   salary            String?
   count             Int?     @default(1)
   status            String?  @default("募集中")
+  osusume_point     String?
+  position_name     String?
+  position_note     String?
   job_description   String?
   requirements      String?
   qualifications    String?
   language_skills   String?
   education_req     String?
+  work_location     String?
   selection_process String?
   work_environment  String?
+  annual_income     String?
   salary_type       String?
+  salary_note       String?
   employment_type   String?
   work_hours        String?
   trial_period      String?

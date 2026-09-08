@@ -10,7 +10,7 @@ type Job = {
   // 求人概要
   osusume_point: string; position_name: string; position_note: string;
   job_description: string; requirements: string; qualifications: string;
-  language_skill: string; education: string; work_location: string;
+  language_skills: string; education_req: string; work_location: string;
   selection_process: string; work_environment: string; annual_income: string;
   salary_type: string; salary_note: string; employment_type: string;
   work_hours: string; trial_period: string; insurance: string;
@@ -66,8 +66,8 @@ const FIELDS = [
   {key:"job_description", ja:"職務内容",             vn:"Nội dung công việc", rows:4},
   {key:"requirements",    ja:"応募要件",             vn:"Yêu cầu ứng tuyển", rows:3},
   {key:"qualifications",  ja:"資格",                 vn:"Bằng cấp/Chứng chỉ",rows:2},
-  {key:"language_skill",  ja:"語学力",               vn:"Ngôn ngữ yêu cầu",  rows:1},
-  {key:"education",       ja:"学歴",                 vn:"Học vấn",            rows:1},
+  {key:"language_skills", ja:"語学力",               vn:"Ngôn ngữ yêu cầu",  rows:1},
+  {key:"education_req",   ja:"学歴",                 vn:"Học vấn",            rows:1},
   {key:"work_location",   ja:"勤務地",               vn:"Địa điểm làm việc", rows:1},
   {key:"selection_process",ja:"選考内容",            vn:"Quy trình tuyển dụng",rows:2},
   {key:"work_environment",ja:"就業環境備考",         vn:"Môi trường làm việc",rows:2},
@@ -87,7 +87,7 @@ const EMPTY_JOB = {
   company:"",location:"",position_ja:"",position_vn:"",industry:"その他",
   count:"1",salary:"",jlpt_min:"N4",status:"open",
   osusume_point:"",position_name:"",position_note:"",job_description:"",
-  requirements:"",qualifications:"",language_skill:"",education:"",
+  requirements:"",qualifications:"",language_skills:"",education_req:"",
   work_location:"",selection_process:"",work_environment:"",annual_income:"",
   salary_type:"月給",salary_note:"",employment_type:"正社員",work_hours:"",
   trial_period:"3ヶ月",insurance:"健康保険・厚生年金・雇用保険・労災保険",
@@ -475,7 +475,7 @@ export default function JobsPage() {
                 {lk:"jobs.salary",v:selected.salary||selected.annual_income},
                 {lk:"jobs.employmentType",v:selected.employment_type},
                 {lk:"jobs.workHours",v:selected.work_hours},
-                {lk:"jobs.japaneseReq",v:selected.language_skill||t("jobs.jlptOrMore",{lvl:selected.jlpt_min})},
+                {lk:"jobs.japaneseReq",v:selected.language_skills||t("jobs.jlptOrMore",{lvl:selected.jlpt_min})},
                 {lk:"jobs.trialPeriod",v:selected.trial_period},
                 {lk:"jobs.insurance",v:selected.insurance},
                 {lk:"jobs.holidays",v:selected.holidays},
