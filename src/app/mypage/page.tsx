@@ -11,11 +11,12 @@ type Candidate = {
   date_of_birth:string; gender:string; skill:string; jlpt:string;
   preferred_job:string; visa_type:string; status:string;
   match_job_name:string; motivation:string; availability:string; created_at:string;
+  hasPassword:boolean;
 };
 type Job = {
   id:string; company:string; position_ja:string; position_vn:string;
   industry:string; jlpt_min:string; salary:string; location:string;
-  status:string; matchScore:number; isNew:boolean; job_description:string;
+  status:string; matchScore:number; isNew:boolean; isFavorite:boolean; job_description:string;
 };
 
 const STATUS_STEPS = [
@@ -33,6 +34,13 @@ export default function Mypage() {
   const [jobFilter, setJobFilter] = useState<"all"|"new">("all");
   const [selectedJob, setSelectedJob] = useState<Job|null>(null);
   const [loading, setLoading] = useState(true);
+  const [favBusy, setFavBusy] = useState<string|null>(null);
+
+  // Password form (Profile tab)
+  const [pwCurrent, setPwCurrent] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwMsg, setPwMsg] = useState<{ type:"ok"|"err"; text:string }|null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -49,6 +57,38 @@ export default function Mypage() {
   const logout = async () => {
     await fetch("/api/mypage/logout", { method:"POST" });
     router.push("/mypage/login");
+  };
+
+  const toggleFavorite = async (jobId: string) => {
+    setFavBusy(jobId);
+    try {
+      const res = await fetch("/api/mypage/favorites", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setJobs(prev => prev.map(j => j.id === jobId ? { ...j, isFavorite: data.favorited } : j));
+        setSelectedJob(prev => prev && prev.id === jobId ? { ...prev, isFavorite: data.favorited } : prev);
+      }
+    } finally {
+      setFavBusy(null);
+    }
+  };
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwSaving(true); setPwMsg(null);
+    const res = await fetch("/api/mypage/set-password", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword: pwCurrent || undefined, newPassword: pwNew }),
+    });
+    const data = await res.json();
+    setPwSaving(false);
+    if (!res.ok) { setPwMsg({ type:"err", text: data.error }); return; }
+    setPwMsg({ type:"ok", text:"パスワードを更新しました / Đã cập nhật mật khẩu" });
+    setPwCurrent(""); setPwNew("");
+    setCand(prev => prev ? { ...prev, hasPassword: true } : prev);
   };
 
   const newCount  = jobs.filter(j => j.isNew).length;
@@ -181,9 +221,10 @@ export default function Mypage() {
                           </td>
                           <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.salary||"要相談"}</td>
                           <td style={{ padding:"13px 14px", textAlign:"center" }}>
-                            <button onClick={e => { e.stopPropagation(); setSelectedJob(selectedJob?.id===j.id ? null : j); }}
-                              style={{ background:"none", border:`1.5px solid ${selectedJob?.id===j.id ? red : "#C8D0DB"}`, borderRadius:"50%", width:"28px", height:"28px", cursor:"pointer", fontSize:"14px", color: selectedJob?.id===j.id ? red : "#C8D0DB", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                              {selectedJob?.id===j.id ? "♥" : "♡"}
+                            <button onClick={e => { e.stopPropagation(); toggleFavorite(j.id); }} disabled={favBusy===j.id}
+                              title={j.isFavorite ? "お気に入り解除 / Bỏ yêu thích" : "お気に入りに追加 / Thêm vào yêu thích"}
+                              style={{ background:"none", border:`1.5px solid ${j.isFavorite ? red : "#C8D0DB"}`, borderRadius:"50%", width:"28px", height:"28px", cursor: favBusy===j.id ? "not-allowed" : "pointer", fontSize:"14px", color: j.isFavorite ? red : "#C8D0DB", display:"flex", alignItems:"center", justifyContent:"center", opacity: favBusy===j.id ? 0.5 : 1 }}>
+                              {j.isFavorite ? "♥" : "♡"}
                             </button>
                           </td>
                         </tr>
@@ -223,6 +264,10 @@ export default function Mypage() {
                         <Link href="/#contact" style={{ padding:"9px 20px", borderRadius:"8px", background:red, color:"#fff", textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
                           この求人に応募する
                         </Link>
+                        <button onClick={() => toggleFavorite(selectedJob.id)} disabled={favBusy===selectedJob.id}
+                          style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: selectedJob.isFavorite ? red : "#6B6B6B", border:`1px solid ${selectedJob.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===selectedJob.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
+                          {selectedJob.isFavorite ? "♥" : "♡"} {selectedJob.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
+                        </button>
                         <button onClick={() => setSelectedJob(null)} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
                           閉じる
                         </button>
@@ -320,6 +365,35 @@ export default function Mypage() {
                   style={{ display:"inline-flex", alignItems:"center", gap:"6px", padding:"9px 18px", borderRadius:"8px", background:"#fff", border:`1.5px solid ${navy}`, color:navy, textDecoration:"none", fontSize:"12px", fontWeight:600 }}>
                   ✏️ 情報を更新する · Cập nhật thông tin
                 </Link>
+              </div>
+
+              {/* Password set/change */}
+              <div style={{ borderTop:"1px solid #F0F1F4", padding:"20px 24px" }}>
+                <h3 style={{ margin:"0 0 4px", fontSize:"13px", fontWeight:700, color:navy }}>
+                  {cand.hasPassword ? "パスワード変更" : "パスワードを設定する"}
+                </h3>
+                <p style={{ margin:"0 0 14px", fontSize:"11px", color:"#9BA0AC" }}>
+                  {cand.hasPassword
+                    ? "次回からパスワードでログインできます · Đổi mật khẩu đăng nhập"
+                    : "設定すると次回からマジックリンク不要でログインできます · Đặt mật khẩu để lần sau đăng nhập nhanh hơn"}
+                </p>
+                <form onSubmit={changePassword} style={{ display:"flex", flexDirection:"column", gap:"8px", maxWidth:"320px" }}>
+                  {cand.hasPassword && (
+                    <input type="password" placeholder="現在のパスワード" value={pwCurrent} onChange={e=>setPwCurrent(e.target.value)} required
+                      style={{ padding:"10px 12px", borderRadius:"7px", border:"1.5px solid #E0E3E9", fontSize:"13px", outline:"none", background:"#F7F8FA" }}/>
+                  )}
+                  <input type="password" placeholder="新しいパスワード（6文字以上）" value={pwNew} onChange={e=>setPwNew(e.target.value)} required minLength={6}
+                    style={{ padding:"10px 12px", borderRadius:"7px", border:"1.5px solid #E0E3E9", fontSize:"13px", outline:"none", background:"#F7F8FA" }}/>
+                  {pwMsg && (
+                    <div style={{ fontSize:"11px", padding:"8px 10px", borderRadius:"6px", background: pwMsg.type==="ok" ? "#EAF3DE" : "#FCEBEB", color: pwMsg.type==="ok" ? "#27500A" : "#C8002A" }}>
+                      {pwMsg.type==="ok" ? "✓ " : "⚠️ "}{pwMsg.text}
+                    </div>
+                  )}
+                  <button type="submit" disabled={pwSaving}
+                    style={{ padding:"9px 16px", borderRadius:"7px", background: pwSaving ? "#9BA0AC" : navy, color:"#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: pwSaving ? "not-allowed" : "pointer", alignSelf:"flex-start" }}>
+                    {pwSaving ? "保存中..." : cand.hasPassword ? "パスワードを変更" : "パスワードを設定"}
+                  </button>
+                </form>
               </div>
             </div>
           )}

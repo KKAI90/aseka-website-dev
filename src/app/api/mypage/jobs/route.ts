@@ -14,16 +14,20 @@ export async function GET(req: NextRequest) {
 
   if (!cand) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const jobs = await prisma.job_listings.findMany({
-    where: { NOT: { status: "paused" } },
-    select: {
-      id: true, company: true, position_ja: true, position_vn: true,
-      industry: true, jlpt_min: true, salary: true, location: true,
-      status: true, job_description: true, requirements: true,
-      created_at: true, updated_at: true,
-    },
-    orderBy: { created_at: "desc" },
-  });
+  const [jobs, favs] = await Promise.all([
+    prisma.job_listings.findMany({
+      where: { NOT: { status: "paused" } },
+      select: {
+        id: true, company: true, position_ja: true, position_vn: true,
+        industry: true, jlpt_min: true, salary: true, location: true,
+        status: true, job_description: true, requirements: true,
+        created_at: true, updated_at: true,
+      },
+      orderBy: { created_at: "desc" },
+    }),
+    prisma.mypage_favorites.findMany({ where: { candidate_id: id }, select: { job_id: true } }),
+  ]);
+  const favSet = new Set(favs.map(f => f.job_id));
 
   const candJlptRank = jlptRank[cand.jlpt ?? ""] ?? 5;
 
@@ -45,10 +49,13 @@ export async function GET(req: NextRequest) {
     if (j.status === "urgent") score += 5;
 
     const isNew = (Date.now() - new Date(j.created_at).getTime()) < 1000 * 60 * 60 * 24 * 7;
-    return { ...j, created_at: j.created_at.toISOString(), updated_at: j.updated_at?.toISOString() ?? null, matchScore: score, isNew };
+    return { ...j, created_at: j.created_at.toISOString(), updated_at: j.updated_at?.toISOString() ?? null, matchScore: score, isNew, isFavorite: favSet.has(j.id) };
   });
 
   scored.sort((a, b) => b.matchScore - a.matchScore || (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
 
-  return NextResponse.json({ jobs: scored });
+  // TOP 10 best-matching jobs — "mới/tất cả" filters narrow within this set on the client.
+  const top10 = scored.slice(0, 10);
+
+  return NextResponse.json({ jobs: top10 });
 }

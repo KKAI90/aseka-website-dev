@@ -41,8 +41,18 @@ model candidates {
   match_job_name String?
   note           String?
   cv_filename    String?
+  password_hash  String?
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now()) @updatedAt
+}
+
+model mypage_favorites {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  candidate_id String   @db.Uuid
+  job_id       String   @db.Uuid
+  created_at   DateTime @default(now())
+
+  @@unique([candidate_id, job_id])
 }
 
 model job_listings {
