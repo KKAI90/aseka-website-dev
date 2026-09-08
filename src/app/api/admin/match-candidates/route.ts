@@ -21,16 +21,31 @@ async function callGroq(prompt: string): Promise<unknown[]> {
         model: "openai/gpt-oss-120b",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.2,
-        max_tokens: 1000,
+        max_tokens: 2500,
+        reasoning_effort: "low",
       }),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error("Groq matching call failed:", res.status, await res.text());
+      return [];
+    }
     const data = await res.json();
     const raw = data.choices?.[0]?.message?.content || "[]";
     const match = raw.match(/\[[\s\S]*\]/);
-    if (!match) return [];
-    return JSON.parse(match[0]);
-  } catch { return []; }
+    if (!match) {
+      console.error("Groq matching response had no JSON array:", raw.slice(0, 300));
+      return [];
+    }
+    try {
+      return JSON.parse(match[0]);
+    } catch (e) {
+      console.error("Groq matching JSON parse failed (likely truncated):", (e as Error).message, "finish_reason:", data.choices?.[0]?.finish_reason);
+      return [];
+    }
+  } catch (e) {
+    console.error("Groq matching call threw:", e);
+    return [];
+  }
 }
 
 export async function POST(req: NextRequest) {
