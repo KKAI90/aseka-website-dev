@@ -22,7 +22,11 @@ export async function POST(req: NextRequest) {
     if (!cand || !cand.email) return NextResponse.json(GENERIC_OK);
 
     const token = signMagicLinkToken(cand.id);
-    const origin = new URL(req.url).origin;
+    // req.url reflects the internal proxied URL (e.g. http://localhost:3000)
+    // behind Nginx, not the public host — build the origin from headers instead.
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || new URL(req.url).host;
+    const proto = req.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    const origin = `${proto}://${host}`;
     const link = `${origin}/mypage/magic?token=${encodeURIComponent(token)}`;
 
     if (!mailerConfigured()) {
