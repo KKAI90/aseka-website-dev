@@ -26,3 +26,20 @@ export function verifyMagicLinkToken(token: string): { candidateId: string } | n
     return null;
   }
 }
+
+// Default first-login password: date of birth as DDMMYYYY.
+// candidates.date_of_birth is a free-text column (mostly ISO "YYYY-MM-DD"
+// from CV import, but not guaranteed) — parse defensively via Date.
+export function dobToDefaultPassword(dob: string | null | undefined): string | null {
+  if (!dob) return null;
+  const d = new Date(dob);
+  if (isNaN(d.getTime())) return null;
+  const day   = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year  = d.getUTCFullYear();
+  return `${day}${month}${year}`;
+}
+
+export function normalizeDigits(input: string): string {
+  return String(input).replace(/[^0-9]/g, "");
+}

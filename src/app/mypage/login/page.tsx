@@ -86,7 +86,7 @@ export default function MypageLogin() {
               />
             </div>
 
-            <div style={{ marginBottom:"16px", position:"relative" }}>
+            <div style={{ marginBottom:"6px", position:"relative" }}>
               <input
                 type={showPw ? "text" : "password"}
                 placeholder="パスワード"
@@ -102,6 +102,10 @@ export default function MypageLogin() {
                 {showPw ? "🙈" : "👁"}
               </button>
             </div>
+            <p style={{ fontSize:"11px", color:"#9BA0AC", margin:"0 0 16px", lineHeight:1.6 }}>
+              💡 初回ログインは生年月日8桁（日日月月年年年年）例: 1998年9月14日 → <strong>14091998</strong><br/>
+              <span>Lần đầu đăng nhập dùng ngày sinh dạng DDMMYYYY (VD: 14/09/1998 → 14091998)</span>
+            </p>
 
             {error && (
               <div style={{ background:"#FCEBEB", border:"1px solid #C8002A22", borderRadius:"7px", padding:"10px 12px", fontSize:"12px", color:"#C8002A", marginBottom:"14px" }}>
