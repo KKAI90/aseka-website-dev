@@ -7,18 +7,12 @@ import Image from "next/image";
 const navy = "#0B1F3A";
 const red  = "#C8002A";
 
-/* Real Aseka office/team photos (same set already used on the site's
-   home page PhotoStrip), arranged into a PASONA-style mosaic.
-   Grid: 3 cols (1.15fr 1fr 1fr) x 3 rows (1fr 1fr 0.9fr)
-     a a b b b     a = tall left column (rows 1-2)
-     a a c d       b = wide top-right, c/d = mid squares
-     e e e         e = full-width bottom band */
-const MOSAIC: { src:string; alt:string; pos:string; col:string; row:string }[] = [
-  { src:"/images/office-meeting.jpg", alt:"打ち合わせ風景",       pos:"center 25%", col:"1",         row:"1 / span 2" },
-  { src:"/images/team-office-1.jpg",  alt:"オフィスチーム",       pos:"center 55%", col:"2 / span 2", row:"1" },
-  { src:"/images/contact.jpg",        alt:"業務の様子",          pos:"75% 70%",    col:"2",          row:"2" },
-  { src:"/images/team-office-2.jpg",  alt:"スタッフミーティング", pos:"35% 25%",    col:"3",          row:"2" },
-  { src:"/images/teamwork.jpg",       alt:"チームでの検討",       pos:"center 15%", col:"1 / span 3", row:"3" },
+/* 3 real Aseka office/team photos (same set used on the site's homepage
+   PhotoStrip), floating as staggered cards — PASONA-style motion. */
+const FLOATING: { src:string; alt:string; pos:string; cls:string }[] = [
+  { src:"/images/teamwork.jpg",       alt:"チームでの検討",  pos:"center 15%", cls:"float-a" },
+  { src:"/images/office-meeting.jpg", alt:"打ち合わせ風景",  pos:"center 25%", cls:"float-b" },
+  { src:"/images/team-office-1.jpg",  alt:"オフィスチーム",  pos:"center 55%", cls:"float-c" },
 ];
 
 export default function MypageLogin() {
@@ -64,6 +58,18 @@ export default function MypageLogin() {
       <style>{`
         .login-split { background:#fff; }
         .login-right { display:flex; }
+        .login-input { transition: border-color 0.15s, box-shadow 0.15s; }
+        .login-input:focus { border-color:${navy}; box-shadow:0 0 0 3px rgba(11,31,58,0.08); }
+        .float-card { position:absolute; border-radius:18px; overflow:hidden; box-shadow:0 24px 48px -12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08); }
+        .float-a { width:44%; aspect-ratio:3/4;  left:4%;  top:10%; animation:floatA 7s ease-in-out infinite; z-index:2; }
+        .float-b { width:38%; aspect-ratio:4/5;  right:6%; top:4%;  animation:floatB 6s ease-in-out infinite -2s; z-index:3; }
+        .float-c { width:46%; aspect-ratio:5/4;  right:2%; bottom:8%; animation:floatC 8s ease-in-out infinite -4s; z-index:1; }
+        @keyframes floatA { 0%,100% { transform:translateY(0) rotate(-4deg); } 50% { transform:translateY(-16px) rotate(-4deg); } }
+        @keyframes floatB { 0%,100% { transform:translateY(0) rotate(3deg); }  50% { transform:translateY(-12px) rotate(3deg); } }
+        @keyframes floatC { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-20px) rotate(-2deg); } }
+        @media (prefers-reduced-motion: reduce) {
+          .float-a, .float-b, .float-c { animation:none; }
+        }
         @media (max-width: 900px) {
           .login-right { display:none !important; }
           .login-left { width:100% !important; max-width:100% !important; }
@@ -71,7 +77,7 @@ export default function MypageLogin() {
       `}</style>
 
       {/* ── Left: form ── */}
-      <div className="login-left" style={{ width:"460px", maxWidth:"100%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px" }}>
+      <div className="login-left" style={{ width:"460px", maxWidth:"100%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", padding:"48px 32px" }}>
         <div style={{ width:"100%", maxWidth:"340px" }}>
 
           {/* Logo */}
@@ -107,6 +113,7 @@ export default function MypageLogin() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
+                  className="login-input"
                   style={{ width:"100%", padding:"14px 16px", borderRadius:"8px", border:"1.5px solid #E0E3E9", fontSize:"14px", outline:"none", background:"#F7F8FA", boxSizing:"border-box" }}
                   onFocus={e => e.target.style.borderColor = navy}
                   onBlur={e => e.target.style.borderColor = "#E0E3E9"}
@@ -120,6 +127,7 @@ export default function MypageLogin() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
+                  className="login-input"
                   style={{ width:"100%", padding:"14px 44px 14px 16px", borderRadius:"8px", border:"1.5px solid #E0E3E9", fontSize:"14px", outline:"none", background:"#F7F8FA", boxSizing:"border-box" }}
                   onFocus={e => e.target.style.borderColor = navy}
                   onBlur={e => e.target.style.borderColor = "#E0E3E9"}
@@ -170,6 +178,7 @@ export default function MypageLogin() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
+                  className="login-input"
                   style={{ width:"100%", padding:"14px 16px", borderRadius:"8px", border:"1.5px solid #E0E3E9", fontSize:"14px", outline:"none", background:"#F7F8FA", boxSizing:"border-box" }}
                   onFocus={e => e.target.style.borderColor = navy}
                   onBlur={e => e.target.style.borderColor = "#E0E3E9"}
@@ -213,21 +222,31 @@ export default function MypageLogin() {
         </div>
       </div>
 
-      {/* ── Right: photo mosaic ── */}
-      <div className="login-right" style={{ flex:1, background:red, padding:"14px", alignItems:"stretch", justifyContent:"stretch" }}>
-        <div style={{
-          display:"grid", width:"100%", height:"100%",
-          gridTemplateColumns:"1.15fr 1fr 1fr",
-          gridTemplateRows:"1fr 1fr 0.9fr",
-          gap:"5px",
-        }}>
-          {MOSAIC.map(p => (
-            <div key={p.src} style={{ position:"relative", overflow:"hidden", gridColumn:p.col, gridRow:p.row }}>
-              <Image src={p.src} alt={p.alt} fill sizes="(max-width: 900px) 0px, 40vw"
-                style={{ objectFit:"cover", objectPosition:p.pos }} />
-            </div>
-          ))}
+      {/* ── Right: floating photo cards ── */}
+      <div className="login-right" style={{
+        flex:1, position:"relative", overflow:"hidden",
+        background:"linear-gradient(160deg, #E0143F 0%, #C8002A 45%, #8F0019 100%)",
+      }}>
+        {/* Decorative glow blobs */}
+        <div style={{ position:"absolute", width:"520px", height:"520px", borderRadius:"50%", top:"-160px", right:"-140px", background:"radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", width:"460px", height:"460px", borderRadius:"50%", bottom:"-180px", left:"-120px", background:"radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%)", pointerEvents:"none" }} />
+
+        {/* Tagline */}
+        <div style={{ position:"absolute", left:"6%", bottom:"6%", zIndex:4, maxWidth:"320px", color:"#fff" }}>
+          <div style={{ fontSize:"20px", fontWeight:800, lineHeight:1.4, letterSpacing:"0.02em", textShadow:"0 2px 12px rgba(0,0,0,0.25)" }}>
+            日本で、次のキャリアへ。
+          </div>
+          <div style={{ fontSize:"12px", color:"rgba(255,255,255,0.85)", marginTop:"6px", lineHeight:1.6 }}>
+            Bước tiếp theo trong sự nghiệp của bạn tại Nhật Bản
+          </div>
         </div>
+
+        {FLOATING.map(p => (
+          <div key={p.src} className={`float-card ${p.cls}`}>
+            <Image src={p.src} alt={p.alt} fill sizes="(max-width: 900px) 0px, 30vw"
+              style={{ objectFit:"cover", objectPosition:p.pos }} />
+          </div>
+        ))}
       </div>
     </div>
   );

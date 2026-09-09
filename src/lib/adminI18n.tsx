@@ -129,6 +129,8 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "candidates.visaExpiry": { en: "Visa expiry", vi: "Hạn visa", ja: "在留期限" },
   "candidates.heightWeight": { en: "Height / Weight", vi: "Chiều cao / Cân nặng", ja: "身長/体重" },
   "candidates.marital": { en: "Marital status", vi: "Tình trạng hôn nhân", ja: "婚姻" },
+  "candidates.jlptActual": { en: "JLPT (actual level)", vi: "JLPT thực tế", ja: "日本語実力" },
+  "candidates.editInfo": { en: "Edit info", vi: "Sửa thông tin", ja: "情報を編集" },
   "candidates.dependents": { en: "Dependents", vi: "Số người phụ thuộc", ja: "扶養家族" },
   "candidates.workHours": { en: "Work hours", vi: "Giờ làm việc", ja: "勤務時間" },
   "candidates.availability": { en: "Available from", vi: "Ngày có thể làm việc", ja: "就業可能日" },

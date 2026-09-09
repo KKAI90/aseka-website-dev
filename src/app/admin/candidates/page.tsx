@@ -17,7 +17,7 @@ type Candidate = {
   visa_type:string; visa_expiry:string; jlpt:string; jlpt_actual:string;
   height_cm:number|null; weight_kg:number|null;
   skill:string; preferred_job:string; work_hours:string; availability:string;
-  marital_status:string; dependents:number;
+  marital_status:string; dependents:string;
   education:Edu[]; work_history:Work[]; certifications:Cert[];
   motivation:string; self_pr:string;
   status:string; match_job_id:string|null; match_job_name:string;
@@ -143,6 +143,9 @@ export default function CandidatesPage() {
   const [currentReview, setCurrentReview] = useState<{candidate:Record<string,unknown>;suggestions:Job[];fileName:string}|null>(null);
   const [editForm, setEditForm] = useState<Record<string,string>>({});
   const [selectedJobId, setSelectedJobId] = useState<string|null>(null);
+  const [editingBasic, setEditingBasic] = useState(false);
+  const [basicEditForm, setBasicEditForm] = useState<Record<string,string>>({});
+  const [savingBasic, setSavingBasic] = useState(false);
   const [saving, setSaving] = useState(false);
   const [matchResults, setMatchResults] = useState<Job[]>([]);
   const [matching, setMatching] = useState(false);
@@ -199,6 +202,37 @@ export default function CandidatesPage() {
     await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});
     setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === id ? {...c, status} : c));
     setSelected((p: Candidate | null) => p?.id === id ? {...p, status} : p);
+  };
+
+  const startEditBasic = (c: Candidate) => {
+    setBasicEditForm({
+      name: c.name||"", name_kana: c.name_kana||"", email: c.email||"", phone: c.phone||"",
+      gender: c.gender||"", date_of_birth: c.date_of_birth||"", address: c.address||"",
+      visa_type: c.visa_type||"", visa_expiry: c.visa_expiry||"",
+      jlpt: c.jlpt||"", jlpt_actual: c.jlpt_actual||"",
+      height_cm: c.height_cm?String(c.height_cm):"", weight_kg: c.weight_kg?String(c.weight_kg):"",
+      marital_status: c.marital_status||"", dependents: c.dependents?String(c.dependents):"",
+      preferred_job: c.preferred_job||"", work_hours: c.work_hours||"", availability: c.availability||"",
+    });
+    setEditingBasic(true);
+  };
+
+  const saveBasicInfo = async () => {
+    if (!selected) return;
+    setSavingBasic(true);
+    const payload = {
+      ...basicEditForm,
+      height_cm: basicEditForm.height_cm ? Number(basicEditForm.height_cm) : null,
+      weight_kg: basicEditForm.weight_kg ? Number(basicEditForm.weight_kg) : null,
+      dependents: basicEditForm.dependents || null,
+    };
+    const res = await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:selected.id, ...payload})});
+    setSavingBasic(false);
+    if (!res.ok) { alert(t("common.saveFailed")); return; }
+    const merged = { ...selected, ...payload } as Candidate;
+    setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === selected.id ? merged : c));
+    setSelected(merged);
+    setEditingBasic(false);
   };
 
   const deleteCandidate = async (id:string) => {
@@ -374,7 +408,7 @@ export default function CandidatesPage() {
         ...editForm,
         height_cm: editForm.height_cm ? Number(editForm.height_cm) : null,
         weight_kg: editForm.weight_kg ? Number(editForm.weight_kg) : null,
-        dependents: Number(editForm.dependents)||0,
+        dependents: editForm.dependents || "0",
         status: "new",
         match_job_name: job?.company || "未定",
         education: c.education || [],
@@ -512,7 +546,7 @@ export default function CandidatesPage() {
                     const st=ST[c.status]||ST.new; const jc=JC[c.jlpt]||JC["N5"];
                     const ini=c.name.split(" ").slice(-2).map((w:string)=>w[0]).join("").toUpperCase();
                     return(
-                      <tr key={c.id} onClick={()=>setSelected(selected?.id===c.id?null:c)}
+                      <tr key={c.id} onClick={()=>{setSelected(selected?.id===c.id?null:c);setEditingBasic(false);}}
                         onMouseEnter={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="#FAFBFC";}}
                         onMouseLeave={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="transparent";}}
                         style={{borderBottom:"0.5px solid rgba(11,31,58,0.05)",cursor:"pointer",background:selected?.id===c.id?"#E6F1FB":"transparent",transition:"background 0.12s"}}>
@@ -570,28 +604,79 @@ export default function CandidatesPage() {
                 {/* Basic tab */}
                 {detailTab==="basic"&&(
                   <div>
-                    {[
-                      {lk:"candidates.name",v:`${selected.name} / ${selected.name_kana||"—"}`},
-                      {lk:"candidates.gender",v:selected.gender||"—"},
-                      {lk:"candidates.dob",v:selected.date_of_birth?new Date(selected.date_of_birth).toLocaleDateString("ja-JP"):"—"},
-                      {lk:"candidates.contact",v:selected.email||selected.phone||"—"},
-                      {lk:"candidates.phone",v:selected.phone||"—"},
-                      {lk:"candidates.address",v:selected.address||"ベトナム"},
-                      {lk:"candidates.visaType",v:selected.visa_type||"—"},
-                      {lk:"candidates.visaExpiry",v:fmtDate(selected.visa_expiry)},
-                      {lk:"candidates.colJlpt",v:`${selected.jlpt||"—"} (${selected.jlpt_actual||"—"})`},
-                      {lk:"candidates.heightWeight",v:`${selected.height_cm||"—"}cm / ${selected.weight_kg||"—"}kg`},
-                      {lk:"candidates.marital",v:selected.marital_status||"—"},
-                      {lk:"candidates.dependents",v:`${selected.dependents||0}`},
-                      {lk:"candidates.colPreferredJob",v:selected.preferred_job||"—"},
-                      {lk:"candidates.workHours",v:selected.work_hours||"—"},
-                      {lk:"candidates.availability",v:selected.availability||t("candidates.immediate")},
-                    ].map(r=>(
-                      <div key={r.lk} style={{display:"flex",gap:"8px",padding:"5px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)",fontSize:"12px"}}>
-                        <span style={{color:"#6B6B6B",width:"80px",flexShrink:0,fontSize:"11px"}}>{t(r.lk)}</span>
-                        <span style={{color:navy,fontWeight:500,flex:1,wordBreak:"break-word"}}>{r.v}</span>
+                    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:"8px"}}>
+                      {editingBasic ? (
+                        <div style={{display:"flex",gap:"6px"}}>
+                          <button onClick={()=>setEditingBasic(false)} disabled={savingBasic}
+                            style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"transparent",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>
+                            {t("common.cancel")}
+                          </button>
+                          <button onClick={saveBasicInfo} disabled={savingBasic}
+                            style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:savingBasic?"not-allowed":"pointer"}}>
+                            {savingBasic?t("common.saving"):t("common.save")}
+                          </button>
+                        </div>
+                      ) : (
+                        <button onClick={()=>startEditBasic(selected)}
+                          style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"#F6F7F9",color:navy,border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer",display:"flex",alignItems:"center",gap:"4px"}}>
+                          ✏️ {t("candidates.editInfo")}
+                        </button>
+                      )}
+                    </div>
+
+                    {editingBasic ? (
+                      <div style={{display:"flex",flexDirection:"column",gap:"9px"}}>
+                        {[
+                          {k:"name",lk:"candidates.name",type:"text"},
+                          {k:"name_kana",lk:"candidates.nameKana",type:"text"},
+                          {k:"email",lk:"candidates.email",type:"email"},
+                          {k:"phone",lk:"candidates.phone",type:"text"},
+                          {k:"gender",lk:"candidates.gender",type:"text"},
+                          {k:"date_of_birth",lk:"candidates.dob",type:"text"},
+                          {k:"address",lk:"candidates.address",type:"text"},
+                          {k:"visa_type",lk:"candidates.visaType",type:"text"},
+                          {k:"visa_expiry",lk:"candidates.visaExpiry",type:"text"},
+                          {k:"jlpt",lk:"candidates.colJlpt",type:"text"},
+                          {k:"jlpt_actual",lk:"candidates.jlptActual",type:"text"},
+                          {k:"height_cm",lk:"candidates.heightCm",type:"number"},
+                          {k:"weight_kg",lk:"candidates.weightKg",type:"number"},
+                          {k:"marital_status",lk:"candidates.marital",type:"text"},
+                          {k:"dependents",lk:"candidates.dependents",type:"number"},
+                          {k:"preferred_job",lk:"candidates.colPreferredJob",type:"text"},
+                          {k:"work_hours",lk:"candidates.workHours",type:"text"},
+                          {k:"availability",lk:"candidates.availability",type:"text"},
+                        ].map(f=>(
+                          <div key={f.k}>
+                            <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t(f.lk)}</label>
+                            <input type={f.type} value={basicEditForm[f.k]||""} onChange={e=>setBasicEditForm({...basicEditForm,[f.k]:e.target.value})}
+                              style={{width:"100%",padding:"6px 9px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      [
+                        {lk:"candidates.name",v:`${selected.name} / ${selected.name_kana||"—"}`},
+                        {lk:"candidates.gender",v:selected.gender||"—"},
+                        {lk:"candidates.dob",v:selected.date_of_birth?new Date(selected.date_of_birth).toLocaleDateString("ja-JP"):"—"},
+                        {lk:"candidates.contact",v:selected.email||selected.phone||"—"},
+                        {lk:"candidates.phone",v:selected.phone||"—"},
+                        {lk:"candidates.address",v:selected.address||"ベトナム"},
+                        {lk:"candidates.visaType",v:selected.visa_type||"—"},
+                        {lk:"candidates.visaExpiry",v:fmtDate(selected.visa_expiry)},
+                        {lk:"candidates.colJlpt",v:`${selected.jlpt||"—"} (${selected.jlpt_actual||"—"})`},
+                        {lk:"candidates.heightWeight",v:`${selected.height_cm||"—"}cm / ${selected.weight_kg||"—"}kg`},
+                        {lk:"candidates.marital",v:selected.marital_status||"—"},
+                        {lk:"candidates.dependents",v:`${selected.dependents||0}`},
+                        {lk:"candidates.colPreferredJob",v:selected.preferred_job||"—"},
+                        {lk:"candidates.workHours",v:selected.work_hours||"—"},
+                        {lk:"candidates.availability",v:selected.availability||t("candidates.immediate")},
+                      ].map(r=>(
+                        <div key={r.lk} style={{display:"flex",gap:"8px",padding:"5px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)",fontSize:"12px"}}>
+                          <span style={{color:"#6B6B6B",width:"80px",flexShrink:0,fontSize:"11px"}}>{t(r.lk)}</span>
+                          <span style={{color:navy,fontWeight:500,flex:1,wordBreak:"break-word"}}>{r.v}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
 
