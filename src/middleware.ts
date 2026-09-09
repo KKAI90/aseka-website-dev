@@ -16,7 +16,7 @@ import { NextRequest, NextResponse } from "next/server";
  *   - mypage.aseka.jp     → mypage
  */
 
-const PUBLIC_PATHS = ["/api/", "/_next/", "/favicon", "/robots", "/sitemap"];
+const PUBLIC_PATHS = ["/api/", "/_next/", "/favicon", "/robots", "/sitemap", "/images/"];
 
 function isPublic(path: string) {
   return PUBLIC_PATHS.some(p => path.startsWith(p));
