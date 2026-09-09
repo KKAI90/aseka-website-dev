@@ -21,7 +21,7 @@ type Job = {
   requirements:string|null; qualifications:string|null; language_skills:string|null; education_req:string|null;
   work_location:string|null; selection_process:string|null; work_environment:string|null;
   annual_income:string|null; salary_type:string|null; salary_note:string|null;
-  employment_type:string|null; work_hours:string|null; trial_period:string|null;
+  employment_type:string|null; visa_type:string|null; work_hours:string|null; trial_period:string|null;
   insurance:string|null; holidays:string|null; remarks:string|null; count:number|null;
 };
 
@@ -42,6 +42,7 @@ const JOB_DETAIL_FIELDS: { key: keyof Job; label: string }[] = [
   { key:"salary_type",       label:"給与形態" },
   { key:"salary_note",       label:"賃金備考" },
   { key:"employment_type",   label:"雇用形態" },
+  { key:"visa_type",         label:"在留資格" },
   { key:"work_hours",        label:"勤務時間" },
   { key:"trial_period",      label:"試用期間" },
   { key:"insurance",         label:"各種保険" },

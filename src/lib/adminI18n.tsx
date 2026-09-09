@@ -207,6 +207,8 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "jobs.searchPlaceholder": { en: "Search company, position, location...", vi: "Tìm công ty, vị trí, khu vực...", ja: "企業名・職種・勤務地で検索" },
   "jobs.allIndustries": { en: "All industries", vi: "Mọi ngành", ja: "業種すべて" },
   "jobs.allJlpt": { en: "All JLPT levels", vi: "Mọi JLPT", ja: "日本語すべて" },
+  "jobs.allVisa": { en: "All visa types", vi: "Mọi loại visa", ja: "在留資格すべて" },
+  "jobs.allEmployment": { en: "All employment types", vi: "Mọi hình thức", ja: "雇用形態すべて" },
   "jobs.statusUrgent": { en: "Urgent", vi: "Khẩn cấp", ja: "緊急募集" },
   "jobs.statusOpen": { en: "Open", vi: "Đang tuyển", ja: "募集中" },
   "jobs.statusFull": { en: "Full", vi: "Đủ người", ja: "充足" },
@@ -232,6 +234,11 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "jobs.location": { en: "Location", vi: "Khu vực làm việc", ja: "勤務地" },
   "jobs.salary": { en: "Salary", vi: "Lương", ja: "給与" },
   "jobs.employmentType": { en: "Employment type", vi: "Hình thức hợp đồng", ja: "雇用形態" },
+  "jobs.visaType": { en: "Visa status", vi: "Loại visa", ja: "在留資格" },
+  "jobs.fieldVisaType": { en: "Visa status", vi: "Loại visa", ja: "在留資格" },
+  "jobs.pageOf": { en: "Page {page} / {total}", vi: "Trang {page} / {total}", ja: "{page} / {total} ページ" },
+  "jobs.prevPage": { en: "Previous", vi: "Trước", ja: "前へ" },
+  "jobs.nextPage": { en: "Next", vi: "Sau", ja: "次へ" },
   "jobs.workHours": { en: "Work hours", vi: "Giờ làm việc", ja: "勤務時間" },
   "jobs.japaneseReq": { en: "Japanese level", vi: "Yêu cầu tiếng Nhật", ja: "日本語" },
   "jobs.trialPeriod": { en: "Trial period", vi: "Thời gian thử việc", ja: "試用期間" },
@@ -351,6 +358,7 @@ const DICT: Record<string, Record<AdminLang, string>> = {
 
 const FIELD_DICT: Record<string, Record<AdminLang, string>> = {
   osusume_point:    { en: "Highlights",              vi: "Điểm nổi bật",        ja: "おすすめポイント" },
+  visa_type:        { en: "Visa status",             vi: "Loại visa",           ja: "在留資格" },
   position_name:    { en: "Position name",           vi: "Tên vị trí",           ja: "ポジション名" },
   position_note:    { en: "Position notes",           vi: "Ghi chú vị trí",       ja: "ポジション備考" },
   job_description:  { en: "Job description",         vi: "Nội dung công việc",   ja: "職務内容" },

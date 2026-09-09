@@ -81,6 +81,7 @@ model job_listings {
   selection_process String?
   work_environment  String?
   annual_income     String?
+  visa_type         String?
   salary_type       String?
   salary_note       String?
   employment_type   String?

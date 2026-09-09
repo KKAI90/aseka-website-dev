@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
         qualifications: true, language_skills: true, education_req: true,
         work_location: true, selection_process: true, work_environment: true,
         annual_income: true, salary_type: true, salary_note: true,
-        employment_type: true, work_hours: true, trial_period: true,
+        employment_type: true, visa_type: true, work_hours: true, trial_period: true,
         insurance: true, holidays: true, remarks: true, count: true,
         created_at: true, updated_at: true,
       },

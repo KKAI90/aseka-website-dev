@@ -12,7 +12,7 @@ type Job = {
   job_description: string; requirements: string; qualifications: string;
   language_skills: string; education_req: string; work_location: string;
   selection_process: string; work_environment: string; annual_income: string;
-  salary_type: string; salary_note: string; employment_type: string;
+  salary_type: string; salary_note: string; employment_type: string; visa_type: string;
   work_hours: string; trial_period: string; insurance: string;
   holidays: string; remarks: string; reference_url: string;
   created_at: string;
@@ -58,6 +58,8 @@ const IND: Record<string,{tc:string;tb:string;icon:string}> = {
   "その他":          {tc:"#6B6B6B",tb:"#F6F7F9",icon:"📁"},
 };
 const INDUSTRY_LIST = ["介護","ビルクリーニング","工業製品製造業","建設","造船・舶用工業","自動車整備","航空","宿泊","農業","漁業","飲食料品製造業","外食業","繊維業","印刷業","鉄道","林業","IT","機械・電気電子","国際業務","通訳・翻訳","経理・会計","その他"];
+const VISA_LIST = ["特定技能1号","特定技能2号","技術・人文知識・国際業務","技能実習","特定活動","永住者","日本人配偶者等","定住者"];
+const EMPLOYMENT_LIST = ["正社員","契約社員","パート・アルバイト","派遣社員"];
 
 const FIELDS = [
   {key:"osusume_point",   ja:"おすすめポイント",    vn:"Điểm nổi bật",      rows:3},
@@ -75,6 +77,7 @@ const FIELDS = [
   {key:"salary_type",     ja:"給与形態",             vn:"Hình thức trả lương",rows:1},
   {key:"salary_note",     ja:"賃金備考",             vn:"Ghi chú lương",      rows:2},
   {key:"employment_type", ja:"雇用形態",             vn:"Hình thức hợp đồng",rows:1},
+  {key:"visa_type",       ja:"在留資格",             vn:"Loại visa",         rows:1},
   {key:"work_hours",      ja:"勤務時間",             vn:"Giờ làm việc",       rows:1},
   {key:"trial_period",    ja:"試用期間",             vn:"Thời gian thử việc", rows:1},
   {key:"insurance",       ja:"各種保険",             vn:"Bảo hiểm",           rows:1},
@@ -89,7 +92,7 @@ const EMPTY_JOB = {
   osusume_point:"",position_name:"",position_note:"",job_description:"",
   requirements:"",qualifications:"",language_skills:"",education_req:"",
   work_location:"",selection_process:"",work_environment:"",annual_income:"",
-  salary_type:"月給",salary_note:"",employment_type:"正社員",work_hours:"",
+  salary_type:"月給",salary_note:"",employment_type:"正社員",visa_type:"特定技能1号",work_hours:"",
   trial_period:"3ヶ月",insurance:"健康保険・厚生年金・雇用保険・労災保険",
   holidays:"",remarks:"",reference_url:"",
 };
@@ -103,6 +106,10 @@ export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [industryFilter, setIndustryFilter] = useState("all");
   const [jlptFilter, setJlptFilter] = useState("all");
+  const [visaFilter, setVisaFilter] = useState("all");
+  const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
   const [selected, setSelected] = useState<Job|null>(null);
   const [view, setView] = useState<"list"|"detail"|"form">("list");
   const [form, setForm] = useState<Record<string,string>>(EMPTY_JOB);
@@ -127,6 +134,8 @@ export default function JobsPage() {
     if (filter!=="all" && j.status!==filter) return false;
     if (industryFilter!=="all" && j.industry!==industryFilter) return false;
     if (jlptFilter!=="all" && j.jlpt_min!==jlptFilter) return false;
+    if (visaFilter!=="all" && j.visa_type!==visaFilter) return false;
+    if (employmentFilter!=="all" && j.employment_type!==employmentFilter) return false;
     if (search) {
       const q = search.toLowerCase();
       const hay = `${j.company} ${j.position_ja} ${j.position_vn} ${j.location}`.toLowerCase();
@@ -134,8 +143,13 @@ export default function JobsPage() {
     }
     return true;
   });
-  const activeFilterCount = (filter!=="all"?1:0) + (industryFilter!=="all"?1:0) + (jlptFilter!=="all"?1:0) + (search?1:0);
-  const clearFilters = () => { setFilter("all"); setIndustryFilter("all"); setJlptFilter("all"); setSearch(""); };
+  const activeFilterCount = (filter!=="all"?1:0) + (industryFilter!=="all"?1:0) + (jlptFilter!=="all"?1:0) + (visaFilter!=="all"?1:0) + (employmentFilter!=="all"?1:0) + (search?1:0);
+  const clearFilters = () => { setFilter("all"); setIndustryFilter("all"); setJlptFilter("all"); setVisaFilter("all"); setEmploymentFilter("all"); setSearch(""); };
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pagedJobs = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+  useEffect(()=>{ setPage(1); }, [filter,industryFilter,jlptFilter,visaFilter,employmentFilter,search]);
+  useEffect(()=>{ if (page>pageCount) setPage(pageCount); }, [pageCount, page]);
   const counts = {
     all:jobs.length,
     urgent:jobs.filter(j=>j.status==="urgent").length,
@@ -206,8 +220,15 @@ export default function JobsPage() {
   if (view==="list") return (
     <div>
       <style>{`
-        @keyframes jobCardIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes jobCardIn { from { opacity:0; transform:translateY(10px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         @keyframes shimmer { 0%{background-position:-400px 0;} 100%{background-position:400px 0;} }
+        @keyframes pageFade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+        .job-card { transition: box-shadow 0.25s cubic-bezier(0.22,1,0.36,1), transform 0.25s cubic-bezier(0.22,1,0.36,1), border-color 0.2s; }
+        .job-card:hover { box-shadow: 0 10px 26px rgba(11,31,58,0.14); transform: translateY(-3px); }
+        .job-card:hover .job-card-link { gap:6px !important; color:#0C447C; }
+        .job-card-link { transition: gap 0.2s ease, color 0.2s ease; }
+        .jobs-input, .jobs-select { transition: border-color 0.15s, box-shadow 0.15s; }
+        .jobs-input:focus, .jobs-select:focus { border-color:#0B1F3A !important; box-shadow: 0 0 0 3px rgba(11,31,58,0.08); }
       `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
@@ -225,19 +246,29 @@ export default function JobsPage() {
         <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
           <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder={t("jobs.searchPlaceholder")} value={search}
+            <input type="text" placeholder={t("jobs.searchPlaceholder")} value={search} className="jobs-input"
               onChange={e=>setSearch(e.target.value)}
               style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
           </div>
-          <select value={industryFilter} onChange={e=>setIndustryFilter(e.target.value)}
+          <select value={industryFilter} onChange={e=>setIndustryFilter(e.target.value)} className="jobs-select"
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
             <option value="all">{t("jobs.allIndustries")}</option>
             {INDUSTRY_LIST.map(i=><option key={i} value={i}>{IND[i]?.icon} {i}</option>)}
           </select>
-          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
+          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)} className="jobs-select"
             style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
             <option value="all">{t("jobs.allJlpt")}</option>
             {["N1","N2","N3","N4","N5","なし"].map(j=><option key={j} value={j}>{j}</option>)}
+          </select>
+          <select value={visaFilter} onChange={e=>setVisaFilter(e.target.value)} className="jobs-select"
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">{t("jobs.allVisa")}</option>
+            {VISA_LIST.map(v=><option key={v} value={v}>{v}</option>)}
+          </select>
+          <select value={employmentFilter} onChange={e=>setEmploymentFilter(e.target.value)} className="jobs-select"
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+            <option value="all">{t("jobs.allEmployment")}</option>
+            {EMPLOYMENT_LIST.map(e=><option key={e} value={e}>{e}</option>)}
           </select>
           {activeFilterCount>0&&(
             <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
@@ -245,7 +276,7 @@ export default function JobsPage() {
             </button>
           )}
           <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
-            {loading?t("common.loading"):`${filtered.length} ${t("common.results")}`}
+            {loading?t("common.loading"):pageCount>1?`${filtered.length} ${t("common.results")} · ${t("jobs.pageOf",{page,total:pageCount})}`:`${filtered.length} ${t("common.results")}`}
           </div>
         </div>
 
@@ -276,14 +307,13 @@ export default function JobsPage() {
               : <button onClick={()=>openForm()} style={{marginTop:"12px",padding:"8px 20px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("jobs.addFirstJob")}</button>}
           </div>
         ) : (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:"12px"}}>
-            {filtered.map((j,idx)=>{
+          <>
+          <div key={page} style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:"12px",animation:"pageFade 0.25s ease both"}}>
+            {pagedJobs.map((j,idx)=>{
               const st=ST[j.status]||ST.open;
               const ind=IND[j.industry]||IND["その他"];
               return(
-                <div key={j.id} onClick={()=>openDetail(j)} style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",cursor:"pointer",transition:"box-shadow 0.15s, transform 0.15s",boxShadow:"0 1px 3px rgba(11,31,58,0.06)",animation:"jobCardIn 0.35s ease both",animationDelay:`${Math.min(idx*30,300)}ms`}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.boxShadow="0 6px 18px rgba(11,31,58,0.13)";(e.currentTarget as HTMLDivElement).style.transform="translateY(-2px)";}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.boxShadow="0 1px 3px rgba(11,31,58,0.06)";(e.currentTarget as HTMLDivElement).style.transform="translateY(0)";}}>
+                <div key={j.id} onClick={()=>openDetail(j)} className="job-card" style={{background:"#fff",...B,borderRadius:"12px",padding:"16px",cursor:"pointer",boxShadow:"0 1px 3px rgba(11,31,58,0.06)",animation:"jobCardIn 0.4s cubic-bezier(0.22,1,0.36,1) both",animationDelay:`${Math.min(idx*25,250)}ms`}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"10px"}}>
                     <div style={{flex:1}}>
                       <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"2px"}}>{j.company}</div>
@@ -301,11 +331,12 @@ export default function JobsPage() {
                   <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"10px"}}>
                     <span style={{background:ind.tb,color:ind.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.industry}</span>
                     <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.jlptOrMore",{lvl:j.jlpt_min})}</span>
+                    {j.visa_type && <span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.visa_type}</span>}
                     <span style={{background:"#F6F7F9",color:"#6B6B6B",fontSize:"10px",padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.peopleWantedFull",{n:j.count})}</span>
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"10px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
                     <span style={{fontSize:"12px",fontWeight:700,color:"#27500A"}}>{j.salary||j.annual_income||t("jobs.negotiable")}</span>
-                    <span style={{fontSize:"10px",color:"#185FA5",fontWeight:600}}>{t("jobs.viewDetail")}</span>
+                    <span className="job-card-link" style={{fontSize:"10px",color:"#185FA5",fontWeight:600,display:"inline-flex",alignItems:"center",gap:"3px"}}>{t("jobs.viewDetail")}</span>
                   </div>
                   {j.osusume_point && (
                     <div style={{marginTop:"8px",background:"#FFFBEB",borderRadius:"6px",padding:"6px 10px",fontSize:"10px",color:"#92400E",borderLeft:"3px solid #F59E0B"}}>
@@ -316,6 +347,28 @@ export default function JobsPage() {
               );
             })}
           </div>
+
+          {pageCount>1 && (
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",marginTop:"20px"}}>
+              <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1}
+                style={{padding:"7px 14px",borderRadius:"7px",fontSize:"12px",fontWeight:600,background:"#fff",color:page<=1?"#C8D0DB":navy,border:"0.5px solid rgba(11,31,58,0.15)",cursor:page<=1?"not-allowed":"pointer",transition:"all 0.15s"}}>
+                ← {t("jobs.prevPage")}
+              </button>
+              <div style={{display:"flex",gap:"4px"}}>
+                {Array.from({length:pageCount},(_,i)=>i+1).map(p=>(
+                  <button key={p} onClick={()=>setPage(p)}
+                    style={{width:"30px",height:"30px",borderRadius:"7px",fontSize:"12px",fontWeight:700,border:`1px solid ${p===page?navy:"rgba(11,31,58,0.15)"}`,background:p===page?navy:"#fff",color:p===page?"#fff":"#6B6B6B",cursor:"pointer",transition:"all 0.15s"}}>
+                    {p}
+                  </button>
+                ))}
+              </div>
+              <button onClick={()=>setPage(p=>Math.min(pageCount,p+1))} disabled={page>=pageCount}
+                style={{padding:"7px 14px",borderRadius:"7px",fontSize:"12px",fontWeight:600,background:"#fff",color:page>=pageCount?"#C8D0DB":navy,border:"0.5px solid rgba(11,31,58,0.15)",cursor:page>=pageCount?"not-allowed":"pointer",transition:"all 0.15s"}}>
+                {t("jobs.nextPage")} →
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
     </div>
@@ -373,6 +426,7 @@ export default function JobsPage() {
                 <span style={{background:ind.tb,color:ind.tc,fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{ind.icon} {selected.industry}</span>
                 <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{t("jobs.jlptOrMore",{lvl:selected.jlpt_min})}</span>
                 <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>{selected.employment_type||t("jobs.employmentTypeDefault")}</span>
+                {selected.visa_type&&<span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"11px",fontWeight:700,padding:"3px 10px",borderRadius:"20px"}}>🛂 {selected.visa_type}</span>}
                 <span style={{background:"#F6F7F9",color:"#444",fontSize:"11px",padding:"3px 10px",borderRadius:"20px"}}>{selected.salary||selected.annual_income}</span>
               </div>
               {selected.osusume_point&&(
@@ -474,6 +528,7 @@ export default function JobsPage() {
                 {lk:"jobs.location",v:selected.work_location||selected.location},
                 {lk:"jobs.salary",v:selected.salary||selected.annual_income},
                 {lk:"jobs.employmentType",v:selected.employment_type},
+                {lk:"jobs.visaType",v:selected.visa_type},
                 {lk:"jobs.workHours",v:selected.work_hours},
                 {lk:"jobs.japaneseReq",v:selected.language_skills||t("jobs.jlptOrMore",{lvl:selected.jlpt_min})},
                 {lk:"jobs.trialPeriod",v:selected.trial_period},
@@ -557,6 +612,18 @@ export default function JobsPage() {
                 {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{t(v.labelKey)}</option>)}
               </select>
             </div>
+            <div>
+              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.visaType")}</label>
+              <select value={form.visa_type||"特定技能1号"} onChange={e=>setForm({...form,visa_type:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
+                {VISA_LIST.map(v=><option key={v}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.employmentType")}</label>
+              <select value={form.employment_type||"正社員"} onChange={e=>setForm({...form,employment_type:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
+                {EMPLOYMENT_LIST.map(e=><option key={e}>{e}</option>)}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -564,7 +631,7 @@ export default function JobsPage() {
         <div style={{background:"#fff",...B,borderRadius:"12px",padding:"20px"}}>
           <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"14px",paddingBottom:"10px",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>{t("jobs.jobDetail")}</div>
           <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
-            {FIELDS.map(field=>{
+            {FIELDS.filter(field=>field.key!=="employment_type"&&field.key!=="visa_type").map(field=>{
               const label = fieldLabel(field.key,lang);
               return(
               <div key={field.key}>
