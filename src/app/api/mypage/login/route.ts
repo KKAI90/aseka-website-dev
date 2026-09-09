@@ -4,7 +4,7 @@ import { verifyPassword, dobToDefaultPassword, normalizeDigits } from "@/lib/myp
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, remember } = await req.json();
     if (!email || !password) {
       return NextResponse.json({ error: "メールアドレスとパスワードを入力してください / Nhập email và mật khẩu" }, { status: 400 });
     }
@@ -41,8 +41,10 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
       path: "/",
+      // "次回から入力を省略する" checked -> stay signed in 30 days.
+      // Unchecked -> session cookie, cleared when the browser closes.
+      ...(remember !== false ? { maxAge: 60 * 60 * 24 * 30 } : {}),
     });
     return res;
   } catch (err) {
