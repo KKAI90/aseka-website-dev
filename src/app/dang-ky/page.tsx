@@ -84,7 +84,7 @@ export default function DangKy() {
     if (!form.motivation.trim()) { setError("志望動機 / Lý do là bắt buộc"); return; }
     setLoading(true); setError("");
     try {
-      const res = await fetch("/api/admin/candidates", {
+      const res = await fetch("/api/admin/candidates?public=1", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
           ...form,
