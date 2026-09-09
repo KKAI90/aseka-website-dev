@@ -58,7 +58,7 @@ const STATUS_STEPS = [
 
 export default function Mypage() {
   const router = useRouter();
-  const [tab, setTab]         = useState<"jobs"|"status"|"profile">("jobs");
+  const [tab, setTab]         = useState<"jobs"|"favorites"|"status"|"profile">("jobs");
   const [cand, setCand]       = useState<Candidate|null>(null);
   const [jobs, setJobs]       = useState<Job[]>([]);
   const [jobFilter, setJobFilter] = useState<"all"|"new">("all");
@@ -150,9 +150,133 @@ export default function Mypage() {
 
   const newCount  = jobs.filter(j => j.isNew).length;
   const allCount  = jobs.length;
+  const favCount  = jobs.filter(j => j.isFavorite).length;
   const displayed = jobFilter === "new" ? jobs.filter(j => j.isNew) : jobs;
+  const favorited = jobs.filter(j => j.isFavorite);
 
   const currentStep = STATUS_STEPS.findIndex(s => s.key === cand?.status);
+
+  /* Shared job table + accordion detail — used by both 紹介求人 and 検討中求人 tabs. */
+  const renderJobTable = (list: Job[], emptyMsg: { ja:string; vn:string }) => (
+    list.length === 0
+      ? <div style={{ padding:"40px", textAlign:"center", color:"#9BA0AC", fontSize:"13px" }}>
+          {emptyMsg.ja}<br/>{emptyMsg.vn}
+        </div>
+      : <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"13px" }}>
+          <thead>
+            <tr style={{ background:"#F8F9FB" }}>
+              {["企業名","求人ポジション","給与・待遇","検討する"].map(h => (
+                <th key={h} style={{ padding:"10px 14px", textAlign:"left", fontSize:"11px", color:"#9BA0AC", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(j => {
+              const isOpen = selectedJob?.id === j.id;
+              return (
+              <Fragment key={j.id}>
+              <tr onClick={() => { setSelectedJob(isOpen ? null : j); setApplyMsg(null); }}
+                style={{ borderBottom: isOpen ? "none" : "1px solid #F8F9FB", cursor:"pointer", background: isOpen ? "#FFF8F8" : "transparent" }}>
+                <td style={{ padding:"13px 14px", fontWeight:600, color:navy }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
+                    {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
+                    {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
+                    {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
+                    {j.company}
+                  </div>
+                </td>
+                <td style={{ padding:"13px 14px", color:navy }}>
+                  <div>{j.position_ja}</div>
+                  {j.position_vn && <div style={{ fontSize:"10px", color:"#9BA0AC", marginTop:"1px" }}>{j.position_vn}</div>}
+                  <div style={{ display:"flex", gap:"4px", marginTop:"4px" }}>
+                    <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"9px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{j.industry}</span>
+                    <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"4px", background:"#F6F7F9", color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{j.jlpt_min}以上</span>
+                  </div>
+                </td>
+                <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.salary||"要相談"}</td>
+                <td style={{ padding:"13px 14px", textAlign:"center" }}>
+                  <button onClick={e => { e.stopPropagation(); toggleFavorite(j.id); }} disabled={favBusy===j.id}
+                    title={j.isFavorite ? "お気に入り解除 / Bỏ yêu thích" : "お気に入りに追加 / Thêm vào yêu thích"}
+                    style={{ background:"none", border:`1.5px solid ${j.isFavorite ? red : "#C8D0DB"}`, borderRadius:"50%", width:"28px", height:"28px", cursor: favBusy===j.id ? "not-allowed" : "pointer", fontSize:"14px", color: j.isFavorite ? red : "#C8D0DB", display:"flex", alignItems:"center", justifyContent:"center", opacity: favBusy===j.id ? 0.5 : 1 }}>
+                    {j.isFavorite ? "♥" : "♡"}
+                  </button>
+                </td>
+              </tr>
+
+              {/* Job detail expand — right under the clicked row */}
+              {isOpen && (
+                <tr style={{ borderBottom:"1px solid #F8F9FB" }}>
+                  <td colSpan={4} style={{ padding:0 }}>
+                    <div style={{ borderTop:"2px solid #FFF0F0", padding:"20px", background:"#FFFAFA" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"12px" }}>
+                        <div>
+                          <div style={{ fontSize:"15px", fontWeight:700, color:navy }}>{j.company}</div>
+                          <div style={{ fontSize:"13px", color:"#444", marginTop:"2px" }}>{j.position_ja}</div>
+                        </div>
+                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", color:"#9BA0AC" }}>✕</button>
+                      </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"12px" }}>
+                        {[
+                          { l:"勤務地", v: j.location||"要相談" },
+                          { l:"給与",   v: j.salary||"要相談" },
+                          { l:"業種",   v: j.industry },
+                          { l:"日本語", v: `${j.jlpt_min}以上` },
+                          ...(j.count ? [{ l:"募集人数", v: `${j.count}名` }] : []),
+                        ].map(d=>(
+                          <div key={d.l} style={{ background:"#fff", borderRadius:"7px", padding:"8px 12px", border:"1px solid #F0F1F4" }}>
+                            <div style={{ fontSize:"10px", color:"#9BA0AC" }}>{d.l}</div>
+                            <div style={{ fontSize:"12px", fontWeight:600, color:navy, marginTop:"2px" }}>{d.v}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {j.osusume_point && (
+                        <div style={{ marginBottom:"12px", background:"#FFFBEB", borderRadius:"8px", padding:"10px 14px", fontSize:"12px", color:"#92400E", borderLeft:"3px solid #F59E0B", lineHeight:1.7 }}>
+                          <div style={{ fontWeight:700, marginBottom:"4px" }}>⭐ おすすめポイント</div>
+                          {j.osusume_point}
+                        </div>
+                      )}
+
+                      {/* Full job details — same fields as the admin's 求人概要 tab */}
+                      <div style={{ background:"#fff", borderRadius:"8px", border:"1px solid #F0F1F4", overflow:"hidden", maxHeight:"420px", overflowY:"auto" }}>
+                        {JOB_DETAIL_FIELDS.filter(f => j[f.key]).map((f, i) => (
+                          <div key={f.key} style={{ display:"grid", gridTemplateColumns:"110px 1fr", borderBottom:"1px solid #F0F1F4", background:i%2===0?"#fff":"#FAFBFC" }}>
+                            <div style={{ padding:"10px 12px", background:"#F8F9FB", fontSize:"11px", fontWeight:700, color:navy, borderRight:"1px solid #F0F1F4" }}>{f.label}</div>
+                            <div style={{ padding:"10px 12px", fontSize:"12px", color:"#444", lineHeight:1.7, whiteSpace:"pre-wrap" }}>{j[f.key] as string}</div>
+                          </div>
+                        ))}
+                        {!JOB_DETAIL_FIELDS.some(f => j[f.key]) && (
+                          <div style={{ padding:"20px", textAlign:"center", color:"#9BA0AC", fontSize:"12px" }}>詳細情報は準備中です。</div>
+                        )}
+                      </div>
+                      {applyMsg && (
+                        <div style={{ marginTop:"12px", fontSize:"12px", padding:"9px 12px", borderRadius:"7px", background: applyMsg.type==="ok" ? "#EAF3DE" : "#FCEBEB", color: applyMsg.type==="ok" ? "#27500A" : "#C8002A" }}>
+                          {applyMsg.type==="ok" ? "✓ " : "⚠️ "}{applyMsg.text}
+                        </div>
+                      )}
+                      <div style={{ marginTop:"14px", display:"flex", gap:"8px" }}>
+                        <button onClick={() => applyToJob(j)} disabled={applyBusy===j.id || j.isApplied}
+                          style={{ padding:"9px 20px", borderRadius:"8px", background: j.isApplied ? "#EAF3DE" : red, color: j.isApplied ? "#27500A" : "#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: (applyBusy===j.id || j.isApplied) ? "default" : "pointer", opacity: applyBusy===j.id ? 0.6 : 1 }}>
+                          {j.isApplied ? "✓ 応募済み" : applyBusy===j.id ? "送信中..." : "この求人に応募する"}
+                        </button>
+                        <button onClick={() => toggleFavorite(j.id)} disabled={favBusy===j.id}
+                          style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: j.isFavorite ? red : "#6B6B6B", border:`1px solid ${j.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===j.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
+                          {j.isFavorite ? "♥" : "♡"} {j.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
+                        </button>
+                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
+                          閉じる
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+  );
 
   if (loading) return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Noto Sans JP',sans-serif" }}>
@@ -194,9 +318,10 @@ export default function Mypage() {
         <div style={{ background:red }}>
           <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 24px", display:"flex" }}>
             {[
-              { key:"jobs",    label:`紹介求人`, count: allCount },
-              { key:"status",  label:"選考状況", count: null },
-              { key:"profile", label:"プロフィール", count: null },
+              { key:"jobs",      label:"紹介求人",     count: allCount },
+              { key:"favorites", label:"検討中求人",   count: favCount },
+              { key:"status",    label:"選考状況",     count: null },
+              { key:"profile",   label:"プロフィール", count: null },
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
                 style={{ padding:"12px 24px", fontSize:"13px", fontWeight: tab===t.key ? 700 : 400, color:"#fff", background: tab===t.key ? "rgba(255,255,255,0.18)" : "transparent", border:"none", cursor:"pointer", borderBottom: tab===t.key ? "3px solid #fff" : "3px solid transparent", display:"flex", alignItems:"center", gap:"6px" }}>
@@ -241,130 +366,26 @@ export default function Mypage() {
                 ))}
               </div>
 
-              {/* Job table */}
-              {displayed.length === 0
-                ? <div style={{ padding:"40px", textAlign:"center", color:"#9BA0AC", fontSize:"13px" }}>
-                    現在該当する求人はありません。<br/>Hiện chưa có việc làm phù hợp.
-                  </div>
-                : <>
-                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"13px" }}>
-                    <thead>
-                      <tr style={{ background:"#F8F9FB" }}>
-                        {["企業名","求人ポジション","業種","JLPT","給与・待遇","検討する"].map(h => (
-                          <th key={h} style={{ padding:"10px 14px", textAlign:"left", fontSize:"11px", color:"#9BA0AC", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {displayed.map(j => {
-                        const isOpen = selectedJob?.id === j.id;
-                        return (
-                        <Fragment key={j.id}>
-                        <tr onClick={() => { setSelectedJob(isOpen ? null : j); setApplyMsg(null); }}
-                          style={{ borderBottom: isOpen ? "none" : "1px solid #F8F9FB", cursor:"pointer", background: isOpen ? "#FFF8F8" : "transparent" }}>
-                          <td style={{ padding:"13px 14px", fontWeight:600, color:navy }}>
-                            <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
-                              {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
-                              {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
-                              {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
-                              {j.company}
-                            </div>
-                          </td>
-                          <td style={{ padding:"13px 14px", color:navy }}>
-                            <div>{j.position_ja}</div>
-                            {j.position_vn && <div style={{ fontSize:"10px", color:"#9BA0AC" }}>{j.position_vn}</div>}
-                          </td>
-                          <td style={{ padding:"13px 14px" }}>
-                            <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"3px 8px", borderRadius:"4px" }}>{j.industry}</span>
-                          </td>
-                          <td style={{ padding:"13px 14px", textAlign:"center" }}>
-                            <span style={{ fontWeight:700, color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{j.jlpt_min}以上</span>
-                          </td>
-                          <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.salary||"要相談"}</td>
-                          <td style={{ padding:"13px 14px", textAlign:"center" }}>
-                            <button onClick={e => { e.stopPropagation(); toggleFavorite(j.id); }} disabled={favBusy===j.id}
-                              title={j.isFavorite ? "お気に入り解除 / Bỏ yêu thích" : "お気に入りに追加 / Thêm vào yêu thích"}
-                              style={{ background:"none", border:`1.5px solid ${j.isFavorite ? red : "#C8D0DB"}`, borderRadius:"50%", width:"28px", height:"28px", cursor: favBusy===j.id ? "not-allowed" : "pointer", fontSize:"14px", color: j.isFavorite ? red : "#C8D0DB", display:"flex", alignItems:"center", justifyContent:"center", opacity: favBusy===j.id ? 0.5 : 1 }}>
-                              {j.isFavorite ? "♥" : "♡"}
-                            </button>
-                          </td>
-                        </tr>
+              <div style={{ padding:"10px 20px 0", fontSize:"11px", color:"#9BA0AC" }}>
+                検討する<span style={{ color:red }}>♡</span>をクリックすると、検討中求人に保存されます。
+                <span style={{ marginLeft:"4px" }}>Nhấn ♡ &quot;Cân nhắc&quot; để lưu vào mục Việc đang cân nhắc.</span>
+              </div>
+              <div style={{ padding:"10px 0 0" }}>
+                {renderJobTable(displayed, { ja:"現在該当する求人はありません。", vn:"Hiện chưa có việc làm phù hợp." })}
+              </div>
+            </div>
+          )}
 
-                        {/* Job detail expand — right under the clicked row */}
-                        {isOpen && (
-                          <tr style={{ borderBottom:"1px solid #F8F9FB" }}>
-                            <td colSpan={6} style={{ padding:0 }}>
-                              <div style={{ borderTop:"2px solid #FFF0F0", padding:"20px", background:"#FFFAFA" }}>
-                                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"12px" }}>
-                                  <div>
-                                    <div style={{ fontSize:"15px", fontWeight:700, color:navy }}>{j.company}</div>
-                                    <div style={{ fontSize:"13px", color:"#444", marginTop:"2px" }}>{j.position_ja}</div>
-                                  </div>
-                                  <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", color:"#9BA0AC" }}>✕</button>
-                                </div>
-                                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"12px" }}>
-                                  {[
-                                    { l:"勤務地", v: j.location||"要相談" },
-                                    { l:"給与",   v: j.salary||"要相談" },
-                                    { l:"業種",   v: j.industry },
-                                    { l:"日本語", v: `${j.jlpt_min}以上` },
-                                    ...(j.count ? [{ l:"募集人数", v: `${j.count}名` }] : []),
-                                  ].map(d=>(
-                                    <div key={d.l} style={{ background:"#fff", borderRadius:"7px", padding:"8px 12px", border:"1px solid #F0F1F4" }}>
-                                      <div style={{ fontSize:"10px", color:"#9BA0AC" }}>{d.l}</div>
-                                      <div style={{ fontSize:"12px", fontWeight:600, color:navy, marginTop:"2px" }}>{d.v}</div>
-                                    </div>
-                                  ))}
-                                </div>
-
-                                {j.osusume_point && (
-                                  <div style={{ marginBottom:"12px", background:"#FFFBEB", borderRadius:"8px", padding:"10px 14px", fontSize:"12px", color:"#92400E", borderLeft:"3px solid #F59E0B", lineHeight:1.7 }}>
-                                    <div style={{ fontWeight:700, marginBottom:"4px" }}>⭐ おすすめポイント</div>
-                                    {j.osusume_point}
-                                  </div>
-                                )}
-
-                                {/* Full job details — same fields as the admin's 求人概要 tab */}
-                                <div style={{ background:"#fff", borderRadius:"8px", border:"1px solid #F0F1F4", overflow:"hidden", maxHeight:"420px", overflowY:"auto" }}>
-                                  {JOB_DETAIL_FIELDS.filter(f => j[f.key]).map((f, i) => (
-                                    <div key={f.key} style={{ display:"grid", gridTemplateColumns:"110px 1fr", borderBottom:"1px solid #F0F1F4", background:i%2===0?"#fff":"#FAFBFC" }}>
-                                      <div style={{ padding:"10px 12px", background:"#F8F9FB", fontSize:"11px", fontWeight:700, color:navy, borderRight:"1px solid #F0F1F4" }}>{f.label}</div>
-                                      <div style={{ padding:"10px 12px", fontSize:"12px", color:"#444", lineHeight:1.7, whiteSpace:"pre-wrap" }}>{j[f.key] as string}</div>
-                                    </div>
-                                  ))}
-                                  {!JOB_DETAIL_FIELDS.some(f => j[f.key]) && (
-                                    <div style={{ padding:"20px", textAlign:"center", color:"#9BA0AC", fontSize:"12px" }}>詳細情報は準備中です。</div>
-                                  )}
-                                </div>
-                                {applyMsg && (
-                                  <div style={{ marginTop:"12px", fontSize:"12px", padding:"9px 12px", borderRadius:"7px", background: applyMsg.type==="ok" ? "#EAF3DE" : "#FCEBEB", color: applyMsg.type==="ok" ? "#27500A" : "#C8002A" }}>
-                                    {applyMsg.type==="ok" ? "✓ " : "⚠️ "}{applyMsg.text}
-                                  </div>
-                                )}
-                                <div style={{ marginTop:"14px", display:"flex", gap:"8px" }}>
-                                  <button onClick={() => applyToJob(j)} disabled={applyBusy===j.id || j.isApplied}
-                                    style={{ padding:"9px 20px", borderRadius:"8px", background: j.isApplied ? "#EAF3DE" : red, color: j.isApplied ? "#27500A" : "#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: (applyBusy===j.id || j.isApplied) ? "default" : "pointer", opacity: applyBusy===j.id ? 0.6 : 1 }}>
-                                    {j.isApplied ? "✓ 応募済み" : applyBusy===j.id ? "送信中..." : "この求人に応募する"}
-                                  </button>
-                                  <button onClick={() => toggleFavorite(j.id)} disabled={favBusy===j.id}
-                                    style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: j.isFavorite ? red : "#6B6B6B", border:`1px solid ${j.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===j.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
-                                    {j.isFavorite ? "♥" : "♡"} {j.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
-                                  </button>
-                                  <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
-                                    閉じる
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                        </Fragment>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </>
-              }
+          {/* ── TAB: 検討中求人 ── */}
+          {tab === "favorites" && (
+            <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
+              <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
+                <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>検討中求人</h2>
+                <p style={{ margin:0, fontSize:"11px", color:"#9BA0AC" }}>
+                  ♥ お気に入りに追加した求人 · Việc làm bạn đã đánh dấu để cân nhắc
+                </p>
+              </div>
+              {renderJobTable(favorited, { ja:"まだ検討中の求人はありません。", vn:"Bạn chưa lưu việc làm nào để cân nhắc." })}
             </div>
           )}
 
