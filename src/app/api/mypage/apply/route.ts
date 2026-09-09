@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.candidates.update({
       where: { id },
-      data: { match_job_id: job.id, match_job_name: job.company },
+      data: { match_job_id: job.id, match_job_name: job.company, applied_via: "self", applied_at: new Date() },
     });
 
     return NextResponse.json({ success: true, company: job.company });

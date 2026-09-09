@@ -21,6 +21,7 @@ type Candidate = {
   education:Edu[]; work_history:Work[]; certifications:Cert[];
   motivation:string; self_pr:string;
   status:string; match_job_id:string|null; match_job_name:string;
+  applied_via:string|null; applied_at:string|null;
   note:string; cv_filename:string|null; ai_data:Record<string,unknown>|null;
   created_at:string; updated_at:string;
 };
@@ -410,7 +411,10 @@ export default function CandidatesPage() {
         weight_kg: editForm.weight_kg ? Number(editForm.weight_kg) : null,
         dependents: editForm.dependents || "0",
         status: "new",
+        match_job_id: job?.id || null,
         match_job_name: job?.company || "未定",
+        applied_via: job ? "admin" : null,
+        applied_at: job ? new Date().toISOString() : null,
         education: c.education || [],
         work_history: c.work_history || [],
         certifications: c.certifications || [],
@@ -590,6 +594,25 @@ export default function CandidatesPage() {
                 </div>
                 <button onClick={()=>setSelected(null)} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",fontSize:"18px"}}>×</button>
               </div>
+
+              {/* Applied job banner */}
+              {selected.match_job_name&&selected.match_job_name!=="未定"&&(
+                <div style={{padding:"10px 16px",background:selected.applied_via==="self"?"#EAF3DE":"#E6F1FB",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"4px"}}>
+                    <div style={{fontSize:"12px",color:navy}}>
+                      <span style={{fontWeight:700}}>📋 {t("candidates.appliedTo")}:</span> {selected.match_job_name}
+                    </div>
+                    <span style={{fontSize:"9px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",background:selected.applied_via==="self"?"#27500A":"#0C447C",color:"#fff"}}>
+                      {selected.applied_via==="self"?t("candidates.appliedSelf"):t("candidates.appliedAdmin")}
+                    </span>
+                  </div>
+                  {selected.applied_at&&(
+                    <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"3px"}}>
+                      {t("candidates.appliedAt")}: {new Date(selected.applied_at).toLocaleString("ja-JP")}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Tabs */}
               <div style={{display:"flex",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>

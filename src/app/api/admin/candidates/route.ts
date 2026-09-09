@@ -77,10 +77,12 @@ export async function POST(req: NextRequest) {
         motivation:     body.motivation || null,
         self_pr:        body.self_pr || null,
         status:         body.status || "新規",
-        match_job_id:   null,
+        match_job_id:   body.match_job_id || null,
         match_job_name: body.match_job_name || null,
         note:           body.note || null,
         cv_filename:    body.cv_filename || null,
+        applied_via:    body.applied_via || null,
+        applied_at:     body.applied_at ? new Date(body.applied_at) : null,
       },
     });
     return NextResponse.json({ data });
