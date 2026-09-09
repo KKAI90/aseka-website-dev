@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
   const cand = await prisma.candidates.findUnique({
     where: { id },
-    select: { skill: true, jlpt: true, preferred_job: true },
+    select: { skill: true, jlpt: true, preferred_job: true, match_job_id: true },
   });
 
   if (!cand) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     if (j.status === "urgent") score += 5;
 
     const isNew = (Date.now() - new Date(j.created_at).getTime()) < 1000 * 60 * 60 * 24 * 7;
-    return { ...j, created_at: j.created_at.toISOString(), updated_at: j.updated_at?.toISOString() ?? null, matchScore: score, isNew, isFavorite: favSet.has(j.id) };
+    return { ...j, created_at: j.created_at.toISOString(), updated_at: j.updated_at?.toISOString() ?? null, matchScore: score, isNew, isFavorite: favSet.has(j.id), isApplied: cand.match_job_id === j.id };
   });
 
   scored.sort((a, b) => b.matchScore - a.matchScore || (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));

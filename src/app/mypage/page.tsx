@@ -10,13 +10,13 @@ type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
   date_of_birth:string; gender:string; skill:string; jlpt:string;
   preferred_job:string; visa_type:string; status:string;
-  match_job_name:string; motivation:string; availability:string; created_at:string;
+  match_job_id:string|null; match_job_name:string; motivation:string; availability:string; created_at:string;
   hasPassword:boolean;
 };
 type Job = {
   id:string; company:string; position_ja:string; position_vn:string;
   industry:string; jlpt_min:string; salary:string; location:string;
-  status:string; matchScore:number; isNew:boolean; isFavorite:boolean; job_description:string;
+  status:string; matchScore:number; isNew:boolean; isFavorite:boolean; isApplied:boolean; job_description:string;
 };
 
 const STATUS_STEPS = [
@@ -35,6 +35,8 @@ export default function Mypage() {
   const [selectedJob, setSelectedJob] = useState<Job|null>(null);
   const [loading, setLoading] = useState(true);
   const [favBusy, setFavBusy] = useState<string|null>(null);
+  const [applyBusy, setApplyBusy] = useState<string|null>(null);
+  const [applyMsg, setApplyMsg] = useState<{ type:"ok"|"err"; text:string }|null>(null);
 
   // Password form (Profile tab)
   const [pwCurrent, setPwCurrent] = useState("");
@@ -73,6 +75,31 @@ export default function Mypage() {
       }
     } finally {
       setFavBusy(null);
+    }
+  };
+
+  const applyToJob = async (job: Job) => {
+    if (cand?.match_job_id && cand.match_job_id !== job.id) {
+      const ok = window.confirm(
+        `現在「${cand.match_job_name}」に応募中です。「${job.company}」に切り替えますか？\n` +
+        `Bạn đang ứng tuyển "${cand.match_job_name}". Chuyển sang "${job.company}"?`
+      );
+      if (!ok) return;
+    }
+    setApplyBusy(job.id); setApplyMsg(null);
+    try {
+      const res = await fetch("/api/mypage/apply", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: job.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setApplyMsg({ type:"err", text: data.error || "エラーが発生しました" }); return; }
+      setJobs(prev => prev.map(j => ({ ...j, isApplied: j.id === job.id })));
+      setSelectedJob(prev => prev && prev.id === job.id ? { ...prev, isApplied: true } : prev);
+      setCand(prev => prev ? { ...prev, match_job_id: job.id, match_job_name: data.company } : prev);
+      setApplyMsg({ type:"ok", text:`「${data.company}」に応募しました / Đã ứng tuyển "${data.company}"` });
+    } finally {
+      setApplyBusy(null);
     }
   };
 
@@ -200,12 +227,13 @@ export default function Mypage() {
                     </thead>
                     <tbody>
                       {displayed.map(j => (
-                        <tr key={j.id} onClick={() => setSelectedJob(selectedJob?.id===j.id ? null : j)}
+                        <tr key={j.id} onClick={() => { setSelectedJob(selectedJob?.id===j.id ? null : j); setApplyMsg(null); }}
                           style={{ borderBottom:"1px solid #F8F9FB", cursor:"pointer", background: selectedJob?.id===j.id ? "#FFF8F8" : "transparent" }}>
                           <td style={{ padding:"13px 14px", fontWeight:600, color:navy }}>
                             <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
                               {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
                               {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
+                              {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
                               {j.company}
                             </div>
                           </td>
@@ -260,15 +288,21 @@ export default function Mypage() {
                           {selectedJob.job_description.slice(0, 300)}{selectedJob.job_description.length > 300 ? "..." : ""}
                         </p>
                       )}
+                      {applyMsg && (
+                        <div style={{ marginTop:"12px", fontSize:"12px", padding:"9px 12px", borderRadius:"7px", background: applyMsg.type==="ok" ? "#EAF3DE" : "#FCEBEB", color: applyMsg.type==="ok" ? "#27500A" : "#C8002A" }}>
+                          {applyMsg.type==="ok" ? "✓ " : "⚠️ "}{applyMsg.text}
+                        </div>
+                      )}
                       <div style={{ marginTop:"14px", display:"flex", gap:"8px" }}>
-                        <Link href="/#contact" style={{ padding:"9px 20px", borderRadius:"8px", background:red, color:"#fff", textDecoration:"none", fontSize:"12px", fontWeight:700 }}>
-                          この求人に応募する
-                        </Link>
+                        <button onClick={() => applyToJob(selectedJob)} disabled={applyBusy===selectedJob.id || selectedJob.isApplied}
+                          style={{ padding:"9px 20px", borderRadius:"8px", background: selectedJob.isApplied ? "#EAF3DE" : red, color: selectedJob.isApplied ? "#27500A" : "#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: (applyBusy===selectedJob.id || selectedJob.isApplied) ? "default" : "pointer", opacity: applyBusy===selectedJob.id ? 0.6 : 1 }}>
+                          {selectedJob.isApplied ? "✓ 応募済み" : applyBusy===selectedJob.id ? "送信中..." : "この求人に応募する"}
+                        </button>
                         <button onClick={() => toggleFavorite(selectedJob.id)} disabled={favBusy===selectedJob.id}
                           style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: selectedJob.isFavorite ? red : "#6B6B6B", border:`1px solid ${selectedJob.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===selectedJob.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
                           {selectedJob.isFavorite ? "♥" : "♡"} {selectedJob.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
                         </button>
-                        <button onClick={() => setSelectedJob(null)} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
+                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
                           閉じる
                         </button>
                       </div>
