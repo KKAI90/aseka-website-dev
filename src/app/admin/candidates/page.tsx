@@ -49,9 +49,10 @@ const navy="#0B1F3A";
 const B={border:"0.5px solid rgba(11,31,58,0.1)"};
 const fmt=(b:number)=>b>1048576?`${(b/1048576).toFixed(1)}MB`:`${(b/1024).toFixed(0)}KB`;
 const fmtDate=(s:string)=>s?new Date(s).toLocaleDateString("ja-JP"):"—";
-const FORM_URL = typeof window !== "undefined"
-  ? `${window.location.origin}/dang-ky`
-  : "https://aseka-website-dev.vercel.app/dang-ky";
+// FORM_URL phải luôn trỏ về domain chính (nơi /dang-ky thực sự tồn tại) —
+// KHÔNG dùng window.location.origin vì trang này chạy trên subdomain admin.*,
+// middleware chặn mọi route không phải /admin trên subdomain đó.
+const FORM_URL = `${process.env.NEXT_PUBLIC_SITE_URL || "https://dev.aseka.co.jp"}/dang-ky`;
 
 /* ─── Export CV as HTML ──────────────────────────────────── */
 function exportCV(c: Candidate) {

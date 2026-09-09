@@ -22,6 +22,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DEV_DIRECT_URL }}
+          NEXT_PUBLIC_SITE_URL: https://dev.aseka.co.jp
         run: |
           npm ci
           npx prisma generate
