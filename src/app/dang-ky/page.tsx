@@ -89,7 +89,7 @@ export default function DangKy() {
         body: JSON.stringify({
           ...form,
           height_cm: null, weight_kg: null,
-          dependents: Number(form.dependents)||0,
+          dependents: form.dependents || "0",
           nationality: "Vietnam",
           status: "new",
           education: [], work_history: [], certifications: [],
