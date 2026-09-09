@@ -90,6 +90,12 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "dashboard.noActivity": { en: "No activity", vi: "Không có hoạt động", ja: "アクティビティなし" },
   "dashboard.today": { en: "Today", vi: "Hôm nay", ja: "本日" },
   "dashboard.yesterday": { en: "Yesterday", vi: "Hôm qua", ja: "昨日" },
+  "dashboard.greeting": { en: "Welcome back", vi: "Chào mừng trở lại", ja: "おかえりなさい" },
+  "dashboard.refresh": { en: "Refresh", vi: "Làm mới", ja: "更新" },
+  "dashboard.live": { en: "Live", vi: "Trực tiếp", ja: "リアルタイム" },
+  "dashboard.snapshotSub": { en: "Here's what's happening across ASEKA today.", vi: "Tổng quan hoạt động của ASEKA hôm nay.", ja: "本日のASEKA業務サマリーです。" },
+  "dashboard.quickActions": { en: "Quick actions", vi: "Thao tác nhanh", ja: "クイックアクション" },
+  "dashboard.pendingApplies": { en: "Self-applications to review", vi: "Ứng viên tự apply cần xử lý", ja: "本人応募・要確認" },
 
   // ── candidates ──────────────────────────────────────
   "candidates.title": { en: "Candidate Management", vi: "Quản lý Ứng viên", ja: "人材管理" },

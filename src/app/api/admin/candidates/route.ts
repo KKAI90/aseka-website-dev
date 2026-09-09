@@ -13,8 +13,23 @@ export async function GET(req: NextRequest) {
   const jlpt = searchParams.get("jlpt");
   const id = searchParams.get("id");
 
+  // password_hash never leaves the server — admin UI has no use for it and
+  // it doesn't belong in a network response even hashed.
+  const safeSelect = {
+    id: true, name: true, name_kana: true, email: true, phone: true,
+    gender: true, date_of_birth: true, nationality: true, address: true,
+    visa_type: true, visa_expiry: true, jlpt: true, jlpt_actual: true,
+    height_cm: true, weight_kg: true, skill: true, preferred_job: true,
+    work_hours: true, availability: true, marital_status: true, dependents: true,
+    education: true, work_history: true, certifications: true,
+    motivation: true, self_pr: true, status: true,
+    match_job_id: true, match_job_name: true, note: true, cv_filename: true,
+    applied_via: true, applied_at: true, applied_reviewed: true,
+    created_at: true, updated_at: true,
+  };
+
   if (id) {
-    const data = await prisma.candidates.findUnique({ where: { id } });
+    const data = await prisma.candidates.findUnique({ where: { id }, select: safeSelect });
     if (!data) return apiError("データの取得に失敗しました");
     return NextResponse.json({ data });
   }
@@ -35,6 +50,7 @@ export async function GET(req: NextRequest) {
   const data = await prisma.candidates.findMany({
     where,
     orderBy: { created_at: "desc" },
+    select: safeSelect,
   });
   return NextResponse.json({ data });
 }
@@ -85,7 +101,8 @@ export async function POST(req: NextRequest) {
         applied_at:     body.applied_at ? new Date(body.applied_at) : null,
       },
     });
-    return NextResponse.json({ data });
+    const { password_hash: _ph1, ...safeData } = data;
+    return NextResponse.json({ data: safeData });
   } catch {
     return apiError("登録に失敗しました", 400);
   }
@@ -98,12 +115,13 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, ...updates } = await req.json();
     if (!id) return apiError("IDが必要です", 400);
-    const { created_at: _ca, ...safeUpdates } = updates;
+    const { created_at: _ca, password_hash: _ph2, ...safeUpdates } = updates;
     const data = await prisma.candidates.update({
       where: { id },
       data: { ...safeUpdates, updated_at: new Date() },
     });
-    return NextResponse.json({ data });
+    const { password_hash: _ph3, ...safeData } = data;
+    return NextResponse.json({ data: safeData });
   } catch {
     return apiError("更新に失敗しました");
   }

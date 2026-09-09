@@ -447,7 +447,20 @@ export default function CandidatesPage() {
   /* ─── LIST VIEW ─────────────────────────────────────────── */
   if (view==="list") return (
     <div>
-      <style>{`@keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }`}</style>
+      <style>{`
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+        @keyframes candFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        .cand-fade { animation: candFadeIn 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+        .cand-input:focus, .cand-select:focus { border-color:${navy} !important; box-shadow:0 0 0 3px rgba(11,31,58,0.08); }
+        .cand-btn { transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; }
+        .cand-btn:hover { opacity:0.85; transform:translateY(-1px); }
+        .cand-btn:active { transform:translateY(0); }
+        .cand-pill { transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease; }
+        .cand-pill:hover { transform:translateY(-1px); }
+        .cand-card { transition: box-shadow 0.2s ease; }
+        .cand-card:hover { box-shadow: 0 4px 18px rgba(11,31,58,0.06); }
+        @media (prefers-reduced-motion: reduce) { .cand-fade{animation:none;} .cand-btn,.cand-pill{transition:none;} }
+      `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
           <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("candidates.title")}</div>
@@ -456,7 +469,7 @@ export default function CandidatesPage() {
         <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           {/* Form share button + popup */}
           <div style={{position:"relative"}}>
-            <button onClick={()=>setShowFormPopup(p=>!p)}
+            <button className="cand-btn" onClick={()=>setShowFormPopup(p=>!p)}
               style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:showFormPopup?"#E6F1FB":"#fff",color:navy,border:`1px solid ${showFormPopup?navy:"rgba(11,31,58,0.2)"}`,cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
               {t("candidates.shareForm")}
@@ -486,7 +499,7 @@ export default function CandidatesPage() {
             )}
           </div>
 
-          <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
+          <button className="cand-btn" onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"5px"}}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             {t("candidates.importCV")}
           </button>
@@ -495,25 +508,25 @@ export default function CandidatesPage() {
 
       <div style={{padding:"16px 20px"}}>
         {/* Search + advanced filters toolbar */}
-        <div style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
+        <div className="cand-fade" style={{background:"#fff",...B,borderRadius:"10px",padding:"12px 14px",marginBottom:"12px",display:"flex",gap:"10px",flexWrap:"wrap",alignItems:"center"}}>
           <div style={{position:"relative",flex:"1 1 220px",minWidth:"200px"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"10px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder={t("candidates.searchPlaceholder")} value={searchInput}
+            <input type="text" className="cand-input" placeholder={t("candidates.searchPlaceholder")} value={searchInput}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
-              style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
+              style={{width:"100%",padding:"7px 10px 7px 30px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box",transition:"border-color 0.15s ease, box-shadow 0.15s ease"}}/>
           </div>
-          <select value={skillFilter} onChange={e=>setSkillFilter(e.target.value)}
-            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+          <select value={skillFilter} onChange={e=>setSkillFilter(e.target.value)} className="cand-select"
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none",transition:"border-color 0.15s ease, box-shadow 0.15s ease"}}>
             <option value="all">{t("candidates.allIndustries")}</option>
             {skillOptions.map(s=><option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)}
-            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none"}}>
+          <select value={jlptFilter} onChange={e=>setJlptFilter(e.target.value)} className="cand-select"
+            style={{padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",color:navy,background:"#fff",cursor:"pointer",outline:"none",transition:"border-color 0.15s ease, box-shadow 0.15s ease"}}>
             <option value="all">{t("candidates.allJlpt")}</option>
             {["N1","N2","N3","N4","N5"].map(j=><option key={j} value={j}>{j}</option>)}
           </select>
           {activeFilterCount>0&&(
-            <button onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
+            <button className="cand-btn" onClick={clearFilters} style={{padding:"7px 12px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer",whiteSpace:"nowrap"}}>
               ✕ {t("common.clearFilters")} ({activeFilterCount})
             </button>
           )}
@@ -522,23 +535,23 @@ export default function CandidatesPage() {
           </div>
         </div>
 
-        <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
+        <div className="cand-fade" style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px",animationDelay:"60ms"}}>
           {[{key:"all",labelKey:"common.all"},...Object.entries(ST).map(([k,v])=>({key:k,labelKey:v.labelKey}))].map(f=>(
-            <button key={f.key} onClick={()=>setFilter(f.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.key?navy:"#fff",color:filter===f.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
+            <button key={f.key} className="cand-pill" onClick={()=>setFilter(f.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.key?navy:"#fff",color:filter===f.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
               {t(f.labelKey)} ({counts[f.key]||0})
             </button>
           ))}
           {pendingAppliesCount>0&&(
-            <button onClick={()=>setPendingAppliesOnly(p=>!p)}
+            <button className="cand-pill" onClick={()=>setPendingAppliesOnly(p=>!p)}
               style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:700,border:`1px solid ${pendingAppliesOnly?"#C8002A":"#F09595"}`,background:pendingAppliesOnly?"#C8002A":"#FCEBEB",color:pendingAppliesOnly?"#fff":"#A32D2D",cursor:"pointer",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"5px"}}>
               🔔 {t("candidates.pendingApplies")} ({pendingAppliesCount})
             </button>
           )}
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:selected?"1fr 420px":"1fr",gap:"12px"}}>
+        <div className="cand-fade" style={{display:"grid",gridTemplateColumns:selected?"1fr 420px":"1fr",gap:"12px",animationDelay:"120ms"}}>
           {/* Table */}
-          <div style={{background:"#fff",...B,borderRadius:"10px",overflow:"hidden"}}>
+          <div className="cand-card" style={{background:"#fff",...B,borderRadius:"10px",overflow:"hidden"}}>
             {loading?<div style={{padding:"40px",textAlign:"center",color:"#6B6B6B"}}>{t("common.loading")}</div>
             :cands.length===0?<div style={{padding:"48px",textAlign:"center"}}>
               <div style={{fontSize:"32px",marginBottom:"12px"}}>👤</div>

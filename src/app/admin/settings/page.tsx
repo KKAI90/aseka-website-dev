@@ -106,6 +106,16 @@ export default function SettingsPage() {
 
   return (
     <div>
+      <style>{`
+        @keyframes settingsFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        .settings-fade { animation: settingsFadeIn 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+        .settings-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .settings-card:hover { box-shadow: 0 6px 20px rgba(11,31,58,0.06); transform: translateY(-1px); }
+        .settings-btn { transition: opacity 0.15s ease, transform 0.15s ease; }
+        .settings-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .settings-btn:active { transform: translateY(0); }
+        @media (prefers-reduced-motion: reduce) { .settings-fade{animation:none;} .settings-card,.settings-btn{transition:none;} }
+      `}</style>
       {/* Header */}
       <div style={{ background: "#fff", ...B, borderTop: "none", borderLeft: "none", borderRight: "none", padding: "0 20px", height: "52px", display: "flex", alignItems: "center" }}>
         <div>
@@ -117,7 +127,7 @@ export default function SettingsPage() {
       <div style={{ padding: "20px" }}>
 
         {/* Flow diagram */}
-        <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
+        <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "16px" }}>
             {t("settings.flowTitle")}
           </div>
@@ -146,21 +156,21 @@ export default function SettingsPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
           {/* Webhook URL */}
-          <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
+          <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
             <div style={{ fontSize: "12px", fontWeight: 700, color: navy, marginBottom: "12px" }}>
               {t("settings.webhookUrlLabel")}
             </div>
             <div style={{ background: "#F6F7F9", borderRadius: "8px", padding: "10px 12px", fontFamily: "monospace", fontSize: "11px", color: "#185FA5", wordBreak: "break-all", marginBottom: "8px" }}>
               {WEBHOOK_URL}
             </div>
-            <button onClick={() => copy(WEBHOOK_URL, "url")}
+            <button className="settings-btn" onClick={() => copy(WEBHOOK_URL, "url")}
               style={{ padding: "6px 14px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, background: copied === "url" ? "#27500A" : navy, color: "#fff", border: "none", cursor: "pointer", width: "100%" }}>
               {copied === "url" ? t("settings.copiedBtn") : t("settings.copyUrlBtn")}
             </button>
           </div>
 
           {/* Webhook Secret */}
-          <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
+          <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", padding: "16px" }}>
             <div style={{ fontSize: "12px", fontWeight: 700, color: navy, marginBottom: "12px" }}>
               {t("settings.webhookSecretLabel")}
             </div>
@@ -170,7 +180,7 @@ export default function SettingsPage() {
             <div style={{ fontSize: "10px", color: "#6B6B6B", marginBottom: "8px" }}>
               {t("settings.secretWarning")}
             </div>
-            <button onClick={() => copy(WEBHOOK_SECRET, "secret")}
+            <button className="settings-btn" onClick={() => copy(WEBHOOK_SECRET, "secret")}
               style={{ padding: "6px 14px", borderRadius: "6px", fontSize: "11px", fontWeight: 600, background: copied === "secret" ? "#27500A" : "#633806", color: "#fff", border: "none", cursor: "pointer", width: "100%" }}>
               {copied === "secret" ? t("settings.copiedBtn") : t("settings.copySecretBtn")}
             </button>
@@ -178,7 +188,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Setup steps */}
-        <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
+        <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "16px" }}>
             {t("settings.setupStepsTitle")}
           </div>
@@ -204,7 +214,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Field mapping */}
-        <div style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
+        <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", padding: "20px", marginBottom: "16px" }}>
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "4px" }}>
             {t("settings.fieldMapTitle")}
           </div>
@@ -235,13 +245,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Google Apps Script code */}
-        <div style={{ background: "#fff", ...B, borderRadius: "12px", overflow: "hidden" }}>
+        <div className="settings-card settings-fade" style={{ background: "#fff", ...B, borderRadius: "12px", overflow: "hidden" }}>
           <div style={{ padding: "14px 20px", borderBottom: "0.5px solid rgba(11,31,58,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: "13px", fontWeight: 700, color: navy }}>{t("settings.gasCodeTitle")}</div>
               <div style={{ fontSize: "10px", color: "#6B6B6B", marginTop: "1px" }}>{t("settings.gasCodeDesc")}</div>
             </div>
-            <button onClick={() => copy(GAS_CODE, "gas")}
+            <button className="settings-btn" onClick={() => copy(GAS_CODE, "gas")}
               style={{ padding: "7px 16px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, background: copied === "gas" ? "#27500A" : navy, color: "#fff", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
               {copied === "gas" ? t("settings.copiedBtn") : t("settings.copyAllBtn")}
             </button>

@@ -138,15 +138,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
               const active = pathname.startsWith(item.href);
               return (
                 <Link key={item.href} href={item.href}
+                  className={`admin-nav-link${active ? " active" : ""}`}
                   style={{
                     display: "flex", alignItems: "center", gap: "11px",
                     padding: "11px 12px", borderRadius: "10px", marginBottom: "3px",
                     textDecoration: "none",
                     background: active ? "rgba(255,255,255,0.14)" : "transparent",
                     borderLeft: active ? "3px solid #60A5FA" : "3px solid transparent",
-                    transition: "background 0.15s",
                   }}>
-                  <div style={{ width: "20px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: active ? 1 : 0.7 }}>
+                  <div className="admin-nav-icon" style={{ width: "20px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: active ? 1 : 0.7 }}>
                     <NavIcon name={item.icon} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -154,7 +154,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     {item.subKey !== item.labelKey && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.38)", marginTop: "2px" }}>{t(item.subKey)}</div>}
                   </div>
                   {item.href === "/admin/candidates" && pendingApplies > 0 && (
-                    <span style={{ background: "#C8002A", color: "#fff", fontSize: "10px", fontWeight: 700, borderRadius: "20px", padding: "1px 6px", minWidth: "16px", textAlign: "center", flexShrink: 0 }}>{pendingApplies}</span>
+                    <span className="admin-nav-badge" style={{ background: "#C8002A", color: "#fff", fontSize: "10px", fontWeight: 700, borderRadius: "20px", padding: "1px 6px", minWidth: "16px", textAlign: "center", flexShrink: 0 }}>{pendingApplies}</span>
                   )}
                   {active && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#60A5FA", flexShrink: 0 }} />}
                 </Link>
@@ -194,6 +194,23 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     <>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes adminFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes adminBadgePop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+
+        /* ── Nav link interactions ── */
+        .admin-nav-link { transition: background 0.18s ease, transform 0.18s ease; }
+        .admin-nav-link:hover { background: rgba(255,255,255,0.09) !important; transform: translateX(2px); }
+        .admin-nav-link.active:hover { background: rgba(255,255,255,0.18) !important; }
+        .admin-nav-icon { transition: opacity 0.18s ease, transform 0.18s ease; }
+        .admin-nav-link:hover .admin-nav-icon { opacity: 1 !important; transform: scale(1.08); }
+        .admin-nav-badge { animation: adminBadgePop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
+        /* ── Page content: soft entrance on route change ── */
+        .admin-main > div { animation: adminFadeIn 0.3s ease both; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .admin-nav-link, .admin-nav-icon, .admin-main > div { animation: none !important; transition: none !important; }
+        }
 
         /* ── Desktop layout ── */
         .admin-root { display: flex; height: 100vh; overflow: hidden; font-family: 'Noto Sans JP','Yu Gothic UI',sans-serif; }
