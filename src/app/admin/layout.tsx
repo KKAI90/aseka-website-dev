@@ -56,6 +56,17 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string>("");
   const [accessChecked, setAccessChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingApplies, setPendingApplies] = useState(0);
+
+  useEffect(() => {
+    if (!accessChecked) return;
+    const load = () => fetch("/api/admin/candidates/pending-count").then(r => r.ok ? r.json() : null).then(d => { if (d) setPendingApplies(d.count); });
+    load();
+    const onVisible = () => { if (!document.hidden) load(); };
+    document.addEventListener("visibilitychange", onVisible);
+    const interval = setInterval(load, 60000);
+    return () => { document.removeEventListener("visibilitychange", onVisible); clearInterval(interval); };
+  }, [accessChecked]);
 
   useEffect(() => {
     if (pathname === "/admin/login") return;
@@ -142,6 +153,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     <div style={{ fontSize: "14px", color: active ? "#fff" : "rgba(255,255,255,0.78)", fontWeight: active ? 700 : 400, lineHeight: 1.2 }}>{t(item.labelKey)}</div>
                     {item.subKey !== item.labelKey && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.38)", marginTop: "2px" }}>{t(item.subKey)}</div>}
                   </div>
+                  {item.href === "/admin/candidates" && pendingApplies > 0 && (
+                    <span style={{ background: "#C8002A", color: "#fff", fontSize: "10px", fontWeight: 700, borderRadius: "20px", padding: "1px 6px", minWidth: "16px", textAlign: "center", flexShrink: 0 }}>{pendingApplies}</span>
+                  )}
                   {active && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#60A5FA", flexShrink: 0 }} />}
                 </Link>
               );

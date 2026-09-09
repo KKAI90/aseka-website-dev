@@ -44,6 +44,7 @@ model candidates {
   password_hash  String?
   applied_via    String?
   applied_at     DateTime?
+  applied_reviewed Boolean @default(false)
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now()) @updatedAt
 }

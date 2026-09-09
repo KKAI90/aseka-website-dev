@@ -21,7 +21,7 @@ type Candidate = {
   education:Edu[]; work_history:Work[]; certifications:Cert[];
   motivation:string; self_pr:string;
   status:string; match_job_id:string|null; match_job_name:string;
-  applied_via:string|null; applied_at:string|null;
+  applied_via:string|null; applied_at:string|null; applied_reviewed:boolean;
   note:string; cv_filename:string|null; ai_data:Record<string,unknown>|null;
   created_at:string; updated_at:string;
 };
@@ -131,6 +131,7 @@ export default function CandidatesPage() {
   const [selected, setSelected] = useState<Candidate|null>(null);
   const [detailTab, setDetailTab] = useState<"basic"|"history"|"pr"|"match">("basic");
   const [filter, setFilter] = useState("all");
+  const [pendingAppliesOnly, setPendingAppliesOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [skillFilter, setSkillFilter] = useState("all");
@@ -180,6 +181,7 @@ export default function CandidatesPage() {
 
   const counts: Record<string,number> = {all:cands.length};
   Object.keys(ST).forEach((k: string) => {counts[k] = cands.filter((c: Candidate) => c.status === k).length;});
+  const pendingAppliesCount = cands.filter(c=>c.applied_via==="self"&&!c.applied_reviewed).length;
 
   const activeFilterCount = (filter!=="all"?1:0) + (skillFilter!=="all"?1:0) + (jlptFilter!=="all"?1:0) + (search?1:0);
   const clearFilters = () => { setFilter("all"); setSkillFilter("all"); setJlptFilter("all"); setSearchInput(""); setSearch(""); };
@@ -187,7 +189,9 @@ export default function CandidatesPage() {
   // Distinct skill values currently in data, for the dropdown
   const skillOptions = Array.from(new Set(cands.map(c=>c.skill).filter(Boolean))).sort();
 
-  const sortedCands = [...cands].sort((a,b)=>{
+  const sortedCands = [...cands]
+    .filter(c=>!pendingAppliesOnly || (c.applied_via==="self"&&!c.applied_reviewed))
+    .sort((a,b)=>{
     let cmp = 0;
     if (sortKey==="name") cmp = a.name.localeCompare(b.name, "ja");
     else if (sortKey==="jlpt") cmp = (a.jlpt||"").localeCompare(b.jlpt||"");
@@ -203,6 +207,12 @@ export default function CandidatesPage() {
     await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});
     setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === id ? {...c, status} : c));
     setSelected((p: Candidate | null) => p?.id === id ? {...p, status} : p);
+  };
+
+  const markApplyReviewed = async (id:string) => {
+    await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,applied_reviewed:true})});
+    setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === id ? {...c, applied_reviewed:true} : c));
+    setSelected((p: Candidate | null) => p?.id === id ? {...p, applied_reviewed:true} : p);
   };
 
   const startEditBasic = (c: Candidate) => {
@@ -436,6 +446,7 @@ export default function CandidatesPage() {
   /* ─── LIST VIEW ─────────────────────────────────────────── */
   if (view==="list") return (
     <div>
+      <style>{`@keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }`}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
           <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("candidates.title")}</div>
@@ -516,6 +527,12 @@ export default function CandidatesPage() {
               {t(f.labelKey)} ({counts[f.key]||0})
             </button>
           ))}
+          {pendingAppliesCount>0&&(
+            <button onClick={()=>setPendingAppliesOnly(p=>!p)}
+              style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:700,border:`1px solid ${pendingAppliesOnly?"#C8002A":"#F09595"}`,background:pendingAppliesOnly?"#C8002A":"#FCEBEB",color:pendingAppliesOnly?"#fff":"#A32D2D",cursor:"pointer",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:"5px"}}>
+              🔔 {t("candidates.pendingApplies")} ({pendingAppliesCount})
+            </button>
+          )}
         </div>
 
         <div style={{display:"grid",gridTemplateColumns:selected?"1fr 420px":"1fr",gap:"12px"}}>
@@ -558,7 +575,12 @@ export default function CandidatesPage() {
                           <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
                             <div style={{width:"28px",height:"28px",borderRadius:"50%",background:st.tb,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",fontWeight:700,color:st.tc,flexShrink:0}}>{ini}</div>
                             <div>
-                              <div style={{fontWeight:600,color:navy}}>{c.name}</div>
+                              <div style={{fontWeight:600,color:navy,display:"flex",alignItems:"center",gap:"5px"}}>
+                                {c.applied_via==="self"&&!c.applied_reviewed&&(
+                                  <span title={t("candidates.pendingApplies")} style={{width:"7px",height:"7px",borderRadius:"50%",background:"#C8002A",flexShrink:0,animation:"pulseDot 1.6s ease-in-out infinite"}}/>
+                                )}
+                                {c.name}
+                              </div>
                               <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.email||c.phone||"—"}</div>
                             </div>
                           </div>
@@ -610,6 +632,11 @@ export default function CandidatesPage() {
                     <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"3px"}}>
                       {t("candidates.appliedAt")}: {new Date(selected.applied_at).toLocaleString("ja-JP")}
                     </div>
+                  )}
+                  {selected.applied_via==="self"&&(
+                    selected.applied_reviewed
+                      ? <div style={{fontSize:"10px",color:"#27500A",fontWeight:700,marginTop:"6px"}}>{t("candidates.reviewed")}</div>
+                      : <button onClick={()=>markApplyReviewed(selected.id)} style={{marginTop:"6px",padding:"4px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.markReviewed")}</button>
                   )}
                 </div>
               )}
