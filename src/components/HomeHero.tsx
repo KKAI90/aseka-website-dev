@@ -11,6 +11,7 @@ const T = {
     desc: "SNS21万人のネットワークと日本語教育を強みに、即戦力の外国人材をご紹介します",
     btn1: "企業様・採用担当者の方へ",
     btn2: "求職者・応募者の方へ",
+    btn3: "新規登録はこちら",
   },
   EN: {
     tag: "Registered Support Organization · Licensed Placement Agency",
@@ -19,6 +20,7 @@ const T = {
     desc: "Leveraging a 210,000-strong SNS network and Japanese language education, we match motivated foreign talent with companies in as little as 2 weeks.",
     btn1: "For Companies & Employers",
     btn2: "For Job Seekers",
+    btn3: "New Registration",
   },
   VN: {
     tag: "Tổ chức Hỗ trợ Đăng ký · Dịch vụ Giới thiệu Việc làm",
@@ -27,6 +29,7 @@ const T = {
     desc: "Với mạng lưới 210.000 người theo dõi trên mạng xã hội và dịch vụ đào tạo tiếng Nhật, chúng tôi kết nối nhân tài năng động với doanh nghiệp trong tối đa 2 tuần.",
     btn1: "Dành cho Doanh nghiệp",
     btn2: "Dành cho Người tìm việc",
+    btn3: "Đăng ký ứng tuyển mới",
   },
 };
 
@@ -145,6 +148,22 @@ export default function HomeHero() {
           onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(250,247,242,0.4)")}
           >
             {t.btn2}
+          </Link>
+          <Link href="/dang-ky" style={{
+            display: "inline-flex", alignItems: "center", gap: "8px",
+            padding: "16px 32px",
+            background: "transparent",
+            color: "var(--gold-light)",
+            border: "1px solid var(--gold)",
+            fontFamily: "'Noto Sans JP', sans-serif",
+            fontSize: lang === "JP" ? "15px" : "14px", fontWeight: 400, letterSpacing: "0.8px",
+            textDecoration: "none",
+            transition: "background 0.3s, color 0.3s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "var(--gold)"; e.currentTarget.style.color = "#0C1F2E"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--gold-light)"; }}
+          >
+            {t.btn3} →
           </Link>
         </div>
       </div>
