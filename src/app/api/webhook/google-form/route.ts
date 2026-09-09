@@ -15,14 +15,19 @@ function pick(data: Record<string, string>, ...keys: string[]): string {
 export async function POST(req: NextRequest) {
   try {
     // ── Auth: verify webhook secret ──────────────────────
+    // Fail CLOSED: if WEBHOOK_SECRET isn't configured on the server, reject
+    // every request instead of silently skipping auth (previous behavior let
+    // anyone on the internet POST fake candidates when the env var was unset).
     const secret = process.env.WEBHOOK_SECRET;
-    if (secret) {
-      const token =
-        req.headers.get("x-webhook-secret") ||
-        req.headers.get("authorization")?.replace("Bearer ", "");
-      if (token !== secret) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!secret) {
+      console.error("[webhook] WEBHOOK_SECRET is not configured — rejecting request");
+      return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+    }
+    const token =
+      req.headers.get("x-webhook-secret") ||
+      req.headers.get("authorization")?.replace("Bearer ", "");
+    if (token !== secret) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
