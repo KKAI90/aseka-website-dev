@@ -5,7 +5,7 @@ import { useAdminLang } from "@/lib/adminI18n";
 const navy = "#0B1F3A";
 const B = { border: "0.5px solid rgba(11,31,58,0.1)" };
 
-const WEBHOOK_URL = "https://aseka-website-dev.vercel.app/api/webhook/google-form";
+const WEBHOOK_URL = `${process.env.NEXT_PUBLIC_SITE_URL || "https://dev.aseka.co.jp"}/api/webhook/google-form`;
 const WEBHOOK_SECRET = "aseka-webhook-2026";
 
 const GAS_CODE = `// ============================================================
