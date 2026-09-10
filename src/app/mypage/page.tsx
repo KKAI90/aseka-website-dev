@@ -160,14 +160,14 @@ export default function Mypage() {
   /* Shared job table + accordion detail — used by both 紹介求人 and 検討中求人 tabs. */
   const renderJobTable = (list: Job[], emptyMsg: { ja:string; vn:string }) => (
     list.length === 0
-      ? <div style={{ padding:"40px", textAlign:"center", color:"#9BA0AC", fontSize:"13px" }}>
+      ? <div style={{ padding:"40px", textAlign:"center", color:"#64748B", fontSize:"13px" }}>
           {emptyMsg.ja}<br/>{emptyMsg.vn}
         </div>
       : <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"13px" }}>
           <thead>
             <tr style={{ background:"#F8F9FB" }}>
               {["企業名","求人ポジション","給与・待遇","検討する"].map(h => (
-                <th key={h} style={{ padding:"10px 14px", textAlign:"left", fontSize:"11px", color:"#9BA0AC", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
+                <th key={h} style={{ padding:"10px 14px", textAlign:"left", fontSize:"11px", color:"#64748B", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -180,18 +180,18 @@ export default function Mypage() {
                 style={{ borderBottom: isOpen ? "none" : "1px solid #F8F9FB", cursor:"pointer", background: isOpen ? "#FFF8F8" : "transparent" }}>
                 <td style={{ padding:"13px 14px", fontWeight:600, color:navy }}>
                   <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
-                    {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
-                    {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
-                    {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"9px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
+                    {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
+                    {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
+                    {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
                     {j.company}
                   </div>
                 </td>
                 <td style={{ padding:"13px 14px", color:navy }}>
                   <div>{j.position_ja}</div>
-                  {j.position_vn && <div style={{ fontSize:"10px", color:"#9BA0AC", marginTop:"1px" }}>{j.position_vn}</div>}
+                  {j.position_vn && <div style={{ fontSize:"11px", color:"#64748B", marginTop:"1px" }}>{j.position_vn}</div>}
                   <div style={{ display:"flex", gap:"4px", marginTop:"4px" }}>
-                    <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"9px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{j.industry}</span>
-                    <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"4px", background:"#F6F7F9", color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{j.jlpt_min}以上</span>
+                    <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{j.industry}</span>
+                    <span style={{ fontSize:"10px", fontWeight:700, padding:"2px 6px", borderRadius:"4px", background:"#F6F7F9", color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{j.jlpt_min}以上</span>
                   </div>
                 </td>
                 <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.salary||"要相談"}</td>
@@ -214,7 +214,7 @@ export default function Mypage() {
                           <div style={{ fontSize:"15px", fontWeight:700, color:navy }}>{j.company}</div>
                           <div style={{ fontSize:"13px", color:"#444", marginTop:"2px" }}>{j.position_ja}</div>
                         </div>
-                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", color:"#9BA0AC" }}>✕</button>
+                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", color:"#64748B" }}>✕</button>
                       </div>
                       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"12px" }}>
                         {[
@@ -225,7 +225,7 @@ export default function Mypage() {
                           ...(j.count ? [{ l:"募集人数", v: `${j.count}名` }] : []),
                         ].map(d=>(
                           <div key={d.l} style={{ background:"#fff", borderRadius:"7px", padding:"8px 12px", border:"1px solid #F0F1F4" }}>
-                            <div style={{ fontSize:"10px", color:"#9BA0AC" }}>{d.l}</div>
+                            <div style={{ fontSize:"11px", color:"#64748B" }}>{d.l}</div>
                             <div style={{ fontSize:"12px", fontWeight:600, color:navy, marginTop:"2px" }}>{d.v}</div>
                           </div>
                         ))}
@@ -247,7 +247,7 @@ export default function Mypage() {
                           </div>
                         ))}
                         {!JOB_DETAIL_FIELDS.some(f => j[f.key]) && (
-                          <div style={{ padding:"20px", textAlign:"center", color:"#9BA0AC", fontSize:"12px" }}>詳細情報は準備中です。</div>
+                          <div style={{ padding:"20px", textAlign:"center", color:"#64748B", fontSize:"12px" }}>詳細情報は準備中です。</div>
                         )}
                       </div>
                       {applyMsg && (
@@ -261,10 +261,10 @@ export default function Mypage() {
                           {j.isApplied ? "✓ 応募済み" : applyBusy===j.id ? "送信中..." : "この求人に応募する"}
                         </button>
                         <button onClick={() => toggleFavorite(j.id)} disabled={favBusy===j.id}
-                          style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: j.isFavorite ? red : "#6B6B6B", border:`1px solid ${j.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===j.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
+                          style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: j.isFavorite ? red : "#52525B", border:`1px solid ${j.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===j.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
                           {j.isFavorite ? "♥" : "♡"} {j.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
                         </button>
-                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#6B6B6B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
+                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#52525B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
                           閉じる
                         </button>
                       </div>
@@ -281,7 +281,7 @@ export default function Mypage() {
 
   if (loading) return (
     <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Noto Sans JP',sans-serif" }}>
-      <div style={{ textAlign:"center", color:"#9BA0AC" }}>
+      <div style={{ textAlign:"center", color:"#64748B" }}>
         <div style={{ fontSize:"28px", marginBottom:"8px" }}>⏳</div>
         <div>読み込み中...</div>
       </div>
@@ -302,14 +302,14 @@ export default function Mypage() {
               <span style={{ fontWeight:800, fontSize:"14px", color:navy, letterSpacing:"0.08em" }}>ASEKA</span>
             </Link>
             <span style={{ color:"#C8D0DB", fontSize:"12px" }}>|</span>
-            <span style={{ fontSize:"12px", color:"#6B6B6B" }}>Asekaキャリア · マイページ</span>
+            <span style={{ fontSize:"12px", color:"#52525B" }}>Asekaキャリア · マイページ</span>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:"16px" }}>
-            <span style={{ fontSize:"12px", color:"#6B6B6B" }}>
+            <span style={{ fontSize:"12px", color:"#52525B" }}>
               ようこそ、<strong style={{ color:navy }}>{cand?.name}</strong> さん
             </span>
             <button onClick={logout}
-              style={{ padding:"5px 12px", borderRadius:"6px", fontSize:"12px", color:"#6B6B6B", background:"none", border:"1px solid #E0E3E9", cursor:"pointer" }}>
+              style={{ padding:"5px 12px", borderRadius:"6px", fontSize:"12px", color:"#52525B", background:"none", border:"1px solid #E0E3E9", cursor:"pointer" }}>
               ログアウト
             </button>
           </div>
@@ -347,7 +347,7 @@ export default function Mypage() {
             <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
                 <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>ピックアップ求人</h2>
-                <p style={{ margin:0, fontSize:"11px", color:"#9BA0AC" }}>
+                <p style={{ margin:0, fontSize:"11px", color:"#64748B" }}>
                   あなたのスキル（{cand?.skill}）· JLPT {cand?.jlpt} に合わせたおすすめ求人
                   · Việc làm phù hợp với hồ sơ của bạn
                 </p>
@@ -360,14 +360,14 @@ export default function Mypage() {
                   { k:"new", l:"新着",   count: newCount },
                 ].map(t => (
                   <button key={t.k} onClick={() => setJobFilter(t.k as "all"|"new")}
-                    style={{ padding:"10px 0", marginRight:"24px", fontSize:"13px", fontWeight: jobFilter===t.k ? 700 : 400, color: jobFilter===t.k ? red : "#6B6B6B", background:"none", border:"none", borderBottom: jobFilter===t.k ? `2px solid ${red}` : "2px solid transparent", cursor:"pointer", display:"flex", alignItems:"center", gap:"5px" }}>
+                    style={{ padding:"10px 0", marginRight:"24px", fontSize:"13px", fontWeight: jobFilter===t.k ? 700 : 400, color: jobFilter===t.k ? red : "#52525B", background:"none", border:"none", borderBottom: jobFilter===t.k ? `2px solid ${red}` : "2px solid transparent", cursor:"pointer", display:"flex", alignItems:"center", gap:"5px" }}>
                     {t.l}
-                    <span style={{ background: jobFilter===t.k ? red : "#E8EAF0", color: jobFilter===t.k ? "#fff" : "#6B6B6B", borderRadius:"20px", fontSize:"10px", fontWeight:700, padding:"1px 6px" }}>{t.count}</span>
+                    <span style={{ background: jobFilter===t.k ? red : "#E8EAF0", color: jobFilter===t.k ? "#fff" : "#52525B", borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 6px" }}>{t.count}</span>
                   </button>
                 ))}
               </div>
 
-              <div style={{ padding:"10px 20px 0", fontSize:"11px", color:"#9BA0AC" }}>
+              <div style={{ padding:"10px 20px 0", fontSize:"11px", color:"#64748B" }}>
                 検討する<span style={{ color:red }}>♡</span>をクリックすると、検討中求人に保存されます。
                 <span style={{ marginLeft:"4px" }}>Nhấn ♡ &quot;Cân nhắc&quot; để lưu vào mục Việc đang cân nhắc.</span>
               </div>
@@ -382,7 +382,7 @@ export default function Mypage() {
             <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
                 <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>検討中求人</h2>
-                <p style={{ margin:0, fontSize:"11px", color:"#9BA0AC" }}>
+                <p style={{ margin:0, fontSize:"11px", color:"#64748B" }}>
                   ♥ お気に入りに追加した求人 · Việc làm bạn đã đánh dấu để cân nhắc
                 </p>
               </div>
@@ -395,7 +395,7 @@ export default function Mypage() {
             <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
                 <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>選考状況 / Trạng thái ứng tuyển</h2>
-                <p style={{ margin:0, fontSize:"11px", color:"#9BA0AC" }}>現在の選考ステージ · Giai đoạn tuyển dụng hiện tại</p>
+                <p style={{ margin:0, fontSize:"11px", color:"#64748B" }}>現在の選考ステージ · Giai đoạn tuyển dụng hiện tại</p>
               </div>
               <div style={{ padding:"28px 24px" }}>
                 {/* Progress steps */}
@@ -413,8 +413,8 @@ export default function Mypage() {
                             }
                           </div>
                           <div style={{ textAlign:"center" }}>
-                            <div style={{ fontSize:"10px", fontWeight: active ? 700 : 500, color: active ? s.color : done2 ? "#27500A" : "#9BA0AC" }}>{s.ja}</div>
-                            <div style={{ fontSize:"9px", color:"#C8D0DB" }}>{s.vn}</div>
+                            <div style={{ fontSize:"11px", fontWeight: active ? 700 : 500, color: active ? s.color : done2 ? "#27500A" : "#64748B" }}>{s.ja}</div>
+                            <div style={{ fontSize:"10px", color:"#C8D0DB" }}>{s.vn}</div>
                           </div>
                         </div>
                         {i < STATUS_STEPS.length-1 && (
@@ -428,7 +428,7 @@ export default function Mypage() {
                 {/* Current status card */}
                 <div style={{ background: currentStep >= 0 ? "#F8FFF8" : "#F8F9FB", border:`1px solid ${currentStep>=0?"#27500A22":"#E8EAF0"}`, borderRadius:"10px", padding:"16px 20px" }}>
                   <div style={{ fontSize:"12px", fontWeight:700, color:navy, marginBottom:"4px" }}>
-                    現在のステータス: <span style={{ color: STATUS_STEPS[currentStep]?.color||"#9BA0AC" }}>
+                    現在のステータス: <span style={{ color: STATUS_STEPS[currentStep]?.color||"#64748B" }}>
                       {STATUS_STEPS[currentStep]?.ja || cand?.status || "登録済み"}
                     </span>
                   </div>
@@ -437,7 +437,7 @@ export default function Mypage() {
                       紹介先: <strong>{cand.match_job_name}</strong>
                     </div>
                   )}
-                  <div style={{ fontSize:"11px", color:"#6B6B6B", marginTop:"6px" }}>
+                  <div style={{ fontSize:"11px", color:"#52525B", marginTop:"6px" }}>
                     ご不明な点は担当スタッフへお問い合わせください。
                   </div>
                 </div>
@@ -450,7 +450,7 @@ export default function Mypage() {
             <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
                 <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>プロフィール / Hồ sơ của bạn</h2>
-                <p style={{ margin:0, fontSize:"11px", color:"#9BA0AC" }}>登録情報 · Thông tin đã đăng ký</p>
+                <p style={{ margin:0, fontSize:"11px", color:"#64748B" }}>登録情報 · Thông tin đã đăng ký</p>
               </div>
               <div style={{ padding:"20px 24px", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px" }}>
                 {[
@@ -466,7 +466,7 @@ export default function Mypage() {
                   { l:"来日可能時期",v: cand.availability||"—" },
                 ].map(d => (
                   <div key={d.l} style={{ background:"#F8F9FB", borderRadius:"8px", padding:"10px 14px" }}>
-                    <div style={{ fontSize:"10px", color:"#9BA0AC", marginBottom:"2px" }}>{d.l}</div>
+                    <div style={{ fontSize:"11px", color:"#64748B", marginBottom:"2px" }}>{d.l}</div>
                     <div style={{ fontSize:"13px", fontWeight:600, color:navy }}>{d.v}</div>
                   </div>
                 ))}
@@ -483,7 +483,7 @@ export default function Mypage() {
                 <h3 style={{ margin:"0 0 4px", fontSize:"13px", fontWeight:700, color:navy }}>
                   {cand.hasPassword ? "パスワード変更" : "パスワードを設定する"}
                 </h3>
-                <p style={{ margin:"0 0 14px", fontSize:"11px", color:"#9BA0AC" }}>
+                <p style={{ margin:"0 0 14px", fontSize:"11px", color:"#64748B" }}>
                   {cand.hasPassword
                     ? "次回からパスワードでログインできます · Đổi mật khẩu đăng nhập"
                     : "設定すると次回からマジックリンク不要でログインできます · Đặt mật khẩu để lần sau đăng nhập nhanh hơn"}
@@ -501,7 +501,7 @@ export default function Mypage() {
                     </div>
                   )}
                   <button type="submit" disabled={pwSaving}
-                    style={{ padding:"9px 16px", borderRadius:"7px", background: pwSaving ? "#9BA0AC" : navy, color:"#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: pwSaving ? "not-allowed" : "pointer", alignSelf:"flex-start" }}>
+                    style={{ padding:"9px 16px", borderRadius:"7px", background: pwSaving ? "#64748B" : navy, color:"#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: pwSaving ? "not-allowed" : "pointer", alignSelf:"flex-start" }}>
                     {pwSaving ? "保存中..." : cand.hasPassword ? "パスワードを変更" : "パスワードを設定"}
                   </button>
                 </form>
@@ -521,12 +521,12 @@ export default function Mypage() {
               </div>
               <div>
                 <div style={{ fontSize:"13px", fontWeight:700, color:navy }}>{cand?.name}</div>
-                <div style={{ fontSize:"10px", color:"#9BA0AC" }}>{cand?.email}</div>
+                <div style={{ fontSize:"11px", color:"#64748B" }}>{cand?.email}</div>
               </div>
             </div>
             <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
               {[cand?.skill, cand?.jlpt, cand?.visa_type].filter(Boolean).map(t=>(
-                <span key={t} style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"3px 8px", borderRadius:"4px" }}>{t}</span>
+                <span key={t} style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"11px", fontWeight:600, padding:"3px 8px", borderRadius:"4px" }}>{t}</span>
               ))}
             </div>
           </div>
@@ -538,7 +538,7 @@ export default function Mypage() {
               <div style={{ width:"36px", height:"36px", borderRadius:"50%", background:"#FAEEDA", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"16px" }}>👤</div>
               <div>
                 <div style={{ fontSize:"12px", fontWeight:600, color:navy }}>Aseka キャリア</div>
-                <div style={{ fontSize:"10px", color:"#185FA5" }}>contact@aseka.jp</div>
+                <div style={{ fontSize:"11px", color:"#185FA5" }}>contact@aseka.jp</div>
               </div>
             </div>
             <Link href="/#contact"
@@ -551,7 +551,7 @@ export default function Mypage() {
           <div style={{ background:"linear-gradient(135deg,#06C755,#05A648)", borderRadius:"10px", padding:"16px", color:"#fff", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
             <div style={{ fontSize:"18px", marginBottom:"4px" }}>💬 LINE</div>
             <div style={{ fontSize:"12px", fontWeight:700, marginBottom:"4px" }}>LINEで手軽に相談</div>
-            <div style={{ fontSize:"10px", opacity:0.85, marginBottom:"10px" }}>Nhắn tin qua LINE dễ dàng hơn</div>
+            <div style={{ fontSize:"11px", opacity:0.85, marginBottom:"10px" }}>Nhắn tin qua LINE dễ dàng hơn</div>
             <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:"7px", padding:"8px", textAlign:"center", fontSize:"11px", fontWeight:600 }}>
               @ aseka_career
             </div>
@@ -559,7 +559,7 @@ export default function Mypage() {
 
           {/* Register new */}
           <div style={{ background:"#fff", borderRadius:"10px", padding:"14px", boxShadow:"0 1px 6px rgba(0,0,0,0.06)", textAlign:"center" }}>
-            <div style={{ fontSize:"11px", color:"#9BA0AC", marginBottom:"8px" }}>知人・友人の紹介 · Giới thiệu bạn bè</div>
+            <div style={{ fontSize:"11px", color:"#64748B", marginBottom:"8px" }}>知人・友人の紹介 · Giới thiệu bạn bè</div>
             <Link href="/dang-ky"
               style={{ display:"inline-block", padding:"8px 16px", borderRadius:"7px", background:"#FAEEDA", color:"#633806", textDecoration:"none", fontSize:"11px", fontWeight:700 }}>
               🎁 新規登録はこちら

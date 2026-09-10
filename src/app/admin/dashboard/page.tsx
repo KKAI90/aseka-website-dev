@@ -80,8 +80,8 @@ function DonutChart({ items, lang, t }: { items: PipelineItem[]; lang: AdminLang
             ))
         }
         <text x={cx} y={cy - 8} textAnchor="middle" fontSize="26" fontWeight="700" fill={navy}><CountUp value={total} /></text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fontSize="10" fill="#6B6B6B">{t("dashboard.registered")}</text>
-        <text x={cx} y={cy + 24} textAnchor="middle" fontSize="9" fill="#6B6B6B">{t("sidebar.candidates")}</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fontSize="10" fill="#52525B">{t("dashboard.registered")}</text>
+        <text x={cx} y={cy + 24} textAnchor="middle" fontSize="9" fill="#52525B">{t("sidebar.candidates")}</text>
       </svg>
 
       {/* Legend */}
@@ -94,7 +94,7 @@ function DonutChart({ items, lang, t }: { items: PipelineItem[]; lang: AdminLang
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ fontSize:"13px", fontWeight:700, color:s.color }}>{s.val}</div>
-              <div style={{ fontSize:"9px", color:"#6B6B6B" }}>{total > 0 ? Math.round(s.frac * 100) : 0}%</div>
+              <div style={{ fontSize:"10px", color:"#52525B" }}>{total > 0 ? Math.round(s.frac * 100) : 0}%</div>
             </div>
           </div>
         ))}
@@ -130,7 +130,7 @@ function BarChart({ pipeline, monthly, lang, t }: { pipeline: PipelineItem[]; mo
         ].map(b => (
           <div key={b.labelKey} style={{ flex:1, background:b.bg, borderRadius:"10px", padding:"9px 8px", textAlign:"center", border:`0.5px solid ${b.color}22` }}>
             <div style={{ fontSize:"22px", fontWeight:800, color:b.color, lineHeight:1 }}><CountUp value={b.val} /></div>
-            <div style={{ fontSize:"10px", fontWeight:600, color:navy, marginTop:"3px" }}>{t(b.labelKey)}</div>
+            <div style={{ fontSize:"11px", fontWeight:600, color:navy, marginTop:"3px" }}>{t(b.labelKey)}</div>
           </div>
         ))}
       </div>
@@ -147,7 +147,7 @@ function BarChart({ pipeline, monthly, lang, t }: { pipeline: PipelineItem[]; mo
                 {s.val}
               </div>
               {/* % below value */}
-              <div style={{ fontSize:"9px", color:"#6B6B6B", minHeight:"12px" }}>{pct}%</div>
+              <div style={{ fontSize:"10px", color:"#52525B", minHeight:"12px" }}>{pct}%</div>
               {/* bar */}
               <div className="dash-bar" style={{ width:"100%", height:`${barH}px`, background:s.color, borderRadius:"6px 6px 3px 3px", opacity: s.val === 0 ? 0.2 : 1, transition:"height 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.2s ease", position:"relative", overflow:"hidden" }}>
                 {/* shine overlay */}
@@ -155,7 +155,7 @@ function BarChart({ pipeline, monthly, lang, t }: { pipeline: PipelineItem[]; mo
               </div>
               {/* x-axis label */}
               <div style={{ textAlign:"center", marginTop:"4px" }}>
-                <div style={{ fontSize:"10px", fontWeight:600, color:navy, whiteSpace:"nowrap" }}>{dashLabel(s.key, lang)}</div>
+                <div style={{ fontSize:"11px", fontWeight:600, color:navy, whiteSpace:"nowrap" }}>{dashLabel(s.key, lang)}</div>
               </div>
             </div>
           );
@@ -222,12 +222,12 @@ export default function Dashboard() {
         <div>
           <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
             <div style={{ fontSize:"16px",fontWeight:700,color:navy }}>{t("dashboard.greeting")}{greetName ? `, ${greetName}` : ""}</div>
-            <span style={{ display:"inline-flex", alignItems:"center", gap:"4px", background:"#EAF3DE", color:"#27500A", fontSize:"9px", fontWeight:700, padding:"2px 7px", borderRadius:"20px" }}>
+            <span style={{ display:"inline-flex", alignItems:"center", gap:"4px", background:"#EAF3DE", color:"#27500A", fontSize:"10px", fontWeight:700, padding:"2px 7px", borderRadius:"20px" }}>
               <span className="dash-live-dot" style={{ width:"5px", height:"5px", borderRadius:"50%", background:"#27500A", display:"inline-block" }} />
               {t("dashboard.live")}
             </span>
           </div>
-          <div style={{ fontSize:"11px",color:"#6B6B6B", marginTop:"2px" }}>{t("dashboard.snapshotSub")} · {time}</div>
+          <div style={{ fontSize:"11px",color:"#52525B", marginTop:"2px" }}>{t("dashboard.snapshotSub")} · {time}</div>
         </div>
         <div style={{ display:"flex",gap:"8px",alignItems:"center" }}>
           <button onClick={() => loadData(true)} title={t("dashboard.refresh")}
@@ -277,7 +277,7 @@ export default function Dashboard() {
                     <div>
                       <div style={{ fontSize:"26px",fontWeight:800,color:navy,lineHeight:1 }}><CountUp value={s.val} /></div>
                       <div style={{ fontSize:"12px",fontWeight:600,color:navy,margin:"6px 0 2px" }}>{t(s.labelKey)}</div>
-                      <div style={{ fontSize:"10px",color:s.color,fontWeight:600 }}>{s.sub}</div>
+                      <div style={{ fontSize:"11px",color:s.color,fontWeight:600 }}>{s.sub}</div>
                     </div>
                     <div style={{ width:"38px",height:"38px",borderRadius:"10px",background:s.bg,color:s.color,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
                       <StatIcon name={s.icon} />
@@ -298,7 +298,7 @@ export default function Dashboard() {
             <div key={card.titleKey} className="dash-card dash-fade-in" style={{ ...CARD,overflow:"hidden",animationDelay:`${240+i*60}ms` }}>
               <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
                 <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t(card.titleKey)}</div>
-                <Link href={card.href} className="dash-link" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
+                <Link href={card.href} className="dash-link" style={{ fontSize:"11px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
               </div>
               <div style={{ padding:"14px 16px" }}>
                 {loading
@@ -309,7 +309,7 @@ export default function Dashboard() {
                       </div>
                     ))
                   : card.data.length === 0
-                  ? <div style={{ textAlign:"center",padding:"20px",fontSize:"12px",color:"#6B6B6B" }}>{t("dashboard.noData")}</div>
+                  ? <div style={{ textAlign:"center",padding:"20px",fontSize:"12px",color:"#52525B" }}>{t("dashboard.noData")}</div>
                   : card.data.map(p => (
                       <div key={p.ja} style={{ display:"flex",alignItems:"center",gap:"8px",marginBottom:"9px" }}>
                         <div style={{ width:"100px",flexShrink:0 }}>
@@ -335,9 +335,9 @@ export default function Dashboard() {
             <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.statusDistTitle")}</div>
-                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>{t("dashboard.donutSub")}</div>
+                <div style={{ fontSize:"10px",color:"#52525B",marginTop:"1px" }}>{t("dashboard.donutSub")}</div>
               </div>
-              <Link href="/admin/candidates" className="dash-link" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
+              <Link href="/admin/candidates" className="dash-link" style={{ fontSize:"11px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
             </div>
             <div style={{ padding:"16px 20px" }}>
               {loading
@@ -354,9 +354,9 @@ export default function Dashboard() {
             <div style={{ padding:"12px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.stageMonthTitle")}</div>
-                <div style={{ fontSize:"9px",color:"#6B6B6B",marginTop:"1px" }}>{t("dashboard.barSub")}</div>
+                <div style={{ fontSize:"10px",color:"#52525B",marginTop:"1px" }}>{t("dashboard.barSub")}</div>
               </div>
-              <Link href="/admin/candidates" className="dash-link" style={{ fontSize:"10px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
+              <Link href="/admin/candidates" className="dash-link" style={{ fontSize:"11px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
             </div>
             <div style={{ padding:"16px 20px" }}>
               {loading
@@ -377,9 +377,9 @@ export default function Dashboard() {
             <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t("dashboard.activityTitle")}</div>
           </div>
           {loading
-            ? <div style={{ padding:"20px",textAlign:"center",color:"#6B6B6B",fontSize:"12px" }}>{t("common.loading")}</div>
+            ? <div style={{ padding:"20px",textAlign:"center",color:"#52525B",fontSize:"12px" }}>{t("common.loading")}</div>
             : (d?.activity || []).length === 0
-            ? <div style={{ padding:"32px 20px",textAlign:"center",color:"#9BA0AC",fontSize:"12px" }}>
+            ? <div style={{ padding:"32px 20px",textAlign:"center",color:"#64748B",fontSize:"12px" }}>
                 <div style={{ fontSize:"22px", marginBottom:"6px" }}>📭</div>
                 {t("dashboard.noActivity")}
               </div>
@@ -395,8 +395,8 @@ export default function Dashboard() {
                         {dashLabel(a.ja, lang, a.vn)} · <span style={{ fontWeight:700 }}>{a.obj}</span>
                       </div>
                     </div>
-                    <span style={{ background:a.tb,color:a.tc,fontSize:"9px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",flexShrink:0 }}>{dashLabel(a.ja, lang, a.vn)}</span>
-                    <div style={{ fontSize:"10px",color:"#9BA0AC",whiteSpace:"nowrap",flexShrink:0,width:"64px",textAlign:"right" }}>{dashTime(a.time, lang)}</div>
+                    <span style={{ background:a.tb,color:a.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",flexShrink:0 }}>{dashLabel(a.ja, lang, a.vn)}</span>
+                    <div style={{ fontSize:"11px",color:"#64748B",whiteSpace:"nowrap",flexShrink:0,width:"64px",textAlign:"right" }}>{dashTime(a.time, lang)}</div>
                   </div>
                 ))}
               </div>

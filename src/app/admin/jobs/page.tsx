@@ -34,7 +34,7 @@ const ST: Record<string,{ja:string;vn:string;tc:string;tb:string;labelKey:string
 };
 const IND: Record<string,{tc:string;tb:string;icon:string}> = {
   "介護":            {tc:"#0F6E6E",tb:"#E0F7F7",icon:"🩺"},
-  "ビルクリーニング": {tc:"#6B6B6B",tb:"#F6F7F9",icon:"🧹"},
+  "ビルクリーニング": {tc:"#52525B",tb:"#F6F7F9",icon:"🧹"},
   "工業製品製造業":   {tc:"#27500A",tb:"#EAF3DE",icon:"🏭"},
   "製造":            {tc:"#27500A",tb:"#EAF3DE",icon:"🏭"},
   "建設":            {tc:"#8A6800",tb:"#FFF4D6",icon:"🏗️"},
@@ -49,7 +49,7 @@ const IND: Record<string,{tc:string;tb:string;icon:string}> = {
   "外食業":          {tc:"#0C447C",tb:"#E6F1FB",icon:"🍽️"},
   "飲食":            {tc:"#0C447C",tb:"#E6F1FB",icon:"🍽️"},
   "繊維業":          {tc:"#9D2467",tb:"#FDE7F3",icon:"🧵"},
-  "印刷業":          {tc:"#6B6B6B",tb:"#F6F7F9",icon:"🖨️"},
+  "印刷業":          {tc:"#52525B",tb:"#F6F7F9",icon:"🖨️"},
   "鉄道":            {tc:"#0369A1",tb:"#E0F2FE",icon:"🚃"},
   "林業":            {tc:"#27500A",tb:"#EAF3DE",icon:"🌲"},
   "IT":              {tc:"#3730A3",tb:"#E8EAFD",icon:"💻"},
@@ -57,7 +57,7 @@ const IND: Record<string,{tc:string;tb:string;icon:string}> = {
   "国際業務":         {tc:"#0C447C",tb:"#E6F1FB",icon:"🌐"},
   "通訳・翻訳":       {tc:"#8A6800",tb:"#FFF4D6",icon:"🗣️"},
   "経理・会計":       {tc:"#9F1239",tb:"#FFE4E6",icon:"📊"},
-  "その他":          {tc:"#6B6B6B",tb:"#F6F7F9",icon:"📁"},
+  "その他":          {tc:"#52525B",tb:"#F6F7F9",icon:"📁"},
 };
 const INDUSTRY_LIST = ["介護","ビルクリーニング","工業製品製造業","建設","造船・舶用工業","自動車整備","航空","宿泊","農業","漁業","飲食料品製造業","外食業","繊維業","印刷業","鉄道","林業","IT","機械・電気電子","国際業務","通訳・翻訳","経理・会計","その他"];
 const VISA_LIST = ["特定技能1号","特定技能2号","技術・人文知識・国際業務","技能実習","特定活動","永住者","日本人配偶者等","定住者"];
@@ -315,7 +315,7 @@ export default function JobsPage() {
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
           <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("jobs.title")}</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>{t("jobs.subtitle")}</div>
+          <div style={{fontSize:"11px",color:"#52525B",marginTop:"2px"}}>{t("jobs.subtitle")}</div>
         </div>
         <button onClick={()=>openForm()} style={{padding:"9px 16px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:"6px",transition:"opacity 0.15s"}}
           onMouseEnter={e=>{e.currentTarget.style.opacity="0.85";}} onMouseLeave={e=>{e.currentTarget.style.opacity="1";}}>
@@ -357,14 +357,14 @@ export default function JobsPage() {
               ✕ {t("common.clearFilters")} ({activeFilterCount})
             </button>
           )}
-          <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
+          <div style={{marginLeft:"auto",fontSize:"11px",color:"#52525B",whiteSpace:"nowrap"}}>
             {loading?t("common.loading"):pageCount>1?`${filtered.length} ${t("common.results")} · ${t("jobs.pageOf",{page,total:pageCount})}`:`${filtered.length} ${t("common.results")}`}
           </div>
         </div>
 
         <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px"}}>
           {[{k:"all",lk:"common.all",n:counts.all},{k:"urgent",lk:"jobs.statusUrgent",n:counts.urgent},{k:"open",lk:"jobs.statusOpen",n:counts.open},{k:"full",lk:"jobs.statusFull",n:counts.full},{k:"paused",lk:"jobs.statusPaused",n:counts.paused}].map(f=>(
-            <button key={f.k} onClick={()=>setFilter(f.k)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.k?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.k?navy:"#fff",color:filter===f.k?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.15s"}}>{t(f.lk)}({f.n})</button>
+            <button key={f.k} onClick={()=>setFilter(f.k)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.k?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.k?navy:"#fff",color:filter===f.k?"#fff":"#52525B",cursor:"pointer",whiteSpace:"nowrap",transition:"all 0.15s"}}>{t(f.lk)}({f.n})</button>
           ))}
         </div>
 
@@ -399,29 +399,29 @@ export default function JobsPage() {
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"10px"}}>
                     <div style={{flex:1}}>
                       <div style={{fontSize:"13px",fontWeight:700,color:navy,marginBottom:"2px"}}>{j.company}</div>
-                      <div style={{fontSize:"10px",color:"#6B6B6B"}}>{j.location}</div>
+                      <div style={{fontSize:"11px",color:"#52525B"}}>{j.location}</div>
                     </div>
-                    <span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"3px 8px",borderRadius:"20px",flexShrink:0,marginLeft:"8px"}}>{t(st.labelKey)}</span>
+                    <span style={{background:st.tb,color:st.tc,fontSize:"11px",fontWeight:700,padding:"3px 8px",borderRadius:"20px",flexShrink:0,marginLeft:"8px"}}>{t(st.labelKey)}</span>
                   </div>
                   <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
                     <span style={{fontSize:"16px"}}>{ind.icon}</span>
                     <div>
                       <div style={{fontSize:"12px",fontWeight:600,color:navy}}>{j.position_ja}</div>
-                      <div style={{fontSize:"10px",color:"#6B6B6B"}}>{j.position_vn}</div>
+                      <div style={{fontSize:"11px",color:"#52525B"}}>{j.position_vn}</div>
                     </div>
                   </div>
                   <div style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"10px"}}>
-                    <span style={{background:ind.tb,color:ind.tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.industry}</span>
-                    <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.jlptOrMore",{lvl:j.jlpt_min})}</span>
-                    {j.visa_type && <span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.visa_type}</span>}
-                    <span style={{background:"#F6F7F9",color:"#6B6B6B",fontSize:"10px",padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.peopleWantedFull",{n:j.count})}</span>
+                    <span style={{background:ind.tb,color:ind.tc,fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.industry}</span>
+                    <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.jlptOrMore",{lvl:j.jlpt_min})}</span>
+                    {j.visa_type && <span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"4px"}}>{j.visa_type}</span>}
+                    <span style={{background:"#F6F7F9",color:"#52525B",fontSize:"11px",padding:"2px 7px",borderRadius:"4px"}}>{t("jobs.peopleWantedFull",{n:j.count})}</span>
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:"10px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
                     <span style={{fontSize:"12px",fontWeight:700,color:"#27500A"}}>{j.salary||j.annual_income||t("jobs.negotiable")}</span>
-                    <span className="job-card-link" style={{fontSize:"10px",color:"#185FA5",fontWeight:600,display:"inline-flex",alignItems:"center",gap:"3px"}}>{t("jobs.viewDetail")}</span>
+                    <span className="job-card-link" style={{fontSize:"11px",color:"#185FA5",fontWeight:600,display:"inline-flex",alignItems:"center",gap:"3px"}}>{t("jobs.viewDetail")}</span>
                   </div>
                   {j.osusume_point && (
-                    <div style={{marginTop:"8px",background:"#FFFBEB",borderRadius:"6px",padding:"6px 10px",fontSize:"10px",color:"#92400E",borderLeft:"3px solid #F59E0B"}}>
+                    <div style={{marginTop:"8px",background:"#FFFBEB",borderRadius:"6px",padding:"6px 10px",fontSize:"11px",color:"#92400E",borderLeft:"3px solid #F59E0B"}}>
                       ⭐ {j.osusume_point.slice(0,60)}{j.osusume_point.length>60?"...":""}
                     </div>
                   )}
@@ -439,7 +439,7 @@ export default function JobsPage() {
               <div style={{display:"flex",gap:"4px"}}>
                 {Array.from({length:pageCount},(_,i)=>i+1).map(p=>(
                   <button key={p} onClick={()=>setPage(p)}
-                    style={{width:"30px",height:"30px",borderRadius:"7px",fontSize:"12px",fontWeight:700,border:`1px solid ${p===page?navy:"rgba(11,31,58,0.15)"}`,background:p===page?navy:"#fff",color:p===page?"#fff":"#6B6B6B",cursor:"pointer",transition:"all 0.15s"}}>
+                    style={{width:"30px",height:"30px",borderRadius:"7px",fontSize:"12px",fontWeight:700,border:`1px solid ${p===page?navy:"rgba(11,31,58,0.15)"}`,background:p===page?navy:"#fff",color:p===page?"#fff":"#52525B",cursor:"pointer",transition:"all 0.15s"}}>
                     {p}
                   </button>
                 ))}
@@ -464,14 +464,14 @@ export default function JobsPage() {
       <div>
         <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-            <button onClick={()=>setView("list")} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",display:"flex",alignItems:"center",gap:"4px",fontSize:"12px"}}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <button onClick={()=>setView("list")} style={{background:"none",border:"none",cursor:"pointer",color:"#52525B",display:"flex",alignItems:"center",gap:"4px",fontSize:"12px"}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#52525B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
               {t("common.backToList")}
             </button>
             <div style={{width:"1px",height:"20px",background:"rgba(11,31,58,0.1)"}}/>
             <div>
               <div style={{fontSize:"14px",fontWeight:700,color:navy}}>{selected.company}</div>
-              <div style={{fontSize:"10px",color:"#6B6B6B"}}>{selected.position_ja}</div>
+              <div style={{fontSize:"11px",color:"#52525B"}}>{selected.position_ja}</div>
             </div>
           </div>
           <div style={{display:"flex",gap:"8px"}}>
@@ -508,7 +508,7 @@ export default function JobsPage() {
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"14px"}}>
                 <div>
                   <div style={{fontSize:"20px",fontWeight:700,color:navy,marginBottom:"4px"}}>{selected.company}</div>
-                  <div style={{fontSize:"12px",color:"#6B6B6B",display:"flex",alignItems:"center",gap:"8px"}}>
+                  <div style={{fontSize:"12px",color:"#52525B",display:"flex",alignItems:"center",gap:"8px"}}>
                     <span>📍 {selected.work_location||selected.location}</span>
                     <span>·</span>
                     <span>👥 {t("jobs.peopleWantedFull",{n:selected.count})}</span>
@@ -516,7 +516,7 @@ export default function JobsPage() {
                 </div>
                 <div style={{textAlign:"right"}}>
                   <div style={{background:st.tb,color:st.tc,fontSize:"11px",fontWeight:700,padding:"4px 10px",borderRadius:"20px",marginBottom:"6px"}}>{t(st.labelKey)}</div>
-                  <select value={selected.status} onChange={e=>updateStatus(selected.id,e.target.value)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"10px",border:"0.5px solid rgba(11,31,58,0.2)",background:"transparent",cursor:"pointer",outline:"none"}}>
+                  <select value={selected.status} onChange={e=>updateStatus(selected.id,e.target.value)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"11px",border:"0.5px solid rgba(11,31,58,0.2)",background:"transparent",cursor:"pointer",outline:"none"}}>
                     {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{t(v.labelKey)}</option>)}
                   </select>
                 </div>
@@ -543,7 +543,7 @@ export default function JobsPage() {
                 {k:"match",l:`${t("jobs.tabMatch")}${matches.length>0?` (${matches.length})`:""}`},
                 {k:"assigned",l:`${t("jobs.tabAssigned")}${assignedCands.length>0?` (${assignedCands.length})`:""}`},
               ].map(tb=>(
-                <button key={tb.k} onClick={()=>{setActiveTab(tb.k as "info"|"match"|"assigned"); if(tb.k==="assigned") loadAssignedCandidates(selected.id);}} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===tb.k?700:400,color:activeTab===tb.k?navy:"#6B6B6B",border:"none",background:activeTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+                <button key={tb.k} onClick={()=>{setActiveTab(tb.k as "info"|"match"|"assigned"); if(tb.k==="assigned") loadAssignedCandidates(selected.id);}} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===tb.k?700:400,color:activeTab===tb.k?navy:"#52525B",border:"none",background:activeTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
                   {tb.l}
                 </button>
               ))}
@@ -564,7 +564,7 @@ export default function JobsPage() {
                   );
                 })}
                 {!FIELDS.some(f=>f.key!=="osusume_point"&&(selected as Record<string,unknown>)[f.key])&&(
-                  <div style={{padding:"32px",textAlign:"center",color:"#6B6B6B",fontSize:"13px"}}>
+                  <div style={{padding:"32px",textAlign:"center",color:"#52525B",fontSize:"13px"}}>
                     {t("jobs.emptyDetail")}
                     <br/><button onClick={()=>openForm(selected)} style={{marginTop:"12px",padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("jobs.fillNow")}</button>
                   </div>
@@ -575,10 +575,10 @@ export default function JobsPage() {
             {activeTab==="match"&&(
               <div style={{background:"#fff",...B,borderRadius:"0 0 12px 12px",padding:"16px"}}>
                 {matching&&(
-                  <div style={{textAlign:"center",padding:"32px",color:"#6B6B6B"}}>
+                  <div style={{textAlign:"center",padding:"32px",color:"#52525B"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🤖</div>
                     <div style={{fontSize:"13px",fontWeight:600,color:navy}}>{t("jobs.aiAnalyzing")}</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginTop:"4px"}}>{t("jobs.aiAnalyzingDesc")}</div>
+                    <div style={{fontSize:"11px",color:"#52525B",marginTop:"4px"}}>{t("jobs.aiAnalyzingDesc")}</div>
                   </div>
                 )}
                 {!matching&&matches.length===0&&matchError&&(
@@ -587,7 +587,7 @@ export default function JobsPage() {
                     <div style={{fontSize:"13px",fontWeight:600,color:"#A32D2D",marginBottom:"6px"}}>
                       {matchError==="rate_limited" ? t("jobs.matchRateLimited") : t("jobs.matchFailed")}
                     </div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>
+                    <div style={{fontSize:"11px",color:"#52525B",marginBottom:"16px"}}>
                       {matchError==="rate_limited" ? t("jobs.matchRateLimitedDesc") : t("jobs.matchFailedDesc")}
                     </div>
                     <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("common.retry")}</button>
@@ -597,7 +597,7 @@ export default function JobsPage() {
                   <div style={{textAlign:"center",padding:"32px"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🎯</div>
                     <div style={{fontSize:"13px",fontWeight:600,color:navy,marginBottom:"6px"}}>{t("jobs.runMatchTitle")}</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>{t("jobs.runMatchDesc")}</div>
+                    <div style={{fontSize:"11px",color:"#52525B",marginBottom:"16px"}}>{t("jobs.runMatchDesc")}</div>
                     <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.startMatching")}</button>
                   </div>
                 )}
@@ -610,12 +610,12 @@ export default function JobsPage() {
                         <div style={{width:"28px",height:"28px",borderRadius:"50%",background:i===0?navy:"#E6F1FB",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",fontWeight:700,color:i===0?"#fff":navy,flexShrink:0}}>{i+1}</div>
                         <div>
                           <div className="match-name-link" style={{fontSize:"13px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{m.candidateName} →</div>
-                          <div style={{fontSize:"10px",color:"#6B6B6B"}}>{m.candidate?.skill} · {m.candidate?.jlpt} · {m.candidate?.status}</div>
+                          <div style={{fontSize:"11px",color:"#52525B"}}>{m.candidate?.skill} · {m.candidate?.jlpt} · {m.candidate?.status}</div>
                         </div>
                       </div>
                       <div style={{textAlign:"right"}}>
-                        <div style={{fontSize:"20px",fontWeight:700,color:m.matchPct>=70?"#27500A":m.matchPct>=50?"#633806":"#6B6B6B"}}>{m.matchPct}%</div>
-                        <div style={{fontSize:"9px",color:"#6B6B6B"}}>{t("jobs.matchDegree")}</div>
+                        <div style={{fontSize:"20px",fontWeight:700,color:m.matchPct>=70?"#27500A":m.matchPct>=50?"#633806":"#52525B"}}>{m.matchPct}%</div>
+                        <div style={{fontSize:"10px",color:"#52525B"}}>{t("jobs.matchDegree")}</div>
                       </div>
                     </div>
                     <div style={{background:"#F1EFE8",borderRadius:"4px",height:"5px",overflow:"hidden",marginBottom:"8px"}}>
@@ -628,12 +628,12 @@ export default function JobsPage() {
                       <div style={{display:"flex",flexDirection:"column",gap:"5px",marginBottom:"8px",background:"#FAFBFC",borderRadius:"8px",padding:"8px 10px",border:"0.5px solid rgba(11,31,58,0.06)"}}>
                         {m.breakdown.map((b,bi)=>(
                           <div key={bi} style={{display:"flex",alignItems:"center",gap:"8px"}}>
-                            <span style={{fontSize:"10px",fontWeight:600,color:navy,width:"46px",flexShrink:0}}>{b.criterion}</span>
+                            <span style={{fontSize:"11px",fontWeight:600,color:navy,width:"46px",flexShrink:0}}>{b.criterion}</span>
                             <div style={{flex:1,background:"#EEF0F3",borderRadius:"3px",height:"4px",overflow:"hidden"}}>
                               <div style={{height:"100%",width:`${b.score}%`,background:b.score>=70?"#27500A":b.score>=50?"#EF9F27":"#C8002A",borderRadius:"3px",transition:"width 0.6s"}}/>
                             </div>
-                            <span style={{fontSize:"10px",fontWeight:700,color:navy,width:"28px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
-                            <span style={{fontSize:"9px",color:"#6B6B6B",flexShrink:0,maxWidth:"110px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={b.noteVn}>{b.noteVn}</span>
+                            <span style={{fontSize:"11px",fontWeight:700,color:navy,width:"28px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
+                            <span style={{fontSize:"10px",color:"#52525B",flexShrink:0,maxWidth:"110px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={b.noteVn}>{b.noteVn}</span>
                           </div>
                         ))}
                       </div>
@@ -641,7 +641,7 @@ export default function JobsPage() {
 
                     {m.strengths?.length>0&&(
                       <div style={{display:"flex",flexWrap:"wrap",gap:"4px",marginBottom:"8px"}}>
-                        {m.strengths.map((s,si)=><span key={si} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>)}
+                        {m.strengths.map((s,si)=><span key={si} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>)}
                       </div>
                     )}
                     <div style={{display:"flex",gap:"6px"}}>
@@ -667,19 +667,19 @@ export default function JobsPage() {
                   {assignSearch.trim()!==""&&(
                     <div style={{marginTop:"8px",border:"0.5px solid rgba(11,31,58,0.1)",borderRadius:"8px",overflow:"hidden",maxHeight:"220px",overflowY:"auto"}}>
                       {assignSearching
-                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#6B6B6B"}}>{t("common.loading")}</div>
+                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#52525B"}}>{t("common.loading")}</div>
                         : assignResults.length===0
-                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#6B6B6B"}}>{t("jobs.noCandidatesFound")}</div>
+                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#52525B"}}>{t("jobs.noCandidatesFound")}</div>
                         : assignResults.map(c=>{
                             const already = c.match_job_id===selected.id;
                             return (
                               <div key={c.id} style={{display:"flex",alignItems:"center",gap:"8px",padding:"8px 10px",borderBottom:"0.5px solid rgba(11,31,58,0.06)"}}>
                                 <div style={{flex:1,minWidth:0}}>
                                   <div style={{fontSize:"12px",fontWeight:600,color:navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
-                                  <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.skill} · {c.jlpt}</div>
+                                  <div style={{fontSize:"11px",color:"#52525B"}}>{c.skill} · {c.jlpt}</div>
                                 </div>
                                 <button onClick={()=>assignCandidateToJob(c)} disabled={already||assigningId===c.id}
-                                  style={{padding:"5px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:700,cursor:already?"default":"pointer",background:already?"#EAF3DE":navy,color:already?"#27500A":"#fff",border:"none",whiteSpace:"nowrap"}}>
+                                  style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:700,cursor:already?"default":"pointer",background:already?"#EAF3DE":navy,color:already?"#27500A":"#fff",border:"none",whiteSpace:"nowrap"}}>
                                   {already ? `✓ ${t("candidates.appliedTo")}` : assigningId===c.id ? "..." : `+ ${t("jobs.assignBtn")}`}
                                 </button>
                               </div>
@@ -694,11 +694,11 @@ export default function JobsPage() {
                 <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>
                   {t("jobs.assignedListTitle",{n:assignedCands.length,total:selected.count})}
                 </div>
-                {assignedLoading&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>{t("common.loading")}</div>}
+                {assignedLoading&&<div style={{textAlign:"center",padding:"20px",color:"#52525B",fontSize:"12px"}}>{t("common.loading")}</div>}
                 {!assignedLoading&&assignedCands.length===0&&(
                   <div style={{textAlign:"center",padding:"24px"}}>
                     <div style={{fontSize:"20px",marginBottom:"8px"}}>👤</div>
-                    <div style={{fontSize:"11px",color:"#6B6B6B"}}>{t("jobs.noAssignedYet")}</div>
+                    <div style={{fontSize:"11px",color:"#52525B"}}>{t("jobs.noAssignedYet")}</div>
                   </div>
                 )}
                 {!assignedLoading&&assignedCands.map(c=>{
@@ -707,9 +707,9 @@ export default function JobsPage() {
                     <div key={c.id} className="match-card" style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",display:"flex",alignItems:"center",gap:"10px",transition:"box-shadow 0.2s ease"}}>
                       <div onClick={()=>router.push(`/admin/candidates?id=${c.id}`)} style={{flex:1,cursor:"pointer",minWidth:0}} title={t("jobs.viewCandidateProfile")}>
                         <div className="match-name-link" style={{fontSize:"12px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{c.name} →</div>
-                        <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.skill} · {c.jlpt}</div>
+                        <div style={{fontSize:"11px",color:"#52525B"}}>{c.skill} · {c.jlpt}</div>
                       </div>
-                      <span style={{background:st2.tb,color:st2.tc,fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px",flexShrink:0}}>{t(st2.labelKey)}</span>
+                      <span style={{background:st2.tb,color:st2.tc,fontSize:"11px",fontWeight:700,padding:"2px 8px",borderRadius:"20px",flexShrink:0}}>{t(st2.labelKey)}</span>
                       <button onClick={()=>unassignCandidate(c)} title={t("jobs.unassignBtn")}
                         style={{background:"none",border:"none",cursor:"pointer",color:"#B4B2A9",padding:"4px",flexShrink:0}}
                         onMouseEnter={e=>e.currentTarget.style.color="#A32D2D"} onMouseLeave={e=>e.currentTarget.style.color="#B4B2A9"}>
@@ -738,7 +738,7 @@ export default function JobsPage() {
                 {lk:"jobs.holidays",v:selected.holidays},
               ].filter(r=>r.v).map(r=>(
                 <div key={r.lk} style={{display:"flex",gap:"8px",padding:"7px 0",borderBottom:"0.5px solid rgba(11,31,58,0.05)"}}>
-                  <span style={{fontSize:"11px",color:"#6B6B6B",width:"70px",flexShrink:0}}>{t(r.lk)}</span>
+                  <span style={{fontSize:"11px",color:"#52525B",width:"70px",flexShrink:0}}>{t(r.lk)}</span>
                   <span style={{fontSize:"11px",color:navy,fontWeight:500,flex:1}}>{r.v}</span>
                 </div>
               ))}
@@ -753,7 +753,7 @@ export default function JobsPage() {
 
             <div style={{background:"#fff",...B,borderRadius:"12px",padding:"16px"}}>
               <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>{t("jobs.registeredInfo")}</div>
-              <div style={{fontSize:"10px",color:"#6B6B6B"}}>{t("jobs.createdAt")}: {new Date(selected.created_at).toLocaleDateString("ja-JP")}</div>
+              <div style={{fontSize:"11px",color:"#52525B"}}>{t("jobs.createdAt")}: {new Date(selected.created_at).toLocaleDateString("ja-JP")}</div>
             </div>
           </div>
         </div>
@@ -766,8 +766,8 @@ export default function JobsPage() {
     <div>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-          <button onClick={()=>setView(selected?"detail":"list")} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",fontSize:"12px",display:"flex",alignItems:"center",gap:"4px"}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <button onClick={()=>setView(selected?"detail":"list")} style={{background:"none",border:"none",cursor:"pointer",color:"#52525B",fontSize:"12px",display:"flex",alignItems:"center",gap:"4px"}}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#52525B" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             {t("common.back")}
           </button>
           <div style={{width:"1px",height:"20px",background:"rgba(11,31,58,0.1)"}}/>
@@ -792,36 +792,36 @@ export default function JobsPage() {
               {f:"count",       lk:"jobs.fieldCount",       p:"3",                   req:false},
             ].map(x=>(
               <div key={x.f}>
-                <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t(x.lk)}</label>
+                <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t(x.lk)}</label>
                 <input required={x.req} type={x.f==="count"?"number":"text"} placeholder={x.p} value={form[x.f]||""} onChange={e=>setForm({...form,[x.f]:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
               </div>
             ))}
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldIndustry")}</label>
+              <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldIndustry")}</label>
               <select value={form.industry||"その他"} onChange={e=>setForm({...form,industry:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {INDUSTRY_LIST.map(i=><option key={i}>{i}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldJlptMin")}</label>
+              <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldJlptMin")}</label>
               <select value={form.jlpt_min||"N4"} onChange={e=>setForm({...form,jlpt_min:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {["N1","N2","N3","N4","N5","なし"].map(j=><option key={j}>{j}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldStatus")}</label>
+              <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t("jobs.fieldStatus")}</label>
               <select value={form.status||"open"} onChange={e=>setForm({...form,status:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {Object.entries(ST).map(([k,v])=><option key={k} value={k}>{t(v.labelKey)}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.visaType")}</label>
+              <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t("jobs.visaType")}</label>
               <select value={form.visa_type||"特定技能1号"} onChange={e=>setForm({...form,visa_type:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {VISA_LIST.map(v=><option key={v}>{v}</option>)}
               </select>
             </div>
             <div>
-              <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"4px",fontWeight:600}}>{t("jobs.employmentType")}</label>
+              <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"4px",fontWeight:600}}>{t("jobs.employmentType")}</label>
               <select value={form.employment_type||"正社員"} onChange={e=>setForm({...form,employment_type:e.target.value})} style={{width:"100%",padding:"8px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                 {EMPLOYMENT_LIST.map(e=><option key={e}>{e}</option>)}
               </select>

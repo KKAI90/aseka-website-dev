@@ -44,7 +44,7 @@ const ST: Record<string,{ja:string;vn:string;tc:string;tb:string;labelKey:string
 };
 const JC: Record<string,{tc:string;tb:string}> = {
   N1:{tc:"#A32D2D",tb:"#FCEBEB"},N2:{tc:"#633806",tb:"#FAEEDA"},
-  N3:{tc:"#27500A",tb:"#EAF3DE"},N4:{tc:"#444441",tb:"#F1EFE8"},N5:{tc:"#6B6B6B",tb:"#F1EFE8"},
+  N3:{tc:"#27500A",tb:"#EAF3DE"},N4:{tc:"#444441",tb:"#F1EFE8"},N5:{tc:"#52525B",tb:"#F1EFE8"},
 };
 const navy="#0B1F3A";
 const B={border:"0.5px solid rgba(11,31,58,0.1)"};
@@ -62,7 +62,7 @@ function exportCV(c: Candidate) {
 <style>
 body{font-family:'Noto Sans JP',sans-serif;max-width:800px;margin:0 auto;padding:24px;color:#0B1F3A}
 h1{font-size:22px;text-align:center;margin-bottom:4px}
-.sub{text-align:center;color:#6B6B6B;font-size:13px;margin-bottom:20px}
+.sub{text-align:center;color:#52525B;font-size:13px;margin-bottom:20px}
 table{width:100%;border-collapse:collapse;margin-bottom:16px}
 th,td{border:1px solid #ddd;padding:8px 12px;font-size:13px}
 th{background:#F6F7F9;font-weight:600;width:180px;text-align:left}
@@ -488,12 +488,14 @@ export default function CandidatesPage() {
         .cand-card:hover { box-shadow: 0 4px 18px rgba(11,31,58,0.06); }
         .match-card:hover { box-shadow: 0 4px 16px rgba(11,31,58,0.08); }
         .match-card:hover .match-name-link { text-decoration-color: #0B1F3A !important; }
+        .cand-row { transition: background 0.12s ease; }
+        .cand-row:hover:not(.selected) { background: #FAFBFC !important; }
         @media (prefers-reduced-motion: reduce) { .cand-fade{animation:none;} .cand-btn,.cand-pill{transition:none;} }
       `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
           <div style={{fontSize:"16px",fontWeight:700,color:navy,letterSpacing:"-0.01em"}}>{t("candidates.title")}</div>
-          <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"2px"}}>{t("candidates.subtitle")}</div>
+          <div style={{fontSize:"11px",color:"#52525B",marginTop:"2px"}}>{t("candidates.subtitle")}</div>
         </div>
         <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           {/* Form share button + popup */}
@@ -507,10 +509,10 @@ export default function CandidatesPage() {
             {showFormPopup && (
               <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:"12px",padding:"16px",boxShadow:"0 8px 32px rgba(11,31,58,0.14)",zIndex:200,width:"300px",border:"0.5px solid rgba(11,31,58,0.1)"}}>
                 <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"6px"}}>📋 {t("candidates.shareFormDesc")}</div>
-                <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"10px"}}>
+                <div style={{fontSize:"11px",color:"#52525B",marginBottom:"10px"}}>
                   {t("candidates.shareFormHint")}
                 </div>
-                <div style={{background:"#F6F7F9",borderRadius:"8px",padding:"8px 10px",fontFamily:"monospace",fontSize:"10px",color:"#185FA5",wordBreak:"break-all",marginBottom:"10px",userSelect:"all"}}>
+                <div style={{background:"#F6F7F9",borderRadius:"8px",padding:"8px 10px",fontFamily:"monospace",fontSize:"11px",color:"#185FA5",wordBreak:"break-all",marginBottom:"10px",userSelect:"all"}}>
                   {FORM_URL}
                 </div>
                 <div style={{display:"flex",gap:"6px"}}>
@@ -559,14 +561,14 @@ export default function CandidatesPage() {
               ✕ {t("common.clearFilters")} ({activeFilterCount})
             </button>
           )}
-          <div style={{marginLeft:"auto",fontSize:"11px",color:"#6B6B6B",whiteSpace:"nowrap"}}>
+          <div style={{marginLeft:"auto",fontSize:"11px",color:"#52525B",whiteSpace:"nowrap"}}>
             {loading?t("common.loading"):`${cands.length} ${t("common.results")}`}
           </div>
         </div>
 
         <div className="cand-fade" style={{display:"flex",gap:"6px",flexWrap:"wrap",marginBottom:"14px",animationDelay:"60ms"}}>
           {[{key:"all",labelKey:"common.all"},...Object.entries(ST).map(([k,v])=>({key:k,labelKey:v.labelKey}))].map(f=>(
-            <button key={f.key} className="cand-pill" onClick={()=>setFilter(f.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.key?navy:"#fff",color:filter===f.key?"#fff":"#6B6B6B",cursor:"pointer",whiteSpace:"nowrap"}}>
+            <button key={f.key} className="cand-pill" onClick={()=>setFilter(f.key)} style={{padding:"5px 12px",borderRadius:"20px",fontSize:"11px",fontWeight:600,border:`1px solid ${filter===f.key?navy:"rgba(11,31,58,0.15)"}`,background:filter===f.key?navy:"#fff",color:filter===f.key?"#fff":"#52525B",cursor:"pointer",whiteSpace:"nowrap"}}>
               {t(f.labelKey)} ({counts[f.key]||0})
             </button>
           ))}
@@ -581,13 +583,13 @@ export default function CandidatesPage() {
         <div className="cand-fade" style={{display:"grid",gridTemplateColumns:selected?"1fr 420px":"1fr",gap:"12px",animationDelay:"120ms"}}>
           {/* Table */}
           <div className="cand-card" style={{background:"#fff",...B,borderRadius:"10px",overflow:"hidden"}}>
-            {loading?<div style={{padding:"40px",textAlign:"center",color:"#6B6B6B"}}>{t("common.loading")}</div>
+            {loading?<div style={{padding:"40px",textAlign:"center",color:"#52525B"}}>{t("common.loading")}</div>
             :cands.length===0?<div style={{padding:"48px",textAlign:"center"}}>
               <div style={{fontSize:"32px",marginBottom:"12px"}}>👤</div>
               <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.empty")}</div>
               <button onClick={()=>setView("import")} style={{marginTop:"8px",padding:"8px 18px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.addViaImport")}</button>
             </div>:(
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:"12px"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:"13px"}}>
                 <thead><tr style={{background:"#F6F7F9"}}>
                   {[
                     {h:t("candidates.colCandidate"),key:"name" as const},
@@ -600,7 +602,7 @@ export default function CandidatesPage() {
                     {h:t("candidates.colUpdated"),key:"updated_at" as const},
                   ].map(col=>(
                     <th key={col.h} onClick={col.key?()=>toggleSort(col.key!):undefined}
-                      style={{padding:"9px 10px",textAlign:"left",fontSize:"10px",color:"#6B6B6B",fontWeight:600,borderBottom:"0.5px solid rgba(11,31,58,0.1)",whiteSpace:"nowrap",cursor:col.key?"pointer":"default",userSelect:"none"}}>
+                      style={{padding:"11px 10px",textAlign:"left",fontSize:"12px",color:"#3F4552",fontWeight:700,borderBottom:"1px solid rgba(11,31,58,0.1)",whiteSpace:"nowrap",cursor:col.key?"pointer":"default",userSelect:"none"}}>
                       {col.h}{col.key&&sortKey===col.key?(sortDir==="asc"?" ▲":" ▼"):""}
                     </th>
                   ))}
@@ -610,31 +612,29 @@ export default function CandidatesPage() {
                     const st=ST[c.status]||ST.new; const jc=JC[c.jlpt]||JC["N5"];
                     const ini=c.name.split(" ").slice(-2).map((w:string)=>w[0]).join("").toUpperCase();
                     return(
-                      <tr key={c.id} onClick={()=>{setSelected(selected?.id===c.id?null:c);setEditingBasic(false);}}
-                        onMouseEnter={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="#FAFBFC";}}
-                        onMouseLeave={e=>{if(selected?.id!==c.id)e.currentTarget.style.background="transparent";}}
-                        style={{borderBottom:"0.5px solid rgba(11,31,58,0.05)",cursor:"pointer",background:selected?.id===c.id?"#E6F1FB":"transparent",transition:"background 0.12s"}}>
-                        <td style={{padding:"10px 10px"}}>
-                          <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
-                            <div style={{width:"28px",height:"28px",borderRadius:"50%",background:st.tb,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",fontWeight:700,color:st.tc,flexShrink:0}}>{ini}</div>
+                      <tr key={c.id} className={`cand-row${selected?.id===c.id?" selected":""}`} onClick={()=>{setSelected(selected?.id===c.id?null:c);setEditingBasic(false);}}
+                        style={{borderBottom:"0.5px solid rgba(11,31,58,0.06)",cursor:"pointer",background:selected?.id===c.id?"#E6F1FB":"transparent"}}>
+                        <td style={{padding:"12px 10px"}}>
+                          <div style={{display:"flex",alignItems:"center",gap:"9px"}}>
+                            <div style={{width:"32px",height:"32px",borderRadius:"50%",background:st.tb,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",fontWeight:700,color:st.tc,flexShrink:0}}>{ini}</div>
                             <div>
-                              <div style={{fontWeight:600,color:navy,display:"flex",alignItems:"center",gap:"5px"}}>
+                              <div style={{fontWeight:700,color:navy,fontSize:"13px",display:"flex",alignItems:"center",gap:"5px"}}>
                                 {c.applied_via==="self"&&!c.applied_reviewed&&(
                                   <span title={t("candidates.pendingApplies")} style={{width:"7px",height:"7px",borderRadius:"50%",background:"#C8002A",flexShrink:0,animation:"pulseDot 1.6s ease-in-out infinite"}}/>
                                 )}
                                 {c.name}
                               </div>
-                              <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.email||c.phone||"—"}</div>
+                              <div style={{fontSize:"12px",color:"#52525B",marginTop:"1px"}}>{c.email||c.phone||"—"}</div>
                             </div>
                           </div>
                         </td>
-                        <td style={{padding:"10px 10px"}}><span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{c.skill||"—"}</span></td>
-                        <td style={{padding:"10px 10px"}}><span style={{background:jc.tb,color:jc.tc,fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{c.jlpt||"—"}</span></td>
-                        <td style={{padding:"10px 10px",fontSize:"11px",color:"#444",maxWidth:"100px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.preferred_job||"—"}</td>
-                        <td style={{padding:"10px 10px",fontSize:"11px",color:c.match_job_name&&c.match_job_name!=="未定"?"#185FA5":"#6B6B6B",fontWeight:600}}>{c.match_job_name&&c.match_job_name!=="未定"?c.match_job_name:t("candidates.noMatch")}</td>
-                        <td style={{padding:"10px 10px"}}>{c.cv_filename?<span style={{fontSize:"10px",color:"#C8002A",fontWeight:700}}>📄</span>:<span style={{fontSize:"10px",color:"#B4B2A9"}}>—</span>}</td>
-                        <td style={{padding:"10px 10px"}}><span style={{background:st.tb,color:st.tc,fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{t(st.labelKey)}</span></td>
-                        <td style={{padding:"10px 10px",fontSize:"10px",color:"#6B6B6B"}}>{c.updated_at?new Date(c.updated_at).toLocaleDateString("ja-JP"):"—"}</td>
+                        <td style={{padding:"12px 10px"}}><span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"12px",fontWeight:700,padding:"3px 8px",borderRadius:"5px"}}>{c.skill||"—"}</span></td>
+                        <td style={{padding:"12px 10px"}}><span style={{background:jc.tb,color:jc.tc,fontSize:"12px",fontWeight:700,padding:"3px 8px",borderRadius:"5px"}}>{c.jlpt||"—"}</span></td>
+                        <td style={{padding:"12px 10px",fontSize:"12px",color:"#33363D",maxWidth:"100px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.preferred_job||"—"}</td>
+                        <td style={{padding:"12px 10px",fontSize:"12px",color:c.match_job_name&&c.match_job_name!=="未定"?"#185FA5":"#52525B",fontWeight:600}}>{c.match_job_name&&c.match_job_name!=="未定"?c.match_job_name:t("candidates.noMatch")}</td>
+                        <td style={{padding:"12px 10px"}}>{c.cv_filename?<span style={{fontSize:"13px",color:"#C8002A",fontWeight:700}}>📄</span>:<span style={{fontSize:"13px",color:"#B4B2A9"}}>—</span>}</td>
+                        <td style={{padding:"12px 10px"}}><span style={{background:st.tb,color:st.tc,fontSize:"12px",fontWeight:700,padding:"3px 8px",borderRadius:"5px"}}>{t(st.labelKey)}</span></td>
+                        <td style={{padding:"12px 10px",fontSize:"12px",color:"#52525B"}}>{c.updated_at?new Date(c.updated_at).toLocaleDateString("ja-JP"):"—"}</td>
                       </tr>
                     );
                   })}
@@ -650,14 +650,14 @@ export default function CandidatesPage() {
               <div style={{padding:"14px 16px",borderBottom:"0.5px solid rgba(11,31,58,0.08)",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                 <div>
                   <div style={{fontSize:"15px",fontWeight:700,color:navy}}>{selected.name}</div>
-                  <div style={{fontSize:"10px",color:"#6B6B6B"}}>{selected.name_kana||""}</div>
+                  <div style={{fontSize:"11px",color:"#52525B"}}>{selected.name_kana||""}</div>
                   <div style={{display:"flex",gap:"5px",marginTop:"5px",flexWrap:"wrap"}}>
-                    <span style={{background:(JC[selected.jlpt]||JC["N5"]).tb,color:(JC[selected.jlpt]||JC["N5"]).tc,fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.jlpt||"—"}</span>
-                    <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.skill||"—"}</span>
-                    {selected.visa_type&&<span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.visa_type}</span>}
+                    <span style={{background:(JC[selected.jlpt]||JC["N5"]).tb,color:(JC[selected.jlpt]||JC["N5"]).tc,fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.jlpt||"—"}</span>
+                    <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.skill||"—"}</span>
+                    {selected.visa_type&&<span style={{background:"#EEEDFE",color:"#534AB7",fontSize:"11px",fontWeight:700,padding:"2px 7px",borderRadius:"20px"}}>{selected.visa_type}</span>}
                   </div>
                 </div>
-                <button onClick={()=>setSelected(null)} style={{background:"none",border:"none",cursor:"pointer",color:"#6B6B6B",fontSize:"18px"}}>×</button>
+                <button onClick={()=>setSelected(null)} style={{background:"none",border:"none",cursor:"pointer",color:"#52525B",fontSize:"18px"}}>×</button>
               </div>
 
               {/* Applied job banner */}
@@ -667,19 +667,19 @@ export default function CandidatesPage() {
                     <div style={{fontSize:"12px",color:navy}}>
                       <span style={{fontWeight:700}}>📋 {t("candidates.appliedTo")}:</span> {selected.match_job_name}
                     </div>
-                    <span style={{fontSize:"9px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",background:selected.applied_via==="self"?"#27500A":"#0C447C",color:"#fff"}}>
+                    <span style={{fontSize:"10px",fontWeight:700,padding:"2px 7px",borderRadius:"20px",background:selected.applied_via==="self"?"#27500A":"#0C447C",color:"#fff"}}>
                       {selected.applied_via==="self"?t("candidates.appliedSelf"):t("candidates.appliedAdmin")}
                     </span>
                   </div>
                   {selected.applied_at&&(
-                    <div style={{fontSize:"10px",color:"#6B6B6B",marginTop:"3px"}}>
+                    <div style={{fontSize:"11px",color:"#52525B",marginTop:"3px"}}>
                       {t("candidates.appliedAt")}: {new Date(selected.applied_at).toLocaleString("ja-JP")}
                     </div>
                   )}
                   {selected.applied_via==="self"&&(
                     selected.applied_reviewed
-                      ? <div style={{fontSize:"10px",color:"#27500A",fontWeight:700,marginTop:"6px"}}>{t("candidates.reviewed")}</div>
-                      : <button onClick={()=>markApplyReviewed(selected.id)} style={{marginTop:"6px",padding:"4px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.markReviewed")}</button>
+                      ? <div style={{fontSize:"11px",color:"#27500A",fontWeight:700,marginTop:"6px"}}>{t("candidates.reviewed")}</div>
+                      : <button onClick={()=>markApplyReviewed(selected.id)} style={{marginTop:"6px",padding:"4px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.markReviewed")}</button>
                   )}
                 </div>
               )}
@@ -687,7 +687,7 @@ export default function CandidatesPage() {
               {/* Tabs */}
               <div style={{display:"flex",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>
                 {[{k:"basic",lk:"candidates.tabBasic"},{k:"history",lk:"candidates.tabHistory"},{k:"pr",lk:"candidates.tabPr"},{k:"match",lk:"candidates.tabMatch"}].map(tb=>(
-                  <button key={tb.k} onClick={()=>setDetailTab(tb.k as "basic"|"history"|"pr"|"match")} style={{flex:1,padding:"8px 4px",fontSize:"10px",fontWeight:detailTab===tb.k?700:400,color:detailTab===tb.k?navy:"#6B6B6B",border:"none",background:detailTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+                  <button key={tb.k} onClick={()=>setDetailTab(tb.k as "basic"|"history"|"pr"|"match")} style={{flex:1,padding:"8px 4px",fontSize:"11px",fontWeight:detailTab===tb.k?700:400,color:detailTab===tb.k?navy:"#52525B",border:"none",background:detailTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
                     {t(tb.lk)}
                   </button>
                 ))}
@@ -701,7 +701,7 @@ export default function CandidatesPage() {
                       {editingBasic ? (
                         <div style={{display:"flex",gap:"6px"}}>
                           <button onClick={()=>setEditingBasic(false)} disabled={savingBasic}
-                            style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"transparent",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>
+                            style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"transparent",color:"#52525B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>
                             {t("common.cancel")}
                           </button>
                           <button onClick={saveBasicInfo} disabled={savingBasic}
@@ -740,7 +740,7 @@ export default function CandidatesPage() {
                           {k:"availability",lk:"candidates.availability",type:"text"},
                         ].map(f=>(
                           <div key={f.k}>
-                            <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t(f.lk)}</label>
+                            <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t(f.lk)}</label>
                             <input type={f.type} value={basicEditForm[f.k]||""} onChange={e=>setBasicEditForm({...basicEditForm,[f.k]:e.target.value})}
                               style={{width:"100%",padding:"6px 9px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
                           </div>
@@ -765,7 +765,7 @@ export default function CandidatesPage() {
                         {lk:"candidates.availability",v:selected.availability||t("candidates.immediate")},
                       ].map(r=>(
                         <div key={r.lk} style={{display:"flex",gap:"8px",padding:"5px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)",fontSize:"12px"}}>
-                          <span style={{color:"#6B6B6B",width:"80px",flexShrink:0,fontSize:"11px"}}>{t(r.lk)}</span>
+                          <span style={{color:"#52525B",width:"80px",flexShrink:0,fontSize:"11px"}}>{t(r.lk)}</span>
                           <span style={{color:navy,fontWeight:500,flex:1,wordBreak:"break-word"}}>{r.v}</span>
                         </div>
                       ))
@@ -780,9 +780,9 @@ export default function CandidatesPage() {
                       <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.education")}</div>
                       {(selected.education||[]).map((e,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
-                          <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{e.year}年{e.month}月</span>
+                          <span style={{color:"#52525B",width:"70px",flexShrink:0}}>{e.year}年{e.month}月</span>
                           <span style={{flex:1,color:navy}}>{e.school}</span>
-                          <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"9px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{e.event}</span>
+                          <span style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{e.event}</span>
                         </div>
                       ))}
                     </>}
@@ -790,9 +790,9 @@ export default function CandidatesPage() {
                       <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.workHistory")}</div>
                       {(selected.work_history||[]).map((w,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
-                          <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{w.year}年{w.month}月</span>
+                          <span style={{color:"#52525B",width:"70px",flexShrink:0}}>{w.year}年{w.month}月</span>
                           <span style={{flex:1,color:navy}}><strong>{w.company}</strong>{w.position?` — ${w.position}`:""}</span>
-                          <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"9px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{w.event}</span>
+                          <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{w.event}</span>
                         </div>
                       ))}
                     </>}
@@ -806,9 +806,9 @@ export default function CandidatesPage() {
                       <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.certifications")}</div>
                       {(selected.certifications||[]).map((ct,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
-                          <span style={{color:"#6B6B6B",width:"70px",flexShrink:0}}>{ct.year}年{ct.month}月</span>
+                          <span style={{color:"#52525B",width:"70px",flexShrink:0}}>{ct.year}年{ct.month}月</span>
                           <span style={{flex:1,color:navy}}>{ct.name}</span>
-                          <span style={{background:"#FAEEDA",color:"#633806",fontSize:"9px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{ct.result}</span>
+                          <span style={{background:"#FAEEDA",color:"#633806",fontSize:"10px",padding:"1px 5px",borderRadius:"3px",flexShrink:0}}>{ct.result}</span>
                         </div>
                       ))}
                     </>}
@@ -824,7 +824,7 @@ export default function CandidatesPage() {
                       <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.aiStrengths")}</div>
                       <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
                         {(selected.ai_data.strengths as string[]).map((s,i)=>(
-                          <span key={i} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>
+                          <span key={i} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"11px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>
                         ))}
                       </div>
                     </>}
@@ -836,7 +836,7 @@ export default function CandidatesPage() {
                   <div>
                     {matchResults.length===0&&!matching&&!matchError&&(
                       <div style={{textAlign:"center",padding:"20px"}}>
-                        <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>{t("candidates.runMatching")}</div>
+                        <div style={{fontSize:"11px",color:"#52525B",marginBottom:"12px"}}>{t("candidates.runMatching")}</div>
                         <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.startMatching")}</button>
                       </div>
                     )}
@@ -846,13 +846,13 @@ export default function CandidatesPage() {
                         <div style={{fontSize:"12px",fontWeight:600,color:"#A32D2D",marginBottom:"4px"}}>
                           {matchError==="rate_limited" ? t("jobs.matchRateLimited") : t("jobs.matchFailed")}
                         </div>
-                        <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"12px"}}>
+                        <div style={{fontSize:"11px",color:"#52525B",marginBottom:"12px"}}>
                           {matchError==="rate_limited" ? t("jobs.matchRateLimitedDesc") : t("jobs.matchFailedDesc")}
                         </div>
                         <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("common.retry")}</button>
                       </div>
                     )}
-                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>{t("candidates.matching")}</div>}
+                    {matching&&<div style={{textAlign:"center",padding:"20px",color:"#52525B",fontSize:"12px"}}>{t("candidates.matching")}</div>}
                     {matchResults.map((job,i)=>{
                       const isApplied = selected.match_job_id===job.id;
                       return (
@@ -862,7 +862,7 @@ export default function CandidatesPage() {
                           title={t("jobs.viewJobDetail")}>
                           <div>
                             <div className="match-name-link" style={{fontSize:"12px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{job.company} →</div>
-                            <div style={{fontSize:"10px",color:"#6B6B6B"}}>{job.position_vn} · {job.location}</div>
+                            <div style={{fontSize:"11px",color:"#52525B"}}>{job.position_vn} · {job.location}</div>
                           </div>
                           <div style={{fontSize:"18px",fontWeight:700,color:job.matchPct>=70?"#27500A":"#633806"}}>{job.matchPct}%</div>
                         </div>
@@ -875,22 +875,22 @@ export default function CandidatesPage() {
                           <div style={{display:"flex",flexDirection:"column",gap:"4px",marginBottom:"6px",background:"#FAFBFC",borderRadius:"7px",padding:"7px 9px",border:"0.5px solid rgba(11,31,58,0.06)"}}>
                             {job.breakdown.map((b,bi)=>(
                               <div key={bi} style={{display:"flex",alignItems:"center",gap:"6px"}}>
-                                <span style={{fontSize:"9px",fontWeight:600,color:navy,width:"40px",flexShrink:0}}>{b.criterion}</span>
+                                <span style={{fontSize:"10px",fontWeight:600,color:navy,width:"40px",flexShrink:0}}>{b.criterion}</span>
                                 <div style={{flex:1,background:"#EEF0F3",borderRadius:"3px",height:"4px",overflow:"hidden"}}>
                                   <div style={{height:"100%",width:`${b.score}%`,background:b.score>=70?"#27500A":b.score>=50?"#EF9F27":"#C8002A",borderRadius:"3px"}}/>
                                 </div>
-                                <span style={{fontSize:"9px",fontWeight:700,color:navy,width:"24px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
+                                <span style={{fontSize:"10px",fontWeight:700,color:navy,width:"24px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
                               </div>
                             ))}
                           </div>
                         )}
 
                         <div style={{display:"flex",flexWrap:"wrap",gap:"3px",marginBottom:"7px"}}>
-                          {job.reasons.map((r,ri)=><span key={ri} style={{background:"#F6F7F9",color:navy,fontSize:"9px",padding:"2px 6px",borderRadius:"20px"}}>{r}</span>)}
+                          {job.reasons.map((r,ri)=><span key={ri} style={{background:"#F6F7F9",color:navy,fontSize:"10px",padding:"2px 6px",borderRadius:"20px"}}>{r}</span>)}
                         </div>
 
                         <button onClick={()=>applyJobToCandidate(selected,job)} disabled={isApplied}
-                          style={{width:"100%",padding:"6px",borderRadius:"6px",fontSize:"10px",fontWeight:700,cursor:isApplied?"default":"pointer",background:isApplied?"#27500A":"#fff",color:isApplied?"#fff":navy,border:`1px solid ${isApplied?"#27500A":"rgba(11,31,58,0.2)"}`}}>
+                          style={{width:"100%",padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:700,cursor:isApplied?"default":"pointer",background:isApplied?"#27500A":"#fff",color:isApplied?"#fff":navy,border:`1px solid ${isApplied?"#27500A":"rgba(11,31,58,0.2)"}`}}>
                           {isApplied ? `✓ ${t("candidates.appliedTo")}` : t("candidates.applyThisJob")}
                         </button>
                       </div>
@@ -904,7 +904,7 @@ export default function CandidatesPage() {
               <div style={{padding:"12px 16px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"4px",marginBottom:"8px"}}>
                   {Object.entries(ST).map(([k,v])=>(
-                    <button key={k} onClick={()=>updateStatus(selected.id,k)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"10px",fontWeight:600,cursor:"pointer",background:selected.status===k?v.tc:v.tb,color:selected.status===k?"#fff":v.tc,border:`1px solid ${v.tc}`}}>{t(v.labelKey)}</button>
+                    <button key={k} onClick={()=>updateStatus(selected.id,k)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"11px",fontWeight:600,cursor:"pointer",background:selected.status===k?v.tc:v.tb,color:selected.status===k?"#fff":v.tc,border:`1px solid ${v.tc}`}}>{t(v.labelKey)}</button>
                   ))}
                 </div>
                 <div style={{display:"flex",gap:"6px"}}>
@@ -924,7 +924,7 @@ export default function CandidatesPage() {
   if (view==="import") return (
     <div>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.importTitle")}</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>{t("candidates.importSubtitle")}</div></div>
+        <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.importTitle")}</div><div style={{fontSize:"11px",color:"#52525B"}}>{t("candidates.importSubtitle")}</div></div>
         <button onClick={()=>{setView("list");setFileItems([]);}} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← {t("common.backToList")}</button>
       </div>
       <div style={{padding:"20px",maxWidth:"780px",margin:"0 auto"}}>
@@ -938,7 +938,7 @@ export default function CandidatesPage() {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={navy} strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
           <div style={{fontSize:"14px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.dropzoneTitle")}</div>
-          <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>{t("candidates.dropzoneHint")}</div>
+          <div style={{fontSize:"11px",color:"#52525B",marginBottom:"12px"}}>{t("candidates.dropzoneHint")}</div>
           <div style={{display:"inline-block",padding:"7px 18px",borderRadius:"7px",background:navy,color:"#fff",fontSize:"12px",fontWeight:600}}>{t("candidates.chooseFile")} ({fileItems.length}/5)</div>
         </div>
         <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx" multiple style={{display:"none"}} onChange={e=>{if(e.target.files)addFiles(e.target.files);e.target.value="";}}/>
@@ -957,28 +957,28 @@ export default function CandidatesPage() {
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:"4px"}}>
                       <span style={{fontSize:"12px",fontWeight:600,color:navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.file.name}</span>
-                      <span style={{fontSize:"10px",color:"#6B6B6B",flexShrink:0,marginLeft:"8px"}}>{fmt(item.file.size)}</span>
+                      <span style={{fontSize:"11px",color:"#52525B",flexShrink:0,marginLeft:"8px"}}>{fmt(item.file.size)}</span>
                     </div>
                     {item.status!=="waiting"&&(
                       <div>
                         <div style={{background:"#F1EFE8",borderRadius:"3px",height:"4px",overflow:"hidden",marginBottom:"3px"}}>
                           <div style={{height:"100%",borderRadius:"3px",transition:"width 0.3s",background:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#378ADD",width:`${item.progress}%`}}/>
                         </div>
-                        <div style={{fontSize:"10px",color:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#6B6B6B"}}>
+                        <div style={{fontSize:"11px",color:item.status==="done"?"#27500A":item.status==="error"?"#C8002A":"#52525B"}}>
                           {item.status==="analyzing"?`${item.progress}% — ${t("candidates.analyzing")}`
                           :item.status==="done"?t("candidates.done")
                           :`${t("candidates.errorPrefix")}${item.result?.error?` · ${item.result.error.slice(0,80)}`:""}`}
                         </div>
                       </div>
                     )}
-                    {item.status==="waiting"&&<div style={{fontSize:"10px",color:"#B4B2A9"}}>{t("candidates.waiting")}</div>}
+                    {item.status==="waiting"&&<div style={{fontSize:"11px",color:"#B4B2A9"}}>{t("candidates.waiting")}</div>}
                   </div>
                   <div style={{display:"flex",gap:"5px",flexShrink:0}}>
                     {item.status==="done"&&item.result?.candidate&&(
                       <button onClick={()=>openReview(item)} style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.reviewSave")}</button>
                     )}
                     {!isAnalyzing&&(
-                      <button onClick={()=>setFileItems(p=>p.filter(f=>f.id!==item.id))} style={{padding:"5px 7px",borderRadius:"6px",fontSize:"11px",background:"transparent",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>×</button>
+                      <button onClick={()=>setFileItems(p=>p.filter(f=>f.id!==item.id))} style={{padding:"5px 7px",borderRadius:"6px",fontSize:"11px",background:"transparent",color:"#52525B",border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>×</button>
                     )}
                   </div>
                 </div>
@@ -1027,7 +1027,7 @@ export default function CandidatesPage() {
     return (
       <div>
         <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"0 20px",height:"52px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.reviewHeaderTitle")}</div><div style={{fontSize:"10px",color:"#6B6B6B"}}>{currentReview.fileName}</div></div>
+          <div><div style={{fontSize:"14px",fontWeight:700,color:navy}}>{t("candidates.reviewHeaderTitle")}</div><div style={{fontSize:"11px",color:"#52525B"}}>{currentReview.fileName}</div></div>
           <button onClick={()=>setView("import")} style={{padding:"7px 14px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"transparent",color:navy,border:`0.5px solid ${navy}`,cursor:"pointer"}}>← {t("common.back")}</button>
         </div>
         <div style={{padding:"16px 20px",maxWidth:"920px",margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px"}}>
@@ -1035,7 +1035,7 @@ export default function CandidatesPage() {
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
               <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"12px",display:"flex",alignItems:"center",gap:"7px"}}>
-                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>{t("candidates.groqExtracted")}</span>
+                <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"2px 8px",borderRadius:"20px"}}>{t("candidates.groqExtracted")}</span>
                 {t("candidates.reviewFormTitle")}
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
@@ -1048,20 +1048,20 @@ export default function CandidatesPage() {
                   {f:"preferred_job",lk:"candidates.colPreferredJob",t:"text"},{f:"work_hours",lk:"candidates.workHours",t:"text"},
                 ].map(x=>(
                   <div key={x.f}>
-                    <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t(x.lk)}{x.req?" *":""}</label>
+                    <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t(x.lk)}{x.req?" *":""}</label>
                     <input type={x.t} value={editForm[x.f]||""} onChange={e=>setEditForm({...editForm,[x.f]:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
                   </div>
                 ))}
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px",marginTop:"10px"}}>
                 <div>
-                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colJlpt")}</label>
+                  <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colJlpt")}</label>
                   <select value={editForm.jlpt||"N4"} onChange={e=>setEditForm({...editForm,jlpt:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                     {["N1","N2","N3","N4","N5","N3相当","N4相当","なし"].map(j=><option key={j}>{j}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:"10px",color:"#6B6B6B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colIndustry")}</label>
+                  <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t("candidates.colIndustry")}</label>
                   <select value={editForm.skill||"飲食"} onChange={e=>setEditForm({...editForm,skill:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
                     {["飲食","製造","農業","ホテル","宿泊業","IT","その他"].map(i=><option key={i}>{i}</option>)}
                   </select>
@@ -1079,15 +1079,15 @@ export default function CandidatesPage() {
                 <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
                   <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"10px"}}>{t("candidates.extractedData")}</div>
                   {edu && edu.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,marginBottom:"4px"}}>{t("candidates.education")} ({edu.length})</div>
+                    <div style={{fontSize:"11px",color:"#52525B",fontWeight:600,marginBottom:"4px"}}>{t("candidates.education")} ({edu.length})</div>
                     {edu.map((e,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{e.year}年{e.month}月 {e.school} {e.event}</div>)}
                   </>}
                   {wh && wh.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.workHistory")} ({wh.length})</div>
+                    <div style={{fontSize:"11px",color:"#52525B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.workHistory")} ({wh.length})</div>
                     {wh.map((w,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{w.year}年{w.month}月 <strong>{w.company}</strong> {w.position} {w.event}</div>)}
                   </>}
                   {crt && crt.length>0&&<>
-                    <div style={{fontSize:"10px",color:"#6B6B6B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.certifications")} ({crt.length})</div>
+                    <div style={{fontSize:"11px",color:"#52525B",fontWeight:600,margin:"8px 0 4px"}}>{t("candidates.certifications")} ({crt.length})</div>
                     {crt.map((ct,i)=><div key={i} style={{fontSize:"11px",color:navy,padding:"3px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>{ct.year}年{ct.month}月 {ct.name} {ct.result}</div>)}
                   </>}
                 </div>
@@ -1101,8 +1101,8 @@ export default function CandidatesPage() {
               if (!mot && !pr) return null;
               return (
                 <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px"}}>
-                  {mot&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.motivation")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
-                  {pr&&<><div style={{fontSize:"10px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.selfPr")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
+                  {mot&&<><div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.motivation")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"10px",background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{mot}</div></>}
+                  {pr&&<><div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.selfPr")}</div><div style={{fontSize:"11px",color:"#444",lineHeight:1.6,background:"#F6F7F9",borderRadius:"6px",padding:"8px"}}>{pr}</div></>}
                 </div>
               );
             })()}
@@ -1112,20 +1112,20 @@ export default function CandidatesPage() {
           <div>
             <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
               <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.aiMatchedJobs")}</div>
-              <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"12px"}}>
+              <div style={{fontSize:"11px",color:"#52525B",marginBottom:"12px"}}>
                 {t("candidates.desiredLabel")}: <strong>{String(c.preferred_job||t("candidates.notFilled"))}</strong> ·
                 {t("candidates.colJlpt")}: <strong>{String(c.jlpt||"—")}</strong> ·
                 {t("candidates.colIndustry")}: <strong>{String(c.skill||"—")}</strong>
               </div>
-              {currentReview.suggestions.length===0&&<div style={{padding:"16px",textAlign:"center",color:"#6B6B6B",fontSize:"12px"}}>{t("candidates.noJobData")}</div>}
+              {currentReview.suggestions.length===0&&<div style={{padding:"16px",textAlign:"center",color:"#52525B",fontSize:"12px"}}>{t("candidates.noJobData")}</div>}
               {currentReview.suggestions.map((job,i)=>(
                 <div key={job.id} onClick={()=>setSelectedJobId(job.id)} style={{border:`1.5px solid ${selectedJobId===job.id?navy:"rgba(11,31,58,0.1)"}`,borderRadius:"10px",padding:"12px",marginBottom:"8px",cursor:"pointer",background:selectedJobId===job.id?"#E6F1FB":"#fff",transition:"all 0.15s"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
                     <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
-                      <div style={{width:"22px",height:"22px",borderRadius:"50%",background:i===0?navy:"#F1EFE8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",fontWeight:700,color:i===0?"#fff":navy,flexShrink:0}}>{i+1}</div>
+                      <div style={{width:"22px",height:"22px",borderRadius:"50%",background:i===0?navy:"#F1EFE8",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"11px",fontWeight:700,color:i===0?"#fff":navy,flexShrink:0}}>{i+1}</div>
                       <div>
                         <div style={{fontSize:"12px",fontWeight:700,color:navy}}>{job.company}</div>
-                        <div style={{fontSize:"10px",color:"#6B6B6B"}}>{job.position_vn} · {job.location}</div>
+                        <div style={{fontSize:"11px",color:"#52525B"}}>{job.position_vn} · {job.location}</div>
                       </div>
                     </div>
                     <div style={{textAlign:"right",flexShrink:0}}>
@@ -1136,16 +1136,16 @@ export default function CandidatesPage() {
                     <div style={{height:"100%",background:job.matchPct>=70?"#27500A":"#EF9F27",borderRadius:"3px",width:`${job.matchPct}%`}}/>
                   </div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:"3px",marginBottom:"4px"}}>
-                    {job.reasons.map((r,ri)=><span key={ri} style={{background:"#F6F7F9",color:navy,fontSize:"9px",padding:"2px 6px",borderRadius:"20px"}}>{r}</span>)}
+                    {job.reasons.map((r,ri)=><span key={ri} style={{background:"#F6F7F9",color:navy,fontSize:"10px",padding:"2px 6px",borderRadius:"20px"}}>{r}</span>)}
                   </div>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <span style={{fontSize:"11px",fontWeight:700,color:"#27500A"}}>{job.salary}</span>
-                    <span style={{background:job.status==="urgent"?"#FCEBEB":"#E6F1FB",color:job.status==="urgent"?"#A32D2D":"#0C447C",fontSize:"9px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{job.status==="urgent"?`⚡ ${t("jobs.statusUrgent")}`:t("dashboard.subRecruiting")}</span>
+                    <span style={{background:job.status==="urgent"?"#FCEBEB":"#E6F1FB",color:job.status==="urgent"?"#A32D2D":"#0C447C",fontSize:"10px",fontWeight:700,padding:"2px 6px",borderRadius:"4px"}}>{job.status==="urgent"?`⚡ ${t("jobs.statusUrgent")}`:t("dashboard.subRecruiting")}</span>
                   </div>
-                  {selectedJobId===job.id&&<div style={{marginTop:"6px",paddingTop:"6px",borderTop:"0.5px solid rgba(11,31,58,0.08)",fontSize:"10px",color:"#27500A",fontWeight:700}}>{t("candidates.registerToThisJob")}</div>}
+                  {selectedJobId===job.id&&<div style={{marginTop:"6px",paddingTop:"6px",borderTop:"0.5px solid rgba(11,31,58,0.08)",fontSize:"11px",color:"#27500A",fontWeight:700}}>{t("candidates.registerToThisJob")}</div>}
                 </div>
               ))}
-              <button onClick={()=>setSelectedJobId(null)} style={{width:"100%",padding:"7px",borderRadius:"7px",fontSize:"11px",color:"#6B6B6B",border:"0.5px solid rgba(11,31,58,0.15)",background:"transparent",cursor:"pointer",marginTop:"4px"}}>
+              <button onClick={()=>setSelectedJobId(null)} style={{width:"100%",padding:"7px",borderRadius:"7px",fontSize:"11px",color:"#52525B",border:"0.5px solid rgba(11,31,58,0.15)",background:"transparent",cursor:"pointer",marginTop:"4px"}}>
                 {t("candidates.noMatchOption")}
               </button>
             </div>

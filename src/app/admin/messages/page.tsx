@@ -444,7 +444,7 @@ export default function MessagesPage() {
                             boxShadow: count>0 ? (isHovered ? "0 4px 16px rgba(37,99,235,0.35)" : "0 2px 8px rgba(37,99,235,0.15)") : "none",
                           }} />
                         </div>
-                        <div style={{ fontSize:"10px", color: isCurrent ? "#2563EB" : "#9CA3AF", fontWeight: isCurrent ? 700 : 400, textAlign:"center", transition:"color 0.15s" }}>
+                        <div style={{ fontSize:"11px", color: isCurrent ? "#2563EB" : "#9CA3AF", fontWeight: isCurrent ? 700 : 400, textAlign:"center", transition:"color 0.15s" }}>
                           {label}
                         </div>
                       </div>
@@ -600,7 +600,7 @@ export default function MessagesPage() {
 
                 {/* Left: Contact Info */}
                 <div className="modal-left">
-                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"12px" }}>{t("messages.contactInfo")}</div>
+                  <div style={{ fontSize:"11px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"12px" }}>{t("messages.contactInfo")}</div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"2px" }}>
                     {[
                       { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, label:t("messages.fieldEmail"), value:selected.email },
@@ -620,7 +620,7 @@ export default function MessagesPage() {
                   <div style={{ height:"1px", background:"#EEF0F4", margin:"16px 0" }} />
 
                   {/* Status change in left panel */}
-                  <div style={{ fontSize:"10px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"10px" }}>{t("messages.statusChangeLabel")}</div>
+                  <div style={{ fontSize:"11px", fontWeight:700, color:"#94A3B8", letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:"10px" }}>{t("messages.statusChangeLabel")}</div>
                   <div style={{ display:"flex", flexDirection:"column", gap:"6px" }}>
                     {Object.entries(ST).map(([k, v]) => {
                       const isAct = selected.status === k;
@@ -644,7 +644,7 @@ export default function MessagesPage() {
                   <div>
                     <div className="sec-title">
                       {t("messages.messageContent")}
-                      <span style={{ marginLeft:"auto", fontSize:"10px", color:"#94A3B8", fontWeight:400, textTransform:"none", letterSpacing:0 }}>
+                      <span style={{ marginLeft:"auto", fontSize:"11px", color:"#94A3B8", fontWeight:400, textTransform:"none", letterSpacing:0 }}>
                         {selected.message ? t("messages.charCount", { n: selected.message.length }) : ""}
                       </span>
                     </div>

@@ -120,7 +120,7 @@ export default function SettingsPage() {
       <div style={{ background: "#fff", ...B, borderTop: "none", borderLeft: "none", borderRight: "none", padding: "0 20px", height: "52px", display: "flex", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: "14px", fontWeight: 700, color: navy }}>{t("sidebar.settings")}</div>
-          <div style={{ fontSize: "10px", color: "#6B6B6B" }}>{t("settings.subtitle")}</div>
+          <div style={{ fontSize: "11px", color: "#52525B" }}>{t("settings.subtitle")}</div>
         </div>
       </div>
 
@@ -145,10 +145,10 @@ export default function SettingsPage() {
                 <div key={i} style={{ background: "#F6F7F9", borderRadius: "10px", padding: "10px 14px", textAlign: "center", minWidth: "120px" }}>
                   <div style={{ fontSize: "20px" }}>{s.icon}</div>
                   <div style={{ fontSize: "11px", fontWeight: 600, color: navy, marginTop: "4px" }}>{s.label}</div>
-                  <div style={{ fontSize: "9px", color: "#6B6B6B" }}>{s.sub}</div>
+                  <div style={{ fontSize: "10px", color: "#52525B" }}>{s.sub}</div>
                 </div>
               ) : (
-                <div key={i} style={{ fontSize: "20px", color: "#6B6B6B" }}>{s.icon}</div>
+                <div key={i} style={{ fontSize: "20px", color: "#52525B" }}>{s.icon}</div>
               )
             ))}
           </div>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
             <div style={{ background: "#FFF8E6", border: "0.5px solid #EF9F27", borderRadius: "8px", padding: "10px 12px", fontFamily: "monospace", fontSize: "13px", fontWeight: 700, color: "#633806", marginBottom: "8px" }}>
               {WEBHOOK_SECRET}
             </div>
-            <div style={{ fontSize: "10px", color: "#6B6B6B", marginBottom: "8px" }}>
+            <div style={{ fontSize: "11px", color: "#52525B", marginBottom: "8px" }}>
               {t("settings.secretWarning")}
             </div>
             <button className="settings-btn" onClick={() => copy(WEBHOOK_SECRET, "secret")}
@@ -206,7 +206,7 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: "12px", fontWeight: 600, color: navy }}>{t(s.titleKey)}</div>
-                  <div style={{ fontSize: "11px", color: "#6B6B6B", marginTop: "2px" }}>{t(s.descKey)}</div>
+                  <div style={{ fontSize: "11px", color: "#52525B", marginTop: "2px" }}>{t(s.descKey)}</div>
                 </div>
               </div>
             ))}
@@ -218,7 +218,7 @@ export default function SettingsPage() {
           <div style={{ fontSize: "13px", fontWeight: 700, color: navy, marginBottom: "4px" }}>
             {t("settings.fieldMapTitle")}
           </div>
-          <div style={{ fontSize: "11px", color: "#6B6B6B", marginBottom: "14px" }}>
+          <div style={{ fontSize: "11px", color: "#52525B", marginBottom: "14px" }}>
             {t("settings.fieldMapDesc")}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
@@ -238,7 +238,7 @@ export default function SettingsPage() {
             ].map(m => (
               <div key={m.field} style={{ background: "#F6F7F9", borderRadius: "8px", padding: "8px 10px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 700, color: navy }}>{m.field}</div>
-                <div style={{ fontSize: "9px", color: "#6B6B6B", marginTop: "2px" }}>{m.accept}</div>
+                <div style={{ fontSize: "10px", color: "#52525B", marginTop: "2px" }}>{m.accept}</div>
               </div>
             ))}
           </div>
@@ -249,7 +249,7 @@ export default function SettingsPage() {
           <div style={{ padding: "14px 20px", borderBottom: "0.5px solid rgba(11,31,58,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: "13px", fontWeight: 700, color: navy }}>{t("settings.gasCodeTitle")}</div>
-              <div style={{ fontSize: "10px", color: "#6B6B6B", marginTop: "1px" }}>{t("settings.gasCodeDesc")}</div>
+              <div style={{ fontSize: "11px", color: "#52525B", marginTop: "1px" }}>{t("settings.gasCodeDesc")}</div>
             </div>
             <button className="settings-btn" onClick={() => copy(GAS_CODE, "gas")}
               style={{ padding: "7px 16px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, background: copied === "gas" ? "#27500A" : navy, color: "#fff", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>
