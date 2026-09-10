@@ -94,7 +94,12 @@ export async function POST(req: NextRequest) {
         certifications: body.certifications || [],
         motivation:     body.motivation || null,
         self_pr:        body.self_pr || null,
-        status:         body.status || "新規",
+        // Default must be the canonical English key ("new") — every other part of the
+        // system (filter pill counts via exact match, mypage's STATUS_STEPS lookup) keys
+        // off this literal string, not the Japanese label. A stray "新規" default here is
+        // exactly what silently broke the "新規" filter count and mypage's 選考状況 tab
+        // for candidates created without an explicit status (found via live DB audit).
+        status:         body.status || "new",
         match_job_id:   body.match_job_id || null,
         match_job_name: body.match_job_name || null,
         note:           body.note || null,
