@@ -151,6 +151,7 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "candidates.immediate": { en: "Immediately", vi: "Ngay lập tức", ja: "即日" },
   "candidates.education": { en: "Education", vi: "Học vấn", ja: "学歴" },
   "candidates.workHistory": { en: "Work experience", vi: "Kinh nghiệm làm việc", ja: "職歴" },
+  "candidates.totalExperience": { en: "Total experience", vi: "Tổng kinh nghiệm", ja: "合計勤務経験" },
   "candidates.certifications": { en: "Certificates & licenses", vi: "Chứng chỉ & bằng cấp", ja: "免許・資格" },
   "candidates.motivation": { en: "Motivation", vi: "Động lực ứng tuyển", ja: "志望動機" },
   "candidates.selfPr": { en: "Self introduction", vi: "Giới thiệu bản thân", ja: "自己PR" },

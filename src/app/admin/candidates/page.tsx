@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import JSZip from "jszip";
 import { useAdminLang } from "@/lib/adminI18n";
+import { calcExperienceMonths, formatExperienceJa, formatExperienceVn } from "@/lib/experience";
 
 /* ─── Types ─────────────────────────────────────────────── */
 type Edu  = { year:string; month:string; school:string; event:string };
@@ -787,7 +788,20 @@ export default function CandidatesPage() {
                       ))}
                     </>}
                     {(selected.work_history||[]).length>0&&<>
-                      <div style={{fontSize:"11px",fontWeight:700,color:navy,margin:"12px 0 6px"}}>{t("candidates.workHistory")}</div>
+                      <div style={{display:"flex",alignItems:"center",gap:"8px",margin:"12px 0 6px",flexWrap:"wrap"}}>
+                        <div style={{fontSize:"11px",fontWeight:700,color:navy}}>{t("candidates.workHistory")}</div>
+                        {(() => {
+                          const months = calcExperienceMonths(selected.work_history);
+                          const ja = formatExperienceJa(months);
+                          const vn = formatExperienceVn(months);
+                          if (!ja) return null;
+                          return (
+                            <span style={{background:"#EAF3DE",color:"#27500A",fontSize:"11px",fontWeight:700,padding:"2px 9px",borderRadius:"20px",display:"inline-flex",alignItems:"center",gap:"4px"}}>
+                              💼 {t("candidates.totalExperience")}: {ja} <span style={{fontWeight:400,opacity:0.8}}>({vn})</span>
+                            </span>
+                          );
+                        })()}
+                      </div>
                       {(selected.work_history||[]).map((w,i)=>(
                         <div key={i} style={{display:"flex",gap:"8px",fontSize:"11px",padding:"4px 0",borderBottom:"0.5px solid rgba(11,31,58,0.04)"}}>
                           <span style={{color:"#52525B",width:"70px",flexShrink:0}}>{w.year}年{w.month}月</span>
