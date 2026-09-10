@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminLang, fieldLabel } from "@/lib/adminI18n";
 
@@ -119,6 +119,7 @@ export default function JobsPage() {
   const [matching, setMatching] = useState(false);
   const [matchError, setMatchError] = useState<string|null>(null);
   const [activeTab, setActiveTab] = useState<"info"|"match">("info");
+  const [forCandidate, setForCandidate] = useState<{id:string;name:string}|null>(null);
   const B = {border:"0.5px solid rgba(11,31,58,0.1)"};
   const navy = "#0B1F3A";
 
@@ -131,6 +132,28 @@ export default function JobsPage() {
   },[router]);
 
   useEffect(()=>{load();},[load]);
+
+  // Deep-link support: /admin/jobs?id=xxx[&forCandidate=yyy] — e.g. from Candidates → マッチング.
+  // Opens that job's detail once, and (if forCandidate is set) fetches the candidate's name for the apply banner.
+  const appliedDeepLink = useRef(false);
+  useEffect(() => {
+    if (appliedDeepLink.current || jobs.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const candId = params.get("forCandidate");
+    if (!id) { appliedDeepLink.current = true; return; }
+    const found = jobs.find(j => j.id === id);
+    if (found) {
+      setSelected(found); setMatches([]); setActiveTab("info"); setView("detail");
+      if (candId) {
+        fetch(`/api/admin/candidates?id=${candId}`).then(r => r.ok ? r.json() : null).then(d => {
+          if (d?.data) setForCandidate({ id: candId, name: d.data.name || candId });
+        });
+      }
+      window.history.replaceState(null, "", "/admin/jobs");
+    }
+    appliedDeepLink.current = true;
+  }, [jobs]);
 
   const filtered = jobs.filter(j=>{
     if (filter!=="all" && j.status!==filter) return false;
@@ -165,6 +188,12 @@ export default function JobsPage() {
     setMatches([]);
     setActiveTab("info");
     setView("detail");
+  };
+
+  const applyJobToCandidate = async () => {
+    if (!selected || !forCandidate) return;
+    await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:forCandidate.id, match_job_id:selected.id, match_job_name:selected.company})});
+    router.push(`/admin/candidates?id=${forCandidate.id}`);
   };
 
   const openForm = (job?: Job) => {
@@ -405,6 +434,23 @@ export default function JobsPage() {
             <button onClick={()=>deleteJob(selected.id)} style={{padding:"7px 12px",borderRadius:"6px",fontSize:"12px",fontWeight:600,background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595",cursor:"pointer"}}>{t("common.delete")}</button>
           </div>
         </div>
+
+        {forCandidate && (
+          <div style={{display:"flex",alignItems:"center",gap:"10px",padding:"10px 20px",background:"#E6F1FB",borderBottom:"1px solid rgba(11,31,58,0.08)",flexWrap:"wrap"}}>
+            <button onClick={()=>{setForCandidate(null);router.push(`/admin/candidates?id=${forCandidate.id}`);}}
+              style={{background:"none",border:"none",cursor:"pointer",color:"#0C447C",display:"flex",alignItems:"center",gap:"4px",fontSize:"11px",fontWeight:600}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0C447C" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              {t("jobs.backToCandidate",{name:forCandidate.name})}
+            </button>
+            <span style={{fontSize:"11px",color:"#185FA5"}}>·</span>
+            <span style={{fontSize:"11px",color:"#0C447C"}}>{t("jobs.viewingForCandidate",{name:forCandidate.name})}</span>
+            <button onClick={applyJobToCandidate}
+              disabled={selected.id===undefined}
+              style={{marginLeft:"auto",padding:"6px 14px",borderRadius:"6px",fontSize:"11px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+              ✓ {t("jobs.applyToCandidate",{name:forCandidate.name})}
+            </button>
+          </div>
+        )}
 
         <div style={{padding:"16px 20px",display:"grid",gridTemplateColumns:"1fr 380px",gap:"16px",maxWidth:"1200px"}}>
           {/* Left: 求人概要 */}

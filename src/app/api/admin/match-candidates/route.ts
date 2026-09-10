@@ -91,9 +91,17 @@ export async function POST(req: NextRequest) {
       if (!jobs.length) return NextResponse.json({ matches: [] });
       const candInfo = `候補者: ${cand.name} / 業種:${cand.skill} / 日本語:${cand.jlpt} / 希望:${cand.preferred_job || ""}\n職歴:${JSON.stringify(cand.work_history || []).slice(0, 200)}\n資格:${JSON.stringify(cand.certifications || []).slice(0, 100)}`;
       const jobList = jobs.map((j, i) => `求人${i + 1}: ID=${j.id} 会社=${j.company} 職種=${j.position_ja} 業種=${j.industry} 日本語${j.jlpt_min}以上${j.status === "urgent" ? " 緊急" : ""}`).join("\n");
-      const prompt = `${candInfo}\n\n求人一覧:\n${jobList}\n\nこの候補者に最適なTOP3求人をJSONで返してください(no markdown, only JSON array)。理由はベトナム語のみで簡潔に。\n形式: [{"jobId":"uuid","company":"name","position_vn":"vn","location":"loc","salary":"sal","status":"open","matchPct":85,"reasonVn":"Lý do","strengths":["s1"]}]`;
-      const { data: arr, error } = await callGroq(prompt) as { data: Array<{ jobId: string; company: string; position_vn: string; location: string; salary: string; status: string; matchPct: number; reasonVn: string; strengths: string[] }>; error: GroqResult["error"] };
-      const matches = arr.map(m => { const job = jobs.find(j => j.id === m.jobId); return job ? { ...job, ...m, matchPct: m.matchPct, reasons: [m.reasonVn] } : null; }).filter(Boolean);
+      const topN = Math.min(10, jobs.length);
+      const prompt = `${candInfo}\n\n求人一覧(${jobs.length}件):\n${jobList}\n\n` +
+        `必ず上位${topN}件を、マッチ度が高い順にJSONで返してください(no markdown, only JSON array)。マッチ度が低い求人も省略せず低いスコアのまま含めてください。件数は必ず${topN}件にしてください。理由・コメントはベトナム語のみで簡潔に。\n` +
+        `各求人について、業種(industry)・日本語レベル(language)・経験(experience)の3つの観点で0-100点の評価とひとことコメント(ベトナム語)を付けてください。\n` +
+        `形式: [{"jobId":"uuid","company":"name","position_vn":"vn","location":"loc","salary":"sal","status":"open","matchPct":85,"reasonVn":"Lý do tổng hợp ngắn gọn","strengths":["s1"],"breakdown":[{"criterion":"業種","score":90,"noteVn":"..."},{"criterion":"日本語","score":100,"noteVn":"..."},{"criterion":"経験","score":60,"noteVn":"..."}]}]`;
+      const { data: arr, error } = await callGroq(prompt) as { data: Array<{ jobId: string; company: string; position_vn: string; location: string; salary: string; status: string; matchPct: number; reasonVn: string; strengths: string[]; breakdown?: Array<{ criterion:string; score:number; noteVn:string }> }>; error: GroqResult["error"] };
+      const matches = arr
+        .map(m => { const job = jobs.find(j => j.id === m.jobId); return job ? { ...job, ...m, matchPct: m.matchPct, reasons: [m.reasonVn] } : null; })
+        .filter((m): m is NonNullable<typeof m> => m !== null)
+        .sort((a, b) => b.matchPct - a.matchPct)
+        .slice(0, 10);
       return NextResponse.json({ matches, error: matches.length === 0 ? error : null });
     }
 

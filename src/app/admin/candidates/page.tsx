@@ -9,7 +9,8 @@ import { useAdminLang } from "@/lib/adminI18n";
 type Edu  = { year:string; month:string; school:string; event:string };
 type Work = { year:string; month:string; company:string; position:string; event:string };
 type Cert = { year:string; month:string; name:string; result:string };
-type Job  = { id:string; company:string; position_ja:string; position_vn:string; industry:string; jlpt_min:string; salary:string; location:string; status:string; score:number; matchPct:number; reasons:string[] };
+type MatchBreakdown = { criterion:string; score:number; noteVn:string };
+type Job  = { id:string; company:string; position_ja:string; position_vn:string; industry:string; jlpt_min:string; salary:string; location:string; status:string; score:number; matchPct:number; reasons:string[]; breakdown?:MatchBreakdown[] };
 
 type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
@@ -152,6 +153,7 @@ export default function CandidatesPage() {
   const [saving, setSaving] = useState(false);
   const [matchResults, setMatchResults] = useState<Job[]>([]);
   const [matching, setMatching] = useState(false);
+  const [matchError, setMatchError] = useState<string|null>(null);
   const [retryCountdown, setRetryCountdown] = useState(0);
   const [showFormPopup, setShowFormPopup] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -270,7 +272,7 @@ export default function CandidatesPage() {
   };
 
   const runMatch = async (cand: Candidate) => {
-    setMatching(true); setMatchResults([]);
+    setMatching(true); setMatchResults([]); setMatchError(null);
     try {
       const res = await fetch("/api/admin/match-candidates",{
         method:"POST", headers:{"Content-Type":"application/json"},
@@ -278,8 +280,18 @@ export default function CandidatesPage() {
       });
       const d = await res.json();
       setMatchResults((d.matches||[]) as Job[]);
-    } catch { setMatchResults([]); }
+      setMatchError(d.error||null);
+    } catch { setMatchResults([]); setMatchError("failed"); }
     setMatching(false);
+  };
+
+  const applyJobToCandidate = async (cand: Candidate, job: Job) => {
+    const payload = { match_job_id: job.id, match_job_name: job.company };
+    const res = await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:cand.id, ...payload})});
+    if (!res.ok) { alert(t("common.saveFailed")); return; }
+    const merged = { ...cand, ...payload } as Candidate;
+    setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === cand.id ? merged : c));
+    setSelected((p: Candidate | null) => p?.id === cand.id ? merged : p);
   };
 
   /* File handling */
@@ -474,6 +486,8 @@ export default function CandidatesPage() {
         .cand-pill:hover { transform:translateY(-1px); }
         .cand-card { transition: box-shadow 0.2s ease; }
         .cand-card:hover { box-shadow: 0 4px 18px rgba(11,31,58,0.06); }
+        .match-card:hover { box-shadow: 0 4px 16px rgba(11,31,58,0.08); }
+        .match-card:hover .match-name-link { text-decoration-color: #0B1F3A !important; }
         @media (prefers-reduced-motion: reduce) { .cand-fade{animation:none;} .cand-btn,.cand-pill{transition:none;} }
       `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
@@ -820,30 +834,68 @@ export default function CandidatesPage() {
                 {/* Match tab */}
                 {detailTab==="match"&&(
                   <div>
-                    {matchResults.length===0&&!matching&&(
+                    {matchResults.length===0&&!matching&&!matchError&&(
                       <div style={{textAlign:"center",padding:"20px"}}>
                         <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"12px"}}>{t("candidates.runMatching")}</div>
                         <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:"#C8002A",color:"#fff",border:"none",cursor:"pointer"}}>{t("candidates.startMatching")}</button>
                       </div>
                     )}
+                    {matchResults.length===0&&!matching&&matchError&&(
+                      <div style={{textAlign:"center",padding:"20px"}}>
+                        <div style={{fontSize:"20px",marginBottom:"8px"}}>⚠️</div>
+                        <div style={{fontSize:"12px",fontWeight:600,color:"#A32D2D",marginBottom:"4px"}}>
+                          {matchError==="rate_limited" ? t("jobs.matchRateLimited") : t("jobs.matchFailed")}
+                        </div>
+                        <div style={{fontSize:"10px",color:"#6B6B6B",marginBottom:"12px"}}>
+                          {matchError==="rate_limited" ? t("jobs.matchRateLimitedDesc") : t("jobs.matchFailedDesc")}
+                        </div>
+                        <button onClick={()=>runMatch(selected)} style={{padding:"8px 16px",borderRadius:"7px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("common.retry")}</button>
+                      </div>
+                    )}
                     {matching&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>{t("candidates.matching")}</div>}
-                    {matchResults.map((job,i)=>(
-                      <div key={job.id} style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",background:i===0?"#F0F7FF":"#fff"}}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
+                    {matchResults.map((job,i)=>{
+                      const isApplied = selected.match_job_id===job.id;
+                      return (
+                      <div key={job.id} className="match-card" style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",background:isApplied?"#EAF3DE":i===0?"#F0F7FF":"#fff",transition:"box-shadow 0.2s ease"}}>
+                        <div onClick={()=>router.push(`/admin/jobs?id=${job.id}&forCandidate=${selected.id}`)}
+                          style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px",cursor:"pointer"}}
+                          title={t("jobs.viewJobDetail")}>
                           <div>
-                            <div style={{fontSize:"12px",fontWeight:700,color:navy}}>{job.company}</div>
+                            <div className="match-name-link" style={{fontSize:"12px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{job.company} →</div>
                             <div style={{fontSize:"10px",color:"#6B6B6B"}}>{job.position_vn} · {job.location}</div>
                           </div>
                           <div style={{fontSize:"18px",fontWeight:700,color:job.matchPct>=70?"#27500A":"#633806"}}>{job.matchPct}%</div>
                         </div>
                         <div style={{background:"#F1EFE8",borderRadius:"3px",height:"4px",overflow:"hidden",marginBottom:"6px"}}>
-                          <div style={{height:"100%",background:job.matchPct>=70?"#27500A":"#EF9F27",width:`${job.matchPct}%`}}/>
+                          <div style={{height:"100%",background:job.matchPct>=70?"#27500A":"#EF9F27",width:`${job.matchPct}%`,transition:"width 0.6s"}}/>
                         </div>
-                        <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>
+
+                        {/* Per-criteria breakdown */}
+                        {job.breakdown && job.breakdown.length>0 && (
+                          <div style={{display:"flex",flexDirection:"column",gap:"4px",marginBottom:"6px",background:"#FAFBFC",borderRadius:"7px",padding:"7px 9px",border:"0.5px solid rgba(11,31,58,0.06)"}}>
+                            {job.breakdown.map((b,bi)=>(
+                              <div key={bi} style={{display:"flex",alignItems:"center",gap:"6px"}}>
+                                <span style={{fontSize:"9px",fontWeight:600,color:navy,width:"40px",flexShrink:0}}>{b.criterion}</span>
+                                <div style={{flex:1,background:"#EEF0F3",borderRadius:"3px",height:"4px",overflow:"hidden"}}>
+                                  <div style={{height:"100%",width:`${b.score}%`,background:b.score>=70?"#27500A":b.score>=50?"#EF9F27":"#C8002A",borderRadius:"3px"}}/>
+                                </div>
+                                <span style={{fontSize:"9px",fontWeight:700,color:navy,width:"24px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <div style={{display:"flex",flexWrap:"wrap",gap:"3px",marginBottom:"7px"}}>
                           {job.reasons.map((r,ri)=><span key={ri} style={{background:"#F6F7F9",color:navy,fontSize:"9px",padding:"2px 6px",borderRadius:"20px"}}>{r}</span>)}
                         </div>
+
+                        <button onClick={()=>applyJobToCandidate(selected,job)} disabled={isApplied}
+                          style={{width:"100%",padding:"6px",borderRadius:"6px",fontSize:"10px",fontWeight:700,cursor:isApplied?"default":"pointer",background:isApplied?"#27500A":"#fff",color:isApplied?"#fff":navy,border:`1px solid ${isApplied?"#27500A":"rgba(11,31,58,0.2)"}`}}>
+                          {isApplied ? `✓ ${t("candidates.appliedTo")}` : t("candidates.applyThisJob")}
+                        </button>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
