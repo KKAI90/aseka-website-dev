@@ -18,6 +18,7 @@ type Job = {
   created_at: string;
 };
 
+type AssignedCandidate = { id:string; name:string; status:string; jlpt:string; skill:string; email:string|null; phone:string|null; match_job_id:string|null };
 type MatchBreakdown = { criterion:string; score:number; noteVn:string };
 type MatchResult = {
   candidateId: string; candidateName: string; matchPct: number;
@@ -118,8 +119,14 @@ export default function JobsPage() {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [matching, setMatching] = useState(false);
   const [matchError, setMatchError] = useState<string|null>(null);
-  const [activeTab, setActiveTab] = useState<"info"|"match">("info");
+  const [activeTab, setActiveTab] = useState<"info"|"match"|"assigned">("info");
   const [forCandidate, setForCandidate] = useState<{id:string;name:string}|null>(null);
+  const [assignedCands, setAssignedCands] = useState<AssignedCandidate[]>([]);
+  const [assignedLoading, setAssignedLoading] = useState(false);
+  const [assignSearch, setAssignSearch] = useState("");
+  const [assignResults, setAssignResults] = useState<AssignedCandidate[]>([]);
+  const [assignSearching, setAssignSearching] = useState(false);
+  const [assigningId, setAssigningId] = useState<string|null>(null);
   const B = {border:"0.5px solid rgba(11,31,58,0.1)"};
   const navy = "#0B1F3A";
 
@@ -133,6 +140,13 @@ export default function JobsPage() {
 
   useEffect(()=>{load();},[load]);
 
+  // Debounce candidate-assign search (300ms)
+  useEffect(() => {
+    const h = setTimeout(() => searchCandidatesToAssign(assignSearch), 300);
+    return () => clearTimeout(h);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignSearch]);
+
   // Deep-link support: /admin/jobs?id=xxx[&forCandidate=yyy] — e.g. from Candidates → マッチング.
   // Opens that job's detail once, and (if forCandidate is set) fetches the candidate's name for the apply banner.
   const appliedDeepLink = useRef(false);
@@ -145,6 +159,7 @@ export default function JobsPage() {
     const found = jobs.find(j => j.id === id);
     if (found) {
       setSelected(found); setMatches([]); setActiveTab("info"); setView("detail");
+      loadAssignedCandidates(found.id);
       if (candId) {
         fetch(`/api/admin/candidates?id=${candId}`).then(r => r.ok ? r.json() : null).then(d => {
           if (d?.data) setForCandidate({ id: candId, name: d.data.name || candId });
@@ -188,12 +203,45 @@ export default function JobsPage() {
     setMatches([]);
     setActiveTab("info");
     setView("detail");
+    loadAssignedCandidates(job.id);
   };
 
   const applyJobToCandidate = async () => {
     if (!selected || !forCandidate) return;
     await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:forCandidate.id, match_job_id:selected.id, match_job_name:selected.company})});
     router.push(`/admin/candidates?id=${forCandidate.id}`);
+  };
+
+  const loadAssignedCandidates = useCallback(async (jobId: string) => {
+    setAssignedLoading(true);
+    const res = await fetch(`/api/admin/candidates?matchJobId=${jobId}`);
+    const d = await res.json();
+    setAssignedCands((d.data||[]) as AssignedCandidate[]);
+    setAssignedLoading(false);
+  },[]);
+
+  const searchCandidatesToAssign = useCallback(async (q: string) => {
+    if (!q.trim()) { setAssignResults([]); return; }
+    setAssignSearching(true);
+    const res = await fetch(`/api/admin/candidates?search=${encodeURIComponent(q)}`);
+    const d = await res.json();
+    setAssignResults((d.data||[]) as AssignedCandidate[]);
+    setAssignSearching(false);
+  },[]);
+
+  const assignCandidateToJob = async (cand: AssignedCandidate) => {
+    if (!selected) return;
+    setAssigningId(cand.id);
+    await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:cand.id, match_job_id:selected.id, match_job_name:selected.company})});
+    await loadAssignedCandidates(selected.id);
+    setAssignSearch(""); setAssignResults([]);
+    setAssigningId(null);
+  };
+
+  const unassignCandidate = async (cand: AssignedCandidate) => {
+    if (!selected || !confirm(t("jobs.unassignConfirm"))) return;
+    await fetch("/api/admin/candidates",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:cand.id, match_job_id:null, match_job_name:"未定"})});
+    await loadAssignedCandidates(selected.id);
   };
 
   const openForm = (job?: Job) => {
@@ -490,8 +538,12 @@ export default function JobsPage() {
 
             {/* Tabs */}
             <div style={{display:"flex",gap:0,marginBottom:"12px",background:"#fff",borderRadius:"10px 10px 0 0",overflow:"hidden",border:"0.5px solid rgba(11,31,58,0.1)",borderBottom:"none"}}>
-              {[{k:"info",l:t("jobs.tabInfo")},{k:"match",l:`${t("jobs.tabMatch")}${matches.length>0?` (${matches.length})`:""}`}].map(tb=>(
-                <button key={tb.k} onClick={()=>setActiveTab(tb.k as "info"|"match")} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===tb.k?700:400,color:activeTab===tb.k?navy:"#6B6B6B",border:"none",background:activeTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+              {[
+                {k:"info",l:t("jobs.tabInfo")},
+                {k:"match",l:`${t("jobs.tabMatch")}${matches.length>0?` (${matches.length})`:""}`},
+                {k:"assigned",l:`${t("jobs.tabAssigned")}${assignedCands.length>0?` (${assignedCands.length})`:""}`},
+              ].map(tb=>(
+                <button key={tb.k} onClick={()=>{setActiveTab(tb.k as "info"|"match"|"assigned"); if(tb.k==="assigned") loadAssignedCandidates(selected.id);}} style={{flex:1,padding:"12px",fontSize:"12px",fontWeight:activeTab===tb.k?700:400,color:activeTab===tb.k?navy:"#6B6B6B",border:"none",background:activeTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${activeTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
                   {tb.l}
                 </button>
               ))}
@@ -599,6 +651,73 @@ export default function JobsPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {activeTab==="assigned"&&(
+              <div style={{background:"#fff",...B,borderRadius:"0 0 12px 12px",padding:"16px"}}>
+                {/* Search & assign */}
+                <div style={{marginBottom:"16px"}}>
+                  <div style={{position:"relative"}}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B4B2A9" strokeWidth="2" style={{position:"absolute",left:"9px",top:"50%",transform:"translateY(-50%)"}}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" value={assignSearch} onChange={e=>setAssignSearch(e.target.value)} className="jobs-input"
+                      placeholder={t("jobs.assignSearchPlaceholder")}
+                      style={{width:"100%",padding:"8px 10px 8px 28px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",boxSizing:"border-box"}}/>
+                  </div>
+                  {assignSearch.trim()!==""&&(
+                    <div style={{marginTop:"8px",border:"0.5px solid rgba(11,31,58,0.1)",borderRadius:"8px",overflow:"hidden",maxHeight:"220px",overflowY:"auto"}}>
+                      {assignSearching
+                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#6B6B6B"}}>{t("common.loading")}</div>
+                        : assignResults.length===0
+                        ? <div style={{padding:"14px",textAlign:"center",fontSize:"11px",color:"#6B6B6B"}}>{t("jobs.noCandidatesFound")}</div>
+                        : assignResults.map(c=>{
+                            const already = c.match_job_id===selected.id;
+                            return (
+                              <div key={c.id} style={{display:"flex",alignItems:"center",gap:"8px",padding:"8px 10px",borderBottom:"0.5px solid rgba(11,31,58,0.06)"}}>
+                                <div style={{flex:1,minWidth:0}}>
+                                  <div style={{fontSize:"12px",fontWeight:600,color:navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
+                                  <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.skill} · {c.jlpt}</div>
+                                </div>
+                                <button onClick={()=>assignCandidateToJob(c)} disabled={already||assigningId===c.id}
+                                  style={{padding:"5px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:700,cursor:already?"default":"pointer",background:already?"#EAF3DE":navy,color:already?"#27500A":"#fff",border:"none",whiteSpace:"nowrap"}}>
+                                  {already ? `✓ ${t("candidates.appliedTo")}` : assigningId===c.id ? "..." : `+ ${t("jobs.assignBtn")}`}
+                                </button>
+                              </div>
+                            );
+                          })
+                      }
+                    </div>
+                  )}
+                </div>
+
+                {/* Currently assigned list */}
+                <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>
+                  {t("jobs.assignedListTitle",{n:assignedCands.length,total:selected.count})}
+                </div>
+                {assignedLoading&&<div style={{textAlign:"center",padding:"20px",color:"#6B6B6B",fontSize:"12px"}}>{t("common.loading")}</div>}
+                {!assignedLoading&&assignedCands.length===0&&(
+                  <div style={{textAlign:"center",padding:"24px"}}>
+                    <div style={{fontSize:"20px",marginBottom:"8px"}}>👤</div>
+                    <div style={{fontSize:"11px",color:"#6B6B6B"}}>{t("jobs.noAssignedYet")}</div>
+                  </div>
+                )}
+                {!assignedLoading&&assignedCands.map(c=>{
+                  const st2=ST[c.status]||ST.open;
+                  return (
+                    <div key={c.id} className="match-card" style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",display:"flex",alignItems:"center",gap:"10px",transition:"box-shadow 0.2s ease"}}>
+                      <div onClick={()=>router.push(`/admin/candidates?id=${c.id}`)} style={{flex:1,cursor:"pointer",minWidth:0}} title={t("jobs.viewCandidateProfile")}>
+                        <div className="match-name-link" style={{fontSize:"12px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{c.name} →</div>
+                        <div style={{fontSize:"10px",color:"#6B6B6B"}}>{c.skill} · {c.jlpt}</div>
+                      </div>
+                      <span style={{background:st2.tb,color:st2.tc,fontSize:"10px",fontWeight:700,padding:"2px 8px",borderRadius:"20px",flexShrink:0}}>{t(st2.labelKey)}</span>
+                      <button onClick={()=>unassignCandidate(c)} title={t("jobs.unassignBtn")}
+                        style={{background:"none",border:"none",cursor:"pointer",color:"#B4B2A9",padding:"4px",flexShrink:0}}
+                        onMouseEnter={e=>e.currentTarget.style.color="#A32D2D"} onMouseLeave={e=>e.currentTarget.style.color="#B4B2A9"}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

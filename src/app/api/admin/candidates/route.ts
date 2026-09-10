@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const skill = searchParams.get("skill");
   const jlpt = searchParams.get("jlpt");
   const id = searchParams.get("id");
+  const matchJobId = searchParams.get("matchJobId");
 
   // password_hash never leaves the server — admin UI has no use for it and
   // it doesn't belong in a network response even hashed.
@@ -38,6 +39,7 @@ export async function GET(req: NextRequest) {
   if (status && status !== "all") where.status = status;
   if (skill && skill !== "all") where.skill = skill;
   if (jlpt && jlpt !== "all") where.jlpt = jlpt;
+  if (matchJobId) where.match_job_id = matchJobId;
   if (search) {
     const safe = search.slice(0, 100);
     where.OR = [

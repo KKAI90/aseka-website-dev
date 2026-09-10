@@ -61,7 +61,12 @@ export async function GET(req: NextRequest) {
   scored.sort((a, b) => b.matchScore - a.matchScore || (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
 
   // TOP 10 best-matching jobs — "mới/tất cả" filters narrow within this set on the client.
-  const top10 = scored.slice(0, 10);
+  // The job an admin has explicitly assigned (match_job_id) must always be visible here —
+  // otherwise a manually-pushed job could silently never appear if it didn't also score
+  // well enough to land in a plain top-10-by-score slice. Pin it first, then fill the rest.
+  const appliedJob = cand.match_job_id ? scored.find(j => j.id === cand.match_job_id) : undefined;
+  const rest = scored.filter(j => j.id !== cand.match_job_id);
+  const top10 = appliedJob ? [appliedJob, ...rest.slice(0, 9)] : rest.slice(0, 10);
 
   return NextResponse.json({ jobs: top10 });
 }
