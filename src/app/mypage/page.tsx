@@ -5,6 +5,9 @@ import Link from "next/link";
 
 const navy  = "#0B1F3A";
 const red   = "#C8002A";
+// Absolute — this page runs on the mypage.* subdomain, where middleware redirects any
+// path outside /mypage back to /mypage/login, so a relative href="/" would just bounce back.
+const MAIN_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dev.aseka.co.jp";
 
 type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
@@ -295,7 +298,7 @@ export default function Mypage() {
       <header style={{ background:"#fff", borderBottom:"1px solid #E8EAF0", position:"sticky", top:0, zIndex:100 }}>
         <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 24px", height:"52px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
-            <Link href="/" style={{ display:"flex", alignItems:"center", gap:"7px", textDecoration:"none" }}>
+            <Link href={MAIN_SITE_URL} style={{ display:"flex", alignItems:"center", gap:"7px", textDecoration:"none" }}>
               <div style={{ width:"28px", height:"28px", background:"#fff", borderRadius:"7px", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden", border:"1px solid rgba(11,31,58,0.08)" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"22px", height:"22px", objectFit:"contain", display:"block" }} />
@@ -561,7 +564,7 @@ export default function Mypage() {
           {/* Register new */}
           <div style={{ background:"#fff", borderRadius:"10px", padding:"14px", boxShadow:"0 1px 6px rgba(0,0,0,0.06)", textAlign:"center" }}>
             <div style={{ fontSize:"11px", color:"#64748B", marginBottom:"8px" }}>知人・友人の紹介 · Giới thiệu bạn bè</div>
-            <Link href="/dang-ky"
+            <Link href={`${MAIN_SITE_URL}/dang-ky`}
               style={{ display:"inline-block", padding:"8px 16px", borderRadius:"7px", background:"#FAEEDA", color:"#633806", textDecoration:"none", fontSize:"11px", fontWeight:700 }}>
               🎁 新規登録はこちら
             </Link>

@@ -6,6 +6,10 @@ import Image from "next/image";
 
 const navy = "#0B1F3A";
 const red  = "#C8002A";
+// Links to the main site must be absolute — this page runs on the mypage.* subdomain,
+// where middleware redirects any path outside /mypage back to /mypage/login. A relative
+// href="/" here would just bounce the user right back to this same login page.
+const MAIN_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dev.aseka.co.jp";
 
 /* 3 real Aseka office/team photos (same set used on the site's homepage
    PhotoStrip), floating as staggered cards — PASONA-style motion. */
@@ -238,9 +242,9 @@ export default function MypageLogin() {
           </div>
 
           <div style={{ borderTop:"1px solid #EDE7E7", marginTop:"24px", paddingTop:"18px", textAlign:"center" }}>
-            <Link href="/" className="login-text-link" style={{ fontSize:"13px", color:"#185FA5", textDecoration:"none", fontWeight:600 }}>← Asekaトップへ戻る</Link>
+            <Link href={MAIN_SITE_URL} className="login-text-link" style={{ fontSize:"13px", color:"#185FA5", textDecoration:"none", fontWeight:600 }}>← Asekaトップへ戻る</Link>
             <span style={{ color:"#D8DCE3", margin:"0 10px" }}>|</span>
-            <Link href="/dang-ky" className="login-text-link" style={{ fontSize:"13px", color:red, textDecoration:"none", fontWeight:600 }}>新規登録はこちら →</Link>
+            <Link href={`${MAIN_SITE_URL}/dang-ky`} className="login-text-link" style={{ fontSize:"13px", color:red, textDecoration:"none", fontWeight:600 }}>新規登録はこちら →</Link>
           </div>
         </div>
       </div>
