@@ -296,8 +296,9 @@ export default function Mypage() {
         <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 24px", height:"52px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
             <Link href="/" style={{ display:"flex", alignItems:"center", gap:"7px", textDecoration:"none" }}>
-              <div style={{ width:"28px", height:"28px", background:navy, borderRadius:"6px", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 7V13L10 18L2 13V7Z" stroke="white" strokeWidth="1.4"/><circle cx="10" cy="10" r="3" fill="white"/></svg>
+              <div style={{ width:"28px", height:"28px", background:"#fff", borderRadius:"7px", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden", border:"1px solid rgba(11,31,58,0.08)" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"22px", height:"22px", objectFit:"contain", display:"block" }} />
               </div>
               <span style={{ fontWeight:800, fontSize:"14px", color:navy, letterSpacing:"0.08em" }}>ASEKA</span>
             </Link>

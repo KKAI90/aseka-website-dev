@@ -105,8 +105,9 @@ export default function MypageLogin() {
 
           {/* Logo */}
           <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"8px" }}>
-            <div style={{ width:"38px", height:"38px", background:navy, borderRadius:"9px", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 3px 10px rgba(11,31,58,0.25)" }}>
-              <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 7V13L10 18L2 13V7Z" stroke="white" strokeWidth="1.4"/><circle cx="10" cy="10" r="3" fill="white"/></svg>
+            <div style={{ width:"38px", height:"38px", background:"#fff", borderRadius:"9px", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden", boxShadow:"0 2px 8px rgba(11,31,58,0.14)", border:"1px solid rgba(11,31,58,0.06)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"30px", height:"30px", objectFit:"contain", display:"block" }} />
             </div>
             <span style={{ fontSize:"23px", fontWeight:800, color:navy, letterSpacing:"0.08em" }}>ASEKA</span>
           </div>

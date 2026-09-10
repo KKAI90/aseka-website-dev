@@ -108,8 +108,9 @@ export default function DangKy() {
     <div style={{ minHeight:"100vh", background:"#F6F7F9", display:"flex", flexDirection:"column" }}>
       <header style={{ background:"#fff", borderBottom:"0.5px solid rgba(11,31,58,0.1)", padding:"0 24px", height:"60px", display:"flex", alignItems:"center" }}>
         <Link href="/" style={{ display:"flex", alignItems:"center", gap:"8px", textDecoration:"none" }}>
-          <div style={{ width:"32px", height:"32px", background:navy, borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 7V13L10 18L2 13V7Z" stroke="white" strokeWidth="1.4"/><circle cx="10" cy="10" r="3" fill="white"/></svg>
+          <div style={{ width:"32px", height:"32px", background:"#fff", borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden", border:"1px solid rgba(11,31,58,0.08)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"26px", height:"26px", objectFit:"contain", display:"block" }} />
           </div>
           <span style={{ fontWeight:700, fontSize:"16px", color:navy }}>ASEKA</span>
         </Link>
@@ -141,8 +142,9 @@ export default function DangKy() {
       {/* Navbar */}
       <header style={{ background:"#fff", borderBottom:"0.5px solid rgba(11,31,58,0.1)", padding:"0 24px", height:"60px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:50 }}>
         <Link href="/" style={{ display:"flex", alignItems:"center", gap:"8px", textDecoration:"none" }}>
-          <div style={{ width:"32px", height:"32px", background:navy, borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2L18 7V13L10 18L2 13V7Z" stroke="white" strokeWidth="1.4"/><circle cx="10" cy="10" r="3" fill="white"/></svg>
+          <div style={{ width:"32px", height:"32px", background:"#fff", borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden", border:"1px solid rgba(11,31,58,0.08)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/aseka-logo-icon.png" alt="ASEKA" style={{ width:"26px", height:"26px", objectFit:"contain", display:"block" }} />
           </div>
           <span style={{ fontWeight:700, fontSize:"16px", color:navy }}>ASEKA</span>
         </Link>
