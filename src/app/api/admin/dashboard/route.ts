@@ -84,11 +84,44 @@ export async function GET(req: NextRequest) {
     const jobsThisMonth   = jobList.filter(j => j.created_at >= monthStart).length;
     const offersThisMonth = cands.filter(c => c.status === "offered" && c.updated_at >= monthStart).length;
 
+    // ── Monthly trend: last 6 months (oldest → newest, current month last) ──
+    // "offers" here counts candidates whose status is CURRENTLY "offered" and whose
+    // record was last touched in that month — same proxy the single-month figure above
+    // already uses (there's no dedicated offered_at timestamp in the schema), kept
+    // consistent rather than introducing a second, different definition of "offer".
+    const MONTH_JA = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+    const monthlyTrend = Array.from({ length: 6 }, (_, i) => {
+      const idx = 5 - i;
+      const start = new Date(now.getFullYear(), now.getMonth() - idx, 1);
+      const end   = new Date(now.getFullYear(), now.getMonth() - idx + 1, 1);
+      const startIso = start.toISOString(), endIso = end.toISOString();
+      return {
+        label: MONTH_JA[start.getMonth()],
+        year: start.getFullYear(),
+        month: start.getMonth() + 1,
+        cv:     cands.filter(c => c.created_at >= startIso && c.created_at < endIso).length,
+        jobs:   jobList.filter(j => j.created_at >= startIso && j.created_at < endIso).length,
+        offers: cands.filter(c => c.status === "offered" && c.updated_at >= startIso && c.updated_at < endIso).length,
+      };
+    });
+    const thisMonthIdx = monthlyTrend.length - 1;
+    const lastMonth = monthlyTrend[thisMonthIdx - 1];
+    // % change vs previous month — null (not 0 or ±100%) when the prior month had zero,
+    // since a 0→N jump isn't meaningfully expressible as a percentage change.
+    const pctDelta = (cur: number, prev: number): number | null => prev === 0 ? null : Math.round(((cur - prev) / prev) * 100);
+    const trendDeltas = {
+      cv:     pctDelta(cvThisMonth, lastMonth.cv),
+      jobs:   pctDelta(jobsThisMonth, lastMonth.jobs),
+      offers: pctDelta(offersThisMonth, lastMonth.offers),
+    };
+
     return NextResponse.json({
       stats: { interview, offered, activeJobs, urgentJobs, unreadMsgs },
       pipeline, jobsByIndustry, activity,
       totals: { candidates: cands.length, jobs: jobList.length },
       monthly: { cv: cvThisMonth, jobs: jobsThisMonth, offers: offersThisMonth },
+      monthlyTrend, trendDeltas,
+      generatedAt: now.toISOString(),
       _debug: { rawStatuses },
     });
   } catch (err) {

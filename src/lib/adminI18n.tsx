@@ -97,6 +97,10 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "dashboard.snapshotSub": { en: "Here's what's happening across ASEKA today.", vi: "Tổng quan hoạt động của ASEKA hôm nay.", ja: "本日のASEKA業務サマリーです。" },
   "dashboard.quickActions": { en: "Quick actions", vi: "Thao tác nhanh", ja: "クイックアクション" },
   "dashboard.pendingApplies": { en: "Self-applications to review", vi: "Ứng viên tự apply cần xử lý", ja: "本人応募・要確認" },
+  "dashboard.monthlyTrendTitle": { en: "Monthly Trend (6 months)", vi: "Xu hướng theo tháng (6 tháng)", ja: "月次推移（過去6ヶ月）" },
+  "dashboard.monthlyTrendSub": { en: "CVs, jobs, and offers registered per month", vi: "CV, tin tuyển dụng và offer đăng ký theo từng tháng", ja: "月ごとのCV登録・求人・内定数" },
+  "dashboard.exportPdf": { en: "Export PDF", vi: "Xuất PDF", ja: "PDFで出力" },
+  "dashboard.exporting": { en: "Generating...", vi: "Đang tạo...", ja: "生成中..." },
 
   // ── candidates ──────────────────────────────────────
   "candidates.title": { en: "Candidate Management", vi: "Quản lý Ứng viên", ja: "人材管理" },
