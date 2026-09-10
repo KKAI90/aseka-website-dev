@@ -96,7 +96,10 @@ export default function Footer() {
         </span>
       </div>
 
-      <style>{`
+      {/* dangerouslySetInnerHTML avoids a React SSR/CSR hydration mismatch: the ">"
+          combinator below gets HTML-entity-escaped in a literal JSX text child, but
+          <style> is a raw-text element in browsers and never decodes it back. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         .footer-link:hover { color: var(--gold) !important; }
         @media (max-width: 900px) {
           .lux-footer-inner {
@@ -107,7 +110,7 @@ export default function Footer() {
           }
           .lux-footer-inner > div:last-child { text-align: center !important; }
         }
-      `}</style>
+      ` }} />
     </footer>
   );
 }

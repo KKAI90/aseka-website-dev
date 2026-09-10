@@ -141,13 +141,16 @@ export default function CompanyInfo() {
       </div>
 
 
-      <style>{`
+      {/* dangerouslySetInnerHTML avoids a React SSR/CSR hydration mismatch: the ">"
+          combinator below gets HTML-entity-escaped in a literal JSX text child, but
+          <style> is a raw-text element in browsers and never decodes it back. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @media (max-width: 900px) {
           .info-grid { grid-template-columns: 1fr !important; }
           .info-grid > div[style*="grid-column"] { grid-column: 1 !important; }
         }
         @media (max-width: 600px) { #company { padding: 80px 24px !important; } }
-      `}</style>
+      ` }} />
     </section>
   );
 }

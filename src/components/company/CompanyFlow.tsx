@@ -171,7 +171,10 @@ export default function CompanyFlow() {
         ))}
       </div>
 
-      <style>{`
+      {/* dangerouslySetInnerHTML avoids a React SSR/CSR hydration mismatch: the ">"
+          combinator below gets HTML-entity-escaped in a literal JSX text child, but
+          <style> is a raw-text element in browsers and never decodes it back. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         .flow-card:hover { background: #FDFCFA !important; }
         .flow-card:hover .flow-bar { transform: scaleX(1) !important; }
         @media (max-width: 900px) {
@@ -182,7 +185,7 @@ export default function CompanyFlow() {
           #process { padding: 64px 0 !important; }
           #process > div:first-child { padding: 0 24px 40px !important; }
         }
-      `}</style>
+      ` }} />
     </section>
   );
 }

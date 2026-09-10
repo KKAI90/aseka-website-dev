@@ -192,7 +192,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <style>{`
+      {/* dangerouslySetInnerHTML, not a literal JSX text child — the child-combinator
+          ">" in ".admin-main > div" gets HTML-entity-escaped ("&gt;") by React's normal
+          SSR text serialization, but browsers treat <style> as a raw-text element and
+          never decode entities back, so the SSR'd markup and the client's re-render
+          disagreed and forced a full client-side re-render on every admin page. */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes adminFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes adminBadgePop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
@@ -272,7 +277,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
           .admin-root { flex-direction: column; }
           .admin-main { flex: 1; overflow: auto; background: #F6F7F9; }
         }
-      `}</style>
+
+        /* Printing a page (e.g. Dashboard → Export PDF) should show only that page's
+           own print-only content, not the nav chrome around it. */
+        @media print {
+          .admin-sidebar-desktop, .admin-sidebar-mobile, .admin-overlay, .admin-topbar-mobile { display: none !important; }
+          .admin-root, .admin-main { display: block !important; height: auto !important; overflow: visible !important; }
+        }
+      ` }} />
 
       <div className="admin-root">
 
