@@ -18,9 +18,10 @@ type Job = {
   created_at: string;
 };
 
+type MatchBreakdown = { criterion:string; score:number; noteVn:string };
 type MatchResult = {
   candidateId: string; candidateName: string; matchPct: number;
-  reasonJa: string; reasonVn: string; strengths: string[];
+  reasonVn: string; strengths: string[]; breakdown?: MatchBreakdown[];
   candidate: { id:string;name:string;skill:string;jlpt:string;status:string;email:string;phone:string };
 };
 
@@ -116,6 +117,7 @@ export default function JobsPage() {
   const [saving, setSaving] = useState(false);
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [matching, setMatching] = useState(false);
+  const [matchError, setMatchError] = useState<string|null>(null);
   const [activeTab, setActiveTab] = useState<"info"|"match">("info");
   const B = {border:"0.5px solid rgba(11,31,58,0.1)"};
   const navy = "#0B1F3A";
@@ -203,7 +205,7 @@ export default function JobsPage() {
 
   const runMatch = async () => {
     if (!selected) return;
-    setMatching(true); setMatches([]); setActiveTab("match");
+    setMatching(true); setMatches([]); setMatchError(null); setActiveTab("match");
     try {
       const res = await fetch("/api/admin/match-candidates",{
         method:"POST",
@@ -212,7 +214,8 @@ export default function JobsPage() {
       });
       const d = await res.json();
       setMatches(d.matches||[]);
-    } catch { setMatches([]); }
+      setMatchError(d.error||null);
+    } catch { setMatches([]); setMatchError("failed"); }
     setMatching(false);
   };
 
@@ -229,6 +232,8 @@ export default function JobsPage() {
         .job-card-link { transition: gap 0.2s ease, color 0.2s ease; }
         .jobs-input, .jobs-select { transition: border-color 0.15s, box-shadow 0.15s; }
         .jobs-input:focus, .jobs-select:focus { border-color:#0B1F3A !important; box-shadow: 0 0 0 3px rgba(11,31,58,0.08); }
+        .match-card:hover { box-shadow: 0 4px 16px rgba(11,31,58,0.08); }
+        .match-card:hover .match-name-link { text-decoration-color: #0B1F3A !important; }
       `}</style>
       <div style={{background:"#fff",...B,borderTop:"none",borderLeft:"none",borderRight:"none",padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"10px"}}>
         <div>
@@ -478,7 +483,19 @@ export default function JobsPage() {
                     <div style={{fontSize:"11px",color:"#6B6B6B",marginTop:"4px"}}>{t("jobs.aiAnalyzingDesc")}</div>
                   </div>
                 )}
-                {!matching&&matches.length===0&&(
+                {!matching&&matches.length===0&&matchError&&(
+                  <div style={{textAlign:"center",padding:"32px"}}>
+                    <div style={{fontSize:"24px",marginBottom:"12px"}}>⚠️</div>
+                    <div style={{fontSize:"13px",fontWeight:600,color:"#A32D2D",marginBottom:"6px"}}>
+                      {matchError==="rate_limited" ? t("jobs.matchRateLimited") : t("jobs.matchFailed")}
+                    </div>
+                    <div style={{fontSize:"11px",color:"#6B6B6B",marginBottom:"16px"}}>
+                      {matchError==="rate_limited" ? t("jobs.matchRateLimitedDesc") : t("jobs.matchFailedDesc")}
+                    </div>
+                    <button onClick={runMatch} style={{padding:"9px 20px",borderRadius:"8px",fontSize:"12px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer"}}>{t("common.retry")}</button>
+                  </div>
+                )}
+                {!matching&&matches.length===0&&!matchError&&(
                   <div style={{textAlign:"center",padding:"32px"}}>
                     <div style={{fontSize:"24px",marginBottom:"12px"}}>🎯</div>
                     <div style={{fontSize:"13px",fontWeight:600,color:navy,marginBottom:"6px"}}>{t("jobs.runMatchTitle")}</div>
@@ -487,12 +504,14 @@ export default function JobsPage() {
                   </div>
                 )}
                 {matches.map((m,i)=>(
-                  <div key={m.candidateId} style={{...B,borderRadius:"10px",padding:"14px",marginBottom:"10px",background:i===0?"#F0F7FF":"#fff"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"8px"}}>
+                  <div key={m.candidateId} className="match-card" style={{...B,borderRadius:"10px",padding:"14px",marginBottom:"10px",background:i===0?"#F0F7FF":"#fff",transition:"box-shadow 0.2s ease"}}>
+                    <div onClick={()=>router.push(`/admin/candidates?id=${m.candidateId}`)}
+                      style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"8px",cursor:"pointer"}}
+                      title={t("jobs.viewCandidateProfile")}>
                       <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
                         <div style={{width:"28px",height:"28px",borderRadius:"50%",background:i===0?navy:"#E6F1FB",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",fontWeight:700,color:i===0?"#fff":navy,flexShrink:0}}>{i+1}</div>
                         <div>
-                          <div style={{fontSize:"13px",fontWeight:700,color:navy}}>{m.candidateName}</div>
+                          <div className="match-name-link" style={{fontSize:"13px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{m.candidateName} →</div>
                           <div style={{fontSize:"10px",color:"#6B6B6B"}}>{m.candidate?.skill} · {m.candidate?.jlpt} · {m.candidate?.status}</div>
                         </div>
                       </div>
@@ -504,15 +523,33 @@ export default function JobsPage() {
                     <div style={{background:"#F1EFE8",borderRadius:"4px",height:"5px",overflow:"hidden",marginBottom:"8px"}}>
                       <div style={{height:"100%",background:m.matchPct>=70?"#27500A":m.matchPct>=50?"#EF9F27":"#B4B2A9",borderRadius:"4px",width:`${m.matchPct}%`,transition:"width 0.8s"}}/>
                     </div>
-                    <div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"6px"}}>{m.reasonVn}</div>
+                    <div style={{fontSize:"11px",color:"#444",lineHeight:1.6,marginBottom:"8px"}}>{m.reasonVn}</div>
+
+                    {/* Per-criteria breakdown */}
+                    {m.breakdown && m.breakdown.length>0 && (
+                      <div style={{display:"flex",flexDirection:"column",gap:"5px",marginBottom:"8px",background:"#FAFBFC",borderRadius:"8px",padding:"8px 10px",border:"0.5px solid rgba(11,31,58,0.06)"}}>
+                        {m.breakdown.map((b,bi)=>(
+                          <div key={bi} style={{display:"flex",alignItems:"center",gap:"8px"}}>
+                            <span style={{fontSize:"10px",fontWeight:600,color:navy,width:"46px",flexShrink:0}}>{b.criterion}</span>
+                            <div style={{flex:1,background:"#EEF0F3",borderRadius:"3px",height:"4px",overflow:"hidden"}}>
+                              <div style={{height:"100%",width:`${b.score}%`,background:b.score>=70?"#27500A":b.score>=50?"#EF9F27":"#C8002A",borderRadius:"3px",transition:"width 0.6s"}}/>
+                            </div>
+                            <span style={{fontSize:"10px",fontWeight:700,color:navy,width:"28px",textAlign:"right",flexShrink:0}}>{b.score}%</span>
+                            <span style={{fontSize:"9px",color:"#6B6B6B",flexShrink:0,maxWidth:"110px",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} title={b.noteVn}>{b.noteVn}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {m.strengths?.length>0&&(
                       <div style={{display:"flex",flexWrap:"wrap",gap:"4px",marginBottom:"8px"}}>
                         {m.strengths.map((s,si)=><span key={si} style={{background:"#E6F1FB",color:"#0C447C",fontSize:"10px",padding:"2px 8px",borderRadius:"20px"}}>{s}</span>)}
                       </div>
                     )}
                     <div style={{display:"flex",gap:"6px"}}>
-                      <a href={`mailto:${m.candidate?.email}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>{t("common.sendEmail")}</a>
-                      {m.candidate?.phone&&<a href={`tel:${m.candidate.phone}`} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:"#EAF3DE",color:"#27500A",textDecoration:"none",border:"0.5px solid #27500A"}}>{t("common.call")}</a>}
+                      <button onClick={()=>router.push(`/admin/candidates?id=${m.candidateId}`)} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:"#fff",color:navy,border:"1px solid rgba(11,31,58,0.2)",cursor:"pointer"}}>{t("jobs.viewProfile")}</button>
+                      <a href={`mailto:${m.candidate?.email}`} onClick={e=>e.stopPropagation()} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>{t("common.sendEmail")}</a>
+                      {m.candidate?.phone&&<a href={`tel:${m.candidate.phone}`} onClick={e=>e.stopPropagation()} style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,textAlign:"center",background:"#EAF3DE",color:"#27500A",textDecoration:"none",border:"0.5px solid #27500A"}}>{t("common.call")}</a>}
                     </div>
                   </div>
                 ))}

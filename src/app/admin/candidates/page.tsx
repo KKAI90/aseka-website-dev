@@ -173,6 +173,21 @@ export default function CandidatesPage() {
 
   useEffect(()=>{load();},[load]);
 
+  // Deep-link support: /admin/candidates?id=xxx (e.g. from Jobs → AIマッチング) auto-opens that candidate's detail panel once.
+  const appliedDeepLink = useRef(false);
+  useEffect(() => {
+    if (appliedDeepLink.current || cands.length === 0) return;
+    const id = new URLSearchParams(window.location.search).get("id");
+    if (!id) { appliedDeepLink.current = true; return; }
+    const found = cands.find(c => c.id === id);
+    if (found) {
+      setSelected(found);
+      setEditingBasic(false);
+      window.history.replaceState(null, "", "/admin/candidates");
+    }
+    appliedDeepLink.current = true;
+  }, [cands]);
+
   // Debounce search input → search (300ms)
   useEffect(()=>{
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);

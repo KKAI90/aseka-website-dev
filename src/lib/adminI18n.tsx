@@ -10,6 +10,7 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "common.save": { en: "Save", vi: "Lưu", ja: "保存" },
   "common.saving": { en: "Saving...", vi: "Đang lưu...", ja: "保存中..." },
   "common.cancel": { en: "Cancel", vi: "Huỷ", ja: "キャンセル" },
+  "common.retry": { en: "Try again", vi: "Thử lại", ja: "再試行" },
   "common.delete": { en: "Delete", vi: "Xoá", ja: "削除" },
   "common.edit": { en: "Edit", vi: "Sửa", ja: "編集" },
   "common.back": { en: "Back", vi: "Quay lại", ja: "戻る" },
@@ -272,6 +273,12 @@ const DICT: Record<string, Record<AdminLang, string>> = {
   "jobs.inputPlaceholder": { en: "Enter {field}...", vi: "Nhập {field}...", ja: "{field}を入力..." },
   "jobs.osusumePointLabel": { en: "⭐ Highlight", vi: "⭐ Điểm nổi bật", ja: "⭐ おすすめポイント" },
   "jobs.matchDegree": { en: "Fit score", vi: "Độ phù hợp", ja: "マッチ度" },
+  "jobs.viewCandidateProfile": { en: "Click to view candidate profile", vi: "Bấm để xem hồ sơ ứng viên", ja: "クリックで候補者詳細へ" },
+  "jobs.viewProfile": { en: "View profile", vi: "Xem hồ sơ", ja: "詳細を見る" },
+  "jobs.matchRateLimited": { en: "AI is busy right now", vi: "AI đang quá tải tạm thời", ja: "AIが混み合っています" },
+  "jobs.matchRateLimitedDesc": { en: "Too many AI requests in the last minute. Please wait about 30 seconds and try again.", vi: "Quá nhiều yêu cầu AI trong 1 phút qua. Vui lòng đợi khoảng 30 giây rồi thử lại.", ja: "直近1分間のAIリクエストが多すぎます。約30秒待ってから再試行してください。" },
+  "jobs.matchFailed": { en: "Matching failed", vi: "Không thể chạy AI matching", ja: "マッチングに失敗しました" },
+  "jobs.matchFailedDesc": { en: "Something went wrong on the AI side. Please try again.", vi: "Có lỗi xảy ra phía AI. Vui lòng thử lại.", ja: "AI側でエラーが発生しました。もう一度お試しください。" },
   "jobs.employmentTypeDefault": { en: "Full-time", vi: "Nhân viên chính thức", ja: "正社員" },
 
   // ── messages ────────────────────────────────────────
