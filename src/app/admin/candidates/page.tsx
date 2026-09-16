@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { createPortal } from "react-dom";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import JSZip from "jszip";
@@ -54,6 +55,15 @@ const navy="#0B1F3A";
 const B={border:"0.5px solid rgba(11,31,58,0.1)"};
 const fmt=(b:number)=>b>1048576?`${(b/1048576).toFixed(1)}MB`:`${(b/1024).toFixed(0)}KB`;
 const fmtDate=(s:string)=>s?new Date(s).toLocaleDateString("ja-JP"):"—";
+const calcAge=(dob:string)=>{
+  if(!dob) return null;
+  const b=new Date(dob); if(Number.isNaN(b.getTime())) return null;
+  const now=new Date();
+  let age=now.getFullYear()-b.getFullYear();
+  const m=now.getMonth()-b.getMonth();
+  if(m<0||(m===0&&now.getDate()<b.getDate())) age--;
+  return age;
+};
 // FORM_URL phải luôn trỏ về domain chính (nơi /dang-ky thực sự tồn tại) —
 // KHÔNG dùng window.location.origin vì trang này chạy trên subdomain admin.*,
 // middleware chặn mọi route không phải /admin trên subdomain đó.
@@ -126,6 +136,216 @@ ${c.self_pr?`<div class="section">自己PR</div><p style="font-size:13px;line-he
   const a = document.createElement("a");
   a.href = url; a.download = `CV_${c.name.replace(/\s+/g,"_")}.html`;
   a.click(); URL.revokeObjectURL(url);
+}
+
+/* ─── CV Modal (履歴書-style view) ──────────────────────────── */
+const DOC_FIELDS: {key:"photo_url"|"id_front_url"|"id_back_url"|"jlpt_cert_url"|"senmonkyu_url"|"other_cert_url"; labelKey:string}[] = [
+  { key:"id_front_url",   labelKey:"candidates.docIdFront" },
+  { key:"id_back_url",    labelKey:"candidates.docIdBack" },
+  { key:"jlpt_cert_url",  labelKey:"candidates.docJlptCert" },
+  { key:"senmonkyu_url",  labelKey:"candidates.docSenmonkyu" },
+  { key:"other_cert_url", labelKey:"candidates.docOther" },
+];
+
+function CVModal({ candidate, fileUrls, loading, onClose, t }:
+  { candidate:Candidate; fileUrls:Record<string,string|null>; loading:boolean; onClose:()=>void; t:(k:string,v?:Record<string,string|number>)=>string }) {
+  const age = calcAge(candidate.date_of_birth);
+  const edu = candidate.education||[];
+  const work = candidate.work_history||[];
+  const certs = candidate.certifications||[];
+  const attachedDocs = DOC_FIELDS.filter(d => candidate[d.key]);
+
+  const th: React.CSSProperties = { border:"1px solid #C9C6BB", background:"#F6F7F9", fontWeight:700, fontSize:"11px", padding:"6px 8px", textAlign:"left", color:navy, whiteSpace:"nowrap" };
+  const td: React.CSSProperties = { border:"1px solid #C9C6BB", fontSize:"12px", padding:"6px 8px", color:"#1A1A1A" };
+  const sectionBar: React.CSSProperties = { background:navy, color:"#fff", fontSize:"12px", fontWeight:700, padding:"6px 10px", letterSpacing:"0.02em" };
+
+  // Portal straight to document.body: .admin-main > div carries a CSS animation
+  // (adminFadeIn) that sets `transform`, which creates a new containing block for any
+  // position:fixed descendant per the CSS spec. Without the portal, this overlay would
+  // resolve "fixed" against that animated ancestor instead of the viewport — found via
+  // real-browser screenshot testing (the modal rendered squeezed into the content area,
+  // sidebar still visible, instead of covering the whole screen).
+  return createPortal(
+    <div className="rirekisho-overlay" style={{position:"fixed",inset:0,background:"rgba(11,31,58,0.55)",zIndex:200,display:"flex",alignItems:"flex-start",justifyContent:"center",overflowY:"auto",padding:"28px 16px"}} onClick={onClose}>
+      <style>{`
+        @media print {
+          /* visibility:hidden (the usual "print only this element" trick) keeps every
+             hidden element's layout box in the flow — it only stops painting. Since this
+             modal is portalled to document.body, the whole rest of the admin app (sidebar,
+             candidate list, detail panel) is a sibling that still occupies its full height
+             above us, pushing our content a full page down and leaving page 1 blank
+             (verified via a real PDF export). display:none actually removes those siblings
+             from layout instead, so collapse everything except our own overlay. */
+          body > *:not(.rirekisho-overlay) { display: none !important; }
+          /* The overlay is position:fixed + overflow-y:auto so it can scroll on screen —
+             but a fixed/overflow-clipped ancestor also clips Chromium's print pagination,
+             silently dropping every page after the first (verified: the 添付書類 page
+             vanished entirely from a real PDF export until this was added). Print needs
+             the whole chain back in normal, unclipped flow so content can paginate. */
+          .rirekisho-overlay { position: static !important; overflow: visible !important; height: auto !important; padding: 0 !important; background: none !important; display: block !important; }
+          .rirekisho-print { position: static !important; overflow: visible !important; width: 100% !important; max-width: 100% !important; box-shadow: none !important; border-radius: 0 !important; }
+          .rirekisho-noprint { display: none !important; }
+        }
+      `}</style>
+      <div className="rirekisho-print" onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:"10px",maxWidth:"860px",width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)",overflow:"hidden"}}>
+        <div className="rirekisho-noprint" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 18px",borderBottom:"0.5px solid rgba(11,31,58,0.1)",position:"sticky",top:0,background:"#fff",zIndex:2}}>
+          <div style={{fontSize:"14px",fontWeight:700,color:navy}}>📋 {t("candidates.rirekishoTitle")} — {candidate.name}</div>
+          <div style={{display:"flex",gap:"8px"}}>
+            <button onClick={()=>window.print()} style={{padding:"6px 12px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"#EAF3DE",color:"#27500A",border:"0.5px solid #27500A",cursor:"pointer"}}>🖨 {t("candidates.printBtn")}</button>
+            <button onClick={onClose} style={{padding:"6px 12px",borderRadius:"6px",fontSize:"11px",fontWeight:600,background:"#F1EFE8",color:navy,border:"0.5px solid rgba(11,31,58,0.15)",cursor:"pointer"}}>✕</button>
+          </div>
+        </div>
+
+        <div style={{padding:"20px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:"8px"}}>
+            <h2 style={{fontSize:"20px",fontWeight:700,color:navy,margin:0}}>{t("candidates.rirekishoTitle")}</h2>
+            <div style={{fontSize:"11px",color:"#52525B"}}>{t("candidates.printedOn")}: {new Date().toLocaleDateString("ja-JP")}</div>
+          </div>
+
+          <table style={{width:"100%",borderCollapse:"collapse",marginBottom:"14px",tableLayout:"fixed"}}>
+            <tbody>
+              <tr>
+                <td style={{...td,width:"110px"}} rowSpan={4}>
+                  {loading ? (
+                    <div style={{width:"100px",height:"120px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",color:"#999",border:"1px solid #C9C6BB"}}>...</div>
+                  ) : fileUrls.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={fileUrls.photo_url} alt={candidate.name} style={{width:"100px",height:"120px",objectFit:"cover",border:"1px solid #C9C6BB"}} />
+                  ) : (
+                    <div style={{width:"100px",height:"120px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",color:"#999",border:"1px solid #C9C6BB",textAlign:"center",padding:"4px"}}>{t("candidates.docPhoto")}</div>
+                  )}
+                </td>
+                <th style={th}>{t("candidates.furigana")}</th>
+                <td style={td} colSpan={3}>{candidate.name_kana||"—"}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.name")}</th>
+                <td style={{...td,fontSize:"15px",fontWeight:700}} colSpan={3}>{candidate.name}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.dob")}</th>
+                <td style={td}>{fmtDate(candidate.date_of_birth)}{age!==null?`（${age}${t("candidates.ageYears")}）`:""}</td>
+                <th style={th}>{t("candidates.gender")}</th>
+                <td style={td}>{candidate.gender||"—"}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.visaType")}</th>
+                <td style={td}>{candidate.visa_type||"—"}</td>
+                <th style={th}>{t("candidates.visaExpiry")}</th>
+                <td style={td}>{fmtDate(candidate.visa_expiry)}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.currentAddress")}</th>
+                <td style={td} colSpan={4}>{candidate.address||"—"}（{candidate.nationality||"Vietnam"}）</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.mobile")}</th>
+                <td style={td}>{candidate.phone||"—"}</td>
+                <th style={th}>{t("candidates.contact")}</th>
+                <td style={td}>{candidate.email||"—"}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.jobType")}</th>
+                <td style={td}>{candidate.preferred_job||"—"}</td>
+                <th style={th}>{t("candidates.jlptExam")}</th>
+                <td style={td}>{candidate.jlpt||"—"}{candidate.jlpt_actual?`（${candidate.jlpt_actual}）`:""}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.preferredLocation")}</th>
+                <td style={td} colSpan={3}>{candidate.preferred_location||"—"}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style={sectionBar}>{t("candidates.education")}</div>
+          <table style={{width:"100%",borderCollapse:"collapse",marginBottom:"14px"}}>
+            <thead><tr><th style={{...th,width:"70px"}}>年</th><th style={{...th,width:"50px"}}>月</th><th style={th}>{t("candidates.education")}</th></tr></thead>
+            <tbody>
+              {edu.length===0 && <tr><td style={td} colSpan={3}>{t("candidates.noEntry")}</td></tr>}
+              {edu.map((e,i)=>(
+                <tr key={i}><td style={td}>{e.year||"—"}</td><td style={td}>{e.month||"—"}</td><td style={td}>{e.school} {e.event||""}</td></tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={sectionBar}>{t("candidates.workHistory")}</div>
+          <table style={{width:"100%",borderCollapse:"collapse",marginBottom:"14px"}}>
+            <thead><tr><th style={{...th,width:"70px"}}>年</th><th style={{...th,width:"50px"}}>月</th><th style={th}>{t("candidates.workHistory")}</th></tr></thead>
+            <tbody>
+              {work.length===0 && <tr><td style={td} colSpan={3}>{t("candidates.noEntry")}</td></tr>}
+              {work.map((w,i)=>(
+                <tr key={i}><td style={td}>{w.year||"—"}</td><td style={td}>{w.month||"—"}</td><td style={td}>{w.company} {w.position?`（${w.position}）`:""} {w.event||""}</td></tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={sectionBar}>{t("candidates.certifications")}</div>
+          <table style={{width:"100%",borderCollapse:"collapse",marginBottom:"14px"}}>
+            <thead><tr><th style={{...th,width:"70px"}}>年</th><th style={{...th,width:"50px"}}>月</th><th style={th}>{t("candidates.certifications")}</th></tr></thead>
+            <tbody>
+              {certs.length===0 && <tr><td style={td} colSpan={3}>{t("candidates.noEntry")}</td></tr>}
+              {certs.map((c,i)=>(
+                <tr key={i}><td style={td}>{c.year||"—"}</td><td style={td}>{c.month||"—"}</td><td style={td}>{c.name} {c.result?`（${c.result}）`:""}</td></tr>
+              ))}
+            </tbody>
+          </table>
+
+          <table style={{width:"100%",borderCollapse:"collapse",marginBottom:"14px"}}>
+            <tbody>
+              <tr>
+                <th style={{...th,width:"25%"}}>{t("candidates.healthTransport")}</th>
+                <td style={td}>{t("candidates.healthGood")} — {candidate.height_cm?`${candidate.height_cm}cm`:"—"} / {candidate.weight_kg?`${candidate.weight_kg}kg`:"—"}</td>
+              </tr>
+              <tr>
+                <th style={th}>{t("candidates.spouseStatus")} / {t("candidates.familyDependents")}</th>
+                <td style={td}>{candidate.marital_status||"—"} / {candidate.dependents||0}{t("candidates.familyDependents")==="扶養家族数（配偶者を除く）"?"人":""}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style={sectionBar}>{t("candidates.motivationTitle")}</div>
+          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.motivation||t("candidates.noEntry")}</div>
+
+          <div style={sectionBar}>{t("candidates.selfPrTitle")}</div>
+          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.self_pr||t("candidates.noEntry")}</div>
+
+          <div style={sectionBar}>{t("candidates.requestField")}</div>
+          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"36px",marginBottom:"4px"}}>{candidate.preferred_location||t("candidates.noEntry")}</div>
+        </div>
+
+        {/* ─ Page 2: attached ID / certificate images ─ */}
+        <div style={{padding:"20px",borderTop:"2px solid "+navy,pageBreakBefore:"always"} as React.CSSProperties}>
+          <div style={sectionBar}>{t("candidates.attachedDocsPage")}</div>
+          {loading ? (
+            <div style={{padding:"20px",textAlign:"center",fontSize:"12px",color:"#52525B"}}>...</div>
+          ) : attachedDocs.length===0 ? (
+            <div style={{padding:"20px",textAlign:"center",fontSize:"12px",color:"#52525B"}}>{t("candidates.noDocuments")}</div>
+          ) : (
+            <div style={{display:"grid",gridTemplateColumns:"repeat(2, 1fr)",gap:"12px",marginTop:"10px"}}>
+              {attachedDocs.map(d => {
+                const url = fileUrls[d.key];
+                const isPdf = (String(candidate[d.key]||"")).toLowerCase().endsWith(".pdf");
+                return (
+                  <div key={d.key} style={{border:"1px solid #C9C6BB",borderRadius:"6px",overflow:"hidden"}}>
+                    <div style={{background:"#F6F7F9",fontSize:"11px",fontWeight:700,color:navy,padding:"6px 8px",borderBottom:"1px solid #C9C6BB"}}>{t(d.labelKey)}</div>
+                    {!url ? (
+                      <div style={{padding:"20px",textAlign:"center",fontSize:"11px",color:"#A32D2D"}}>{t("candidates.fileUnavailable")}</div>
+                    ) : isPdf ? (
+                      <a href={url} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",height:"120px",fontSize:"11px",fontWeight:600,color:navy,background:"#F1EFE8",textDecoration:"none"}}>📄 PDF — {t("common.export")}</a>
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={url} alt={t(d.labelKey)} style={{width:"100%",maxHeight:"260px",objectFit:"contain",background:"#F1EFE8"}} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
 }
 
 /* ─── Main Component ─────────────────────────────────────── */
@@ -278,6 +498,24 @@ export default function CandidatesPage() {
       else alert(t("candidates.fileUnavailable"));
     } catch { alert(t("candidates.fileUnavailable")); }
     setOpeningFile(null);
+  };
+
+  const [showCV, setShowCV] = useState(false);
+  const [cvFileUrls, setCvFileUrls] = useState<Record<string,string|null>>({});
+  const [cvLoading, setCvLoading] = useState(false);
+  const openCVView = async (cand: Candidate) => {
+    setShowCV(true); setCvLoading(true); setCvFileUrls({});
+    const fields: (keyof Candidate)[] = ["photo_url","id_front_url","id_back_url","jlpt_cert_url","senmonkyu_url","other_cert_url"];
+    const present = fields.filter(f => cand[f]);
+    const results = await Promise.all(present.map(async f => {
+      try {
+        const res = await fetch(`/api/admin/candidates/file?id=${cand.id}&field=${f}`);
+        const d = await res.json();
+        return [f, res.ok ? d.url : null] as const;
+      } catch { return [f, null] as const; }
+    }));
+    setCvFileUrls(Object.fromEntries(results));
+    setCvLoading(false);
   };
 
   const deleteCandidate = async (id:string) => {
@@ -963,6 +1201,9 @@ export default function CandidatesPage() {
                     <button key={k} onClick={()=>updateStatus(selected.id,k)} style={{padding:"4px 8px",borderRadius:"5px",fontSize:"11px",fontWeight:600,cursor:"pointer",background:selected.status===k?v.tc:v.tb,color:selected.status===k?"#fff":v.tc,border:`1px solid ${v.tc}`}}>{t(v.labelKey)}</button>
                   ))}
                 </div>
+                <button onClick={()=>openCVView(selected)} style={{width:"100%",padding:"8px",borderRadius:"7px",fontSize:"11px",fontWeight:700,background:navy,color:"#fff",border:"none",cursor:"pointer",marginBottom:"6px",display:"flex",alignItems:"center",justifyContent:"center",gap:"6px"}}>
+                  📋 {t("candidates.viewRirekisho")}
+                </button>
                 <div style={{display:"flex",gap:"6px"}}>
                   <button onClick={()=>exportCV(selected)} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,background:"#EAF3DE",color:"#27500A",border:"0.5px solid #27500A",cursor:"pointer"}}>📄 {t("common.export")}</button>
                   {selected.email&&<a href={`mailto:${selected.email}`} style={{flex:1,padding:"7px",borderRadius:"7px",fontSize:"11px",fontWeight:600,textAlign:"center",background:navy,color:"#fff",textDecoration:"none"}}>{t("common.sendEmail")}</a>}
@@ -973,6 +1214,9 @@ export default function CandidatesPage() {
           )}
         </div>
       </div>
+      {showCV && selected && (
+        <CVModal candidate={selected} fileUrls={cvFileUrls} loading={cvLoading} onClose={()=>setShowCV(false)} t={t} />
+      )}
     </div>
   );
 
