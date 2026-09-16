@@ -36,7 +36,7 @@ model candidates {
   certifications Json?
   motivation     String?
   self_pr        String?
-  status         String?  @default("新規")
+  status         String?  @default("new")
   match_job_id   String?
   match_job_name String?
   note           String?
@@ -68,7 +68,7 @@ model job_listings {
   jlpt_min          String?
   salary            String?
   count             Int?     @default(1)
-  status            String?  @default("募集中")
+  status            String?  @default("open")
   osusume_point     String?
   position_name     String?
   position_note     String?
