@@ -23,10 +23,14 @@ model candidates {
   visa_expiry    String?
   jlpt           String?
   jlpt_actual    String?
+  jlpt_exam_year   String?
+  jlpt_exam_month  String?
+  jlpt_exam_status String?
   height_cm      Float?
   weight_kg      Float?
   skill          String?
   preferred_job  String?
+  preferred_location String?
   work_hours     String?
   availability   String?
   marital_status String?
@@ -41,6 +45,12 @@ model candidates {
   match_job_name String?
   note           String?
   cv_filename    String?
+  photo_url        String?
+  id_front_url     String?
+  id_back_url      String?
+  jlpt_cert_url    String?
+  senmonkyu_url    String?
+  other_cert_url   String?
   password_hash  String?
   applied_via    String?
   applied_at     DateTime?

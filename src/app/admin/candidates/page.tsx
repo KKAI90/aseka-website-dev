@@ -17,14 +17,17 @@ type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
   gender:string; date_of_birth:string; nationality:string; address:string;
   visa_type:string; visa_expiry:string; jlpt:string; jlpt_actual:string;
+  jlpt_exam_year?:string; jlpt_exam_month?:string; jlpt_exam_status?:string;
   height_cm:number|null; weight_kg:number|null;
-  skill:string; preferred_job:string; work_hours:string; availability:string;
+  skill:string; preferred_job:string; preferred_location?:string; work_hours:string; availability:string;
   marital_status:string; dependents:string;
   education:Edu[]; work_history:Work[]; certifications:Cert[];
   motivation:string; self_pr:string;
   status:string; match_job_id:string|null; match_job_name:string;
   applied_via:string|null; applied_at:string|null; applied_reviewed:boolean;
   note:string; cv_filename:string|null; ai_data:Record<string,unknown>|null;
+  photo_url?:string|null; id_front_url?:string|null; id_back_url?:string|null;
+  jlpt_cert_url?:string|null; senmonkyu_url?:string|null; other_cert_url?:string|null;
   created_at:string; updated_at:string;
 };
 
@@ -263,6 +266,18 @@ export default function CandidatesPage() {
     setCands((p: Candidate[]) => p.map((c: Candidate) => c.id === selected.id ? merged : c));
     setSelected(merged);
     setEditingBasic(false);
+  };
+
+  const [openingFile, setOpeningFile] = useState<string|null>(null);
+  const openCandidateFile = async (id:string, field:string) => {
+    setOpeningFile(field);
+    try {
+      const res = await fetch(`/api/admin/candidates/file?id=${id}&field=${field}`);
+      const d = await res.json();
+      if (res.ok && d.url) window.open(d.url, "_blank", "noopener,noreferrer");
+      else alert(t("candidates.fileUnavailable"));
+    } catch { alert(t("candidates.fileUnavailable")); }
+    setOpeningFile(null);
   };
 
   const deleteCandidate = async (id:string) => {
@@ -758,10 +773,12 @@ export default function CandidatesPage() {
                         {lk:"candidates.visaType",v:selected.visa_type||"—"},
                         {lk:"candidates.visaExpiry",v:fmtDate(selected.visa_expiry)},
                         {lk:"candidates.colJlpt",v:`${selected.jlpt||"—"} (${selected.jlpt_actual||"—"})`},
+                        {lk:"candidates.jlptExam",v: selected.jlpt_exam_year ? `${selected.jlpt_exam_year}年${selected.jlpt_exam_month||""}月 · ${selected.jlpt_exam_status||"—"}` : "—"},
                         {lk:"candidates.heightWeight",v:`${selected.height_cm||"—"}cm / ${selected.weight_kg||"—"}kg`},
                         {lk:"candidates.marital",v:selected.marital_status||"—"},
                         {lk:"candidates.dependents",v:`${selected.dependents||0}`},
                         {lk:"candidates.colPreferredJob",v:selected.preferred_job||"—"},
+                        {lk:"candidates.preferredLocation",v:selected.preferred_location||"—"},
                         {lk:"candidates.workHours",v:selected.work_hours||"—"},
                         {lk:"candidates.availability",v:selected.availability||t("candidates.immediate")},
                       ].map(r=>(
@@ -770,6 +787,31 @@ export default function CandidatesPage() {
                           <span style={{color:navy,fontWeight:500,flex:1,wordBreak:"break-word"}}>{r.v}</span>
                         </div>
                       ))
+                    )}
+
+                    {/* Documents — presigned URLs minted on click, never stored/shown as permanent links */}
+                    {!editingBasic && (
+                      <div style={{marginTop:"14px"}}>
+                        <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.documents")}</div>
+                        <div style={{display:"flex",flexWrap:"wrap",gap:"6px"}}>
+                          {[
+                            {field:"photo_url",lk:"candidates.docPhoto",v:selected.photo_url},
+                            {field:"id_front_url",lk:"candidates.docIdFront",v:selected.id_front_url},
+                            {field:"id_back_url",lk:"candidates.docIdBack",v:selected.id_back_url},
+                            {field:"jlpt_cert_url",lk:"candidates.docJlptCert",v:selected.jlpt_cert_url},
+                            {field:"senmonkyu_url",lk:"candidates.docSenmonkyu",v:selected.senmonkyu_url},
+                            {field:"other_cert_url",lk:"candidates.docOther",v:selected.other_cert_url},
+                          ].filter(d=>d.v).map(d=>(
+                            <button key={d.field} onClick={()=>openCandidateFile(selected.id,d.field)} disabled={openingFile===d.field}
+                              style={{padding:"6px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:600,background:"#E6F1FB",color:"#0C447C",border:"0.5px solid #0C447C33",cursor:openingFile===d.field?"wait":"pointer",display:"flex",alignItems:"center",gap:"4px"}}>
+                              📎 {t(d.lk)} {openingFile===d.field?"...":"↗"}
+                            </button>
+                          ))}
+                          {![selected.photo_url,selected.id_front_url,selected.id_back_url,selected.jlpt_cert_url,selected.senmonkyu_url,selected.other_cert_url].some(Boolean) && (
+                            <span style={{fontSize:"11px",color:"#9BA0AC"}}>{t("candidates.noDocuments")}</span>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 )}
