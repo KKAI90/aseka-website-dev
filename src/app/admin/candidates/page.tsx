@@ -160,7 +160,6 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
   const edu = candidate.education||[];
   const work = candidate.work_history||[];
   const certs = candidate.certifications||[];
-  const attachedDocs = DOC_FIELDS.filter(d => candidate[d.key]);
 
   const th: React.CSSProperties = { border:"1px solid #C9C6BB", background:"#F6F7F9", fontWeight:700, fontSize:"11px", padding:"6px 8px", textAlign:"left", color:navy, whiteSpace:"nowrap" };
   const td: React.CSSProperties = { border:"1px solid #C9C6BB", fontSize:"12px", padding:"6px 8px", color:"#1A1A1A" };
@@ -255,8 +254,14 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
                 <td style={td}>{candidate.email||"—"}</td>
               </tr>
               <tr>
+                {/* The reference rirekisho's 職種 row is the candidate's Tokutei/技能実習
+                   industry category (e.g. 外食業) — the same controlled vocabulary
+                   /dang-ky's 現在職種 selector writes to `skill`, not the free-text desired
+                   job in `preferred_job`. Confirmed against a real candidate: their skill
+                   column showed 外食業 on the list page while this row sat empty, because
+                   it was reading the wrong field. */}
                 <th style={th}>{t("candidates.jobType")}</th>
-                <td style={td}>{candidate.preferred_job||"—"}</td>
+                <td style={td}>{candidate.skill||"—"}</td>
                 <th style={th}>{t("candidates.jlptExam")}</th>
                 <td style={td}>{candidate.jlpt||"—"}{candidate.jlpt_actual?`（${candidate.jlpt_actual}）`:""}</td>
               </tr>
@@ -326,31 +331,35 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
         {/* ─ Page 2: attached ID / certificate images ─ */}
         <div style={{padding:"20px",borderTop:"2px solid "+navy,pageBreakBefore:"always"} as React.CSSProperties}>
           <div style={sectionBar}>{t("candidates.attachedDocsPage")}</div>
-          {loading ? (
-            <div style={{padding:"20px",textAlign:"center",fontSize:"12px",color:"#52525B"}}>...</div>
-          ) : attachedDocs.length===0 ? (
-            <div style={{padding:"20px",textAlign:"center",fontSize:"12px",color:"#52525B"}}>{t("candidates.noDocuments")}</div>
-          ) : (
-            <div style={{display:"grid",gridTemplateColumns:"repeat(2, 1fr)",gap:"12px",marginTop:"10px"}}>
-              {attachedDocs.map(d => {
-                const url = fileUrls[d.key];
-                const isPdf = (String(candidate[d.key]||"")).toLowerCase().endsWith(".pdf");
-                return (
-                  <div key={d.key} style={{border:"1px solid #C9C6BB",borderRadius:"6px",overflow:"hidden"}}>
-                    <div style={{background:"#F6F7F9",fontSize:"11px",fontWeight:700,color:navy,padding:"6px 8px",borderBottom:"1px solid #C9C6BB"}}>{t(d.labelKey)}</div>
-                    {!url ? (
-                      <div style={{padding:"20px",textAlign:"center",fontSize:"11px",color:"#A32D2D"}}>{t("candidates.fileUnavailable")}</div>
-                    ) : isPdf ? (
-                      <a href={url} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",height:"120px",fontSize:"11px",fontWeight:600,color:navy,background:"#F1EFE8",textDecoration:"none"}}>📄 PDF — {t("common.export")}</a>
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={url} alt={t(d.labelKey)} style={{width:"100%",maxHeight:"260px",objectFit:"contain",background:"#F1EFE8"}} />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          {/* Always render all 5 slots, matching the reference rirekisho's own layout —
+             its 添付書類 page shows every box (身分証明書の表面/裏面, 日本語検定資格,
+             専門級, その他) even when unfilled (e.g. a literal {{photoSenmonkyu}} template
+             placeholder), rather than collapsing the whole section away just because one
+             candidate happens to be missing a file. */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(2, 1fr)",gap:"12px",marginTop:"10px"}}>
+            {DOC_FIELDS.map(d => {
+              const has = !!candidate[d.key];
+              const url = fileUrls[d.key];
+              const isPdf = (String(candidate[d.key]||"")).toLowerCase().endsWith(".pdf");
+              return (
+                <div key={d.key} style={{border:"1px solid #C9C6BB",borderRadius:"6px",overflow:"hidden"}}>
+                  <div style={{background:"#F6F7F9",fontSize:"11px",fontWeight:700,color:navy,padding:"6px 8px",borderBottom:"1px solid #C9C6BB"}}>{t(d.labelKey)}</div>
+                  {!has ? (
+                    <div style={{padding:"20px",textAlign:"center",fontSize:"11px",color:"#9BA0AC",background:"#FAFBFC"}}>{t("candidates.noDocuments")}</div>
+                  ) : loading ? (
+                    <div style={{padding:"20px",textAlign:"center",fontSize:"11px",color:"#52525B"}}>...</div>
+                  ) : !url ? (
+                    <div style={{padding:"20px",textAlign:"center",fontSize:"11px",color:"#A32D2D"}}>{t("candidates.fileUnavailable")}</div>
+                  ) : isPdf ? (
+                    <a href={url} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",height:"120px",fontSize:"11px",fontWeight:600,color:navy,background:"#F1EFE8",textDecoration:"none"}}>📄 PDF — {t("common.export")}</a>
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={url} alt={t(d.labelKey)} style={{width:"100%",maxHeight:"260px",objectFit:"contain",background:"#F1EFE8"}} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>,
@@ -621,9 +630,17 @@ export default function CandidatesPage() {
           // whose address/phone/visa_type all came back empty despite being on the page).
           // Every table row and paragraph gets its own line instead, so each label/value
           // stays a clearly separate line the LLM can read top-to-bottom.
+          //
+          // The tag match MUST consume the whole opening tag, attributes included.
+          // <w:p[ >] only replaces the "<w:p " it matches, leaving a real Word document's
+          // attributes (w:rsidR="...", w14:paraId="...", ...) and the tag's closing ">"
+          // behind as literal visible text on every single line — invisible in a
+          // hand-written test fixture with bare <w:p> tags, but every real .docx paragraph
+          // carries these, so this was silently corrupting the text sent to Groq on every
+          // real import (caught only once tested against an actual user-supplied file).
           const raw = xml
-            .replace(/<w:tr[ >]/g, "\n<w:tr>")
-            .replace(/<w:p[ >]/g, "\n<w:p>")
+            .replace(/<w:tr(?:\s[^>]*)?>/g, "\n")
+            .replace(/<w:p(?:\s[^>]*)?>/g, "\n")
             .replace(/<[^>]+>/g, "")
             .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ");
           return raw.split("\n").map(l=>l.trim()).filter(Boolean).join("\n").slice(0, 5000);
