@@ -13,6 +13,11 @@ async function analyzeWithGroq(text: string) {
 
   const prompt = `You are an expert HR data extractor for Aseka株式会社.
 Extract ALL information from this resume text (Japanese/Vietnamese/mixed).
+The source is often a table-based 履歴書 form (labels and values side by side, e.g.
+"住所 東京都..." or "電話 090-..."), and the raw text may have lost its table
+structure (cells run together with little or no separator). Read carefully: scan for
+every label below even if it is jammed against its value or other cells, and never
+leave a field empty just because it isn't on its own line.
 Return ONLY valid JSON (no markdown, no explanation):
 {
   "name": "Latin name",
@@ -27,10 +32,14 @@ Return ONLY valid JSON (no markdown, no explanation):
   "visa_expiry": "YYYY-MM-DD or empty",
   "jlpt": "N1/N2/N3/N4/N5/なし",
   "jlpt_actual": "as written in CV",
+  "jlpt_exam_year": "YYYY or empty (year of the JLPT exam sat/scheduled, if stated)",
+  "jlpt_exam_month": "MM or empty (month of the JLPT exam sat/scheduled, if stated)",
+  "jlpt_exam_status": "合格 or 受験予定 or 結果待ち or empty",
   "height_cm": null,
   "weight_kg": null,
   "skill": "介護 or ビルクリーニング or 工業製品製造業 or 建設 or 造船・舶用工業 or 自動車整備 or 航空 or 宿泊 or 農業 or 漁業 or 飲食料品製造業 or 外食業 or 繊維業 or 印刷業 or 鉄道 or 林業 or IT or 機械・電気電子 or 国際業務 or 通訳・翻訳 or 経理・会計 or その他 (choose the closest match to job industries actually used by Aseka; do not default to その他 unless truly none fit)",
   "preferred_job": "希望職種 or empty",
+  "preferred_location": "希望勤務地（都道府県） or empty",
   "work_hours": "or empty",
   "availability": "immediate or YYYY-MM or empty",
   "marital_status": "独身 or 既婚 or empty",

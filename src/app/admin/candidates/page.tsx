@@ -369,6 +369,12 @@ export default function CandidatesPage() {
   const [fileItems, setFileItems] = useState<FileItem[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentReview, setCurrentReview] = useState<{candidate:Record<string,unknown>;suggestions:Job[];fileName:string}|null>(null);
+  // Images pulled out of each uploaded .docx (word/media/*), keyed by FileItem.id, so the
+  // review screen can offer them for upload once Groq's text-only analysis has finished.
+  const [docxImages, setDocxImages] = useState<Record<string,{name:string;url:string;blob:Blob;mime:string}[]>>({});
+  const [reviewImages, setReviewImages] = useState<{name:string;url:string;blob:Blob;mime:string}[]>([]);
+  const [imageUploadState, setImageUploadState] = useState<Record<string,"idle"|"uploading"|"done"|"error">>({});
+  const [imageAssignedField, setImageAssignedField] = useState<Record<string,string>>({});
   const [editForm, setEditForm] = useState<Record<string,string>>({});
   const [selectedJobId, setSelectedJobId] = useState<string|null>(null);
   const [editingBasic, setEditingBasic] = useState(false);
@@ -568,12 +574,20 @@ export default function CandidatesPage() {
         const xmlFile = zip.file("word/document.xml");
         if (xmlFile) {
           const xml = await xmlFile.async("string");
-          return xml
-            .replace(/<w:p[ >]/g, "\n<w:p>")  // newline before each paragraph
-            .replace(/<[^>]+>/g, "")           // strip all XML tags
-            .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ")
-            .replace(/\s+/g," ").trim()
-            .slice(0, 5000);
+          // A raw 履歴書-style table (label in one cell, value in the next) loses its
+          // structure once tags are simply stripped and whitespace collapsed to single
+          // spaces — "住所" and its value end up indistinguishable from the flat token
+          // stream around them, and the LLM was silently dropping fields rather than guess
+          // where one ends and the next begins (verified against a real imported candidate
+          // whose address/phone/visa_type all came back empty despite being on the page).
+          // Every table row and paragraph gets its own line instead, so each label/value
+          // stays a clearly separate line the LLM can read top-to-bottom.
+          const raw = xml
+            .replace(/<w:tr[ >]/g, "\n<w:tr>")
+            .replace(/<w:p[ >]/g, "\n<w:p>")
+            .replace(/<[^>]+>/g, "")
+            .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ");
+          return raw.split("\n").map(l=>l.trim()).filter(Boolean).join("\n").slice(0, 5000);
         }
       } catch { /* fallback to PDF path */ }
     }
@@ -599,6 +613,34 @@ export default function CandidatesPage() {
     return "";
   };
 
+  // A .docx is a ZIP archive — any embedded portrait photo / scanned ID lives as a plain
+  // image file under word/media/, completely separate from the document.xml text stream
+  // extractText() reads. CV import previously only ever sent Groq the resume TEXT, so a
+  // candidate's photo (present right there in the uploaded file) never made it into the
+  // system at all. This pulls those images out client-side so the review screen can offer
+  // them for upload — the same private-S3 pipeline /dang-ky already uses.
+  const IMG_EXT: Record<string,string> = { jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif", bmp:"image/bmp" };
+  const extractDocxImages = async (file: File): Promise<{name:string; blob:Blob; mime:string}[]> => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    if (ext !== "docx" && ext !== "doc") return [];
+    try {
+      const ab = await file.arrayBuffer();
+      const zip = await JSZip.loadAsync(ab);
+      const entries = Object.values(zip.files).filter(f => !f.dir && /^word\/media\//i.test(f.name));
+      const out: {name:string; blob:Blob; mime:string}[] = [];
+      for (const entry of entries) {
+        const fext = entry.name.split(".").pop()?.toLowerCase() || "";
+        const mime = IMG_EXT[fext];
+        if (!mime) continue; // skip non-image media (e.g. embedded .emf drawings)
+        const data = await entry.async("uint8array");
+        if (data.byteLength < 2000) continue; // skip tiny logos/bullets, keep real photos
+        const buf = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
+        out.push({ name: entry.name.split("/").pop() || entry.name, blob: new Blob([buf], {type:mime}), mime });
+      }
+      return out;
+    } catch { return []; }
+  };
+
   const analyzeAll = async () => {
     if (!fileItems.length) return;
     setIsAnalyzing(true);
@@ -618,6 +660,14 @@ export default function CandidatesPage() {
           text: await extractText(item.file),
         }))
       );
+      // Also pull out any embedded photo(s) so the review screen can offer them for upload
+      // — independent of the Groq call, since this never touches the AI at all.
+      await Promise.all(fileItems.map(async (item: FileItem) => {
+        const imgs = await extractDocxImages(item.file);
+        if (imgs.length) {
+          setDocxImages(prev => ({ ...prev, [item.id]: imgs.map(i => ({...i, url: URL.createObjectURL(i.blob)})) }));
+        }
+      }));
       const res = await fetch("/api/admin/analyze-cv",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -669,14 +719,19 @@ export default function CandidatesPage() {
       phone:       String(c.phone||""),
       gender:      String(c.gender||""),
       date_of_birth: String(c.date_of_birth||""),
+      address:     String(c.address||""),
       visa_type:   String(c.visa_type||""),
       visa_expiry: String(c.visa_expiry||""),
       jlpt:        String(c.jlpt||"N4"),
       jlpt_actual: String(c.jlpt_actual||""),
+      jlpt_exam_year:   String(c.jlpt_exam_year||""),
+      jlpt_exam_month:  String(c.jlpt_exam_month||""),
+      jlpt_exam_status: String(c.jlpt_exam_status||""),
       height_cm:   String(c.height_cm||""),
       weight_kg:   String(c.weight_kg||""),
       skill:       String(c.skill||"飲食"),
       preferred_job: String(c.preferred_job||""),
+      preferred_location: String(c.preferred_location||""),
       work_hours:  String(c.work_hours||""),
       availability:String(c.availability||""),
       marital_status: String(c.marital_status||""),
@@ -685,9 +740,30 @@ export default function CandidatesPage() {
       self_pr:     String(c.self_pr||""),
       note:        String((c as Record<string,unknown>).summary_vn||""),
       cv_filename: item.result.fileName,
+      photo_url: "", id_front_url: "", id_back_url: "", jlpt_cert_url: "", senmonkyu_url: "", other_cert_url: "",
     });
     if (item.result.suggestions?.[0]) setSelectedJobId(item.result.suggestions[0].id);
+    setReviewImages(docxImages[item.id] || []);
+    setImageUploadState({});
+    setImageAssignedField({});
     setView("review");
+  };
+
+  const assignExtractedImage = async (img: {name:string;url:string;blob:Blob;mime:string}, fieldKey: string) => {
+    setImageUploadState(prev => ({ ...prev, [img.url]: "uploading" }));
+    try {
+      const fd = new FormData();
+      fd.append("file", img.blob, img.name);
+      fd.append("fieldKey", fieldKey);
+      const res = await fetch("/api/upload-candidate-file", { method:"POST", body: fd });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || "upload_failed");
+      setEditForm(prev => ({ ...prev, [fieldKey]: d.key }));
+      setImageUploadState(prev => ({ ...prev, [img.url]: "done" }));
+      setImageAssignedField(prev => ({ ...prev, [img.url]: fieldKey }));
+    } catch {
+      setImageUploadState(prev => ({ ...prev, [img.url]: "error" }));
+    }
   };
 
   const saveCandidate = async () => {
@@ -1346,6 +1422,7 @@ export default function CandidatesPage() {
                   {f:"visa_type",lk:"candidates.visaType",t:"text"},{f:"visa_expiry",lk:"candidates.visaExpiry",t:"text"},
                   {f:"height_cm",lk:"candidates.heightCm",t:"number"},{f:"weight_kg",lk:"candidates.weightKg",t:"number"},
                   {f:"preferred_job",lk:"candidates.colPreferredJob",t:"text"},{f:"work_hours",lk:"candidates.workHours",t:"text"},
+                  {f:"address",lk:"candidates.address",t:"text"},{f:"preferred_location",lk:"candidates.preferredLocation",t:"text"},
                 ].map(x=>(
                   <div key={x.f}>
                     <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t(x.lk)}{x.req?" *":""}</label>
@@ -1367,7 +1444,54 @@ export default function CandidatesPage() {
                   </select>
                 </div>
               </div>
+              <div style={{marginTop:"10px"}}>
+                <label style={{display:"block",fontSize:"11px",color:"#52525B",marginBottom:"3px",fontWeight:600}}>{t("candidates.jlptExam")}</label>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1.4fr",gap:"6px"}}>
+                  <input placeholder="YYYY" value={editForm.jlpt_exam_year||""} onChange={e=>setEditForm({...editForm,jlpt_exam_year:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
+                  <input placeholder="MM" value={editForm.jlpt_exam_month||""} onChange={e=>setEditForm({...editForm,jlpt_exam_month:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}/>
+                  <select value={editForm.jlpt_exam_status||""} onChange={e=>setEditForm({...editForm,jlpt_exam_status:e.target.value})} style={{width:"100%",padding:"6px 10px",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none"}}>
+                    <option value="">—</option>
+                    <option value="合格">合格</option>
+                    <option value="受験予定">受験予定</option>
+                    <option value="結果待ち">結果待ち</option>
+                  </select>
+                </div>
+              </div>
             </div>
+
+            {/* Photo/ID images extracted from the uploaded .docx — text extraction never
+                sees these, so offer them here for a one-click upload into the matching slot. */}
+            {reviewImages.length>0&&(
+              <div style={{background:"#fff",...B,borderRadius:"10px",padding:"16px",marginBottom:"12px"}}>
+                <div style={{fontSize:"12px",fontWeight:700,color:navy,marginBottom:"4px"}}>{t("candidates.extractedImages")}</div>
+                <div style={{fontSize:"11px",color:"#52525B",marginBottom:"10px"}}>{t("candidates.extractedImagesHint")}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"12px"}}>
+                  {reviewImages.map(img=>{
+                    const state = imageUploadState[img.url]||"idle";
+                    const assignedLabel = imageAssignedField[img.url] ? t(DOC_FIELDS.find(d=>d.key===imageAssignedField[img.url])?.labelKey || "candidates.docPhoto") : "";
+                    return (
+                      <div key={img.url} style={{width:"120px"}}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img.url} alt={img.name} style={{width:"120px",height:"120px",objectFit:"cover",borderRadius:"6px",border:"0.5px solid rgba(11,31,58,0.15)",marginBottom:"6px"}}/>
+                        <select disabled={state==="uploading"} defaultValue=""
+                          onChange={e=>{ if(e.target.value) assignExtractedImage(img, e.target.value); e.target.value=""; }}
+                          style={{width:"100%",padding:"4px 6px",borderRadius:"5px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"10px",outline:"none",marginBottom:"3px"}}>
+                          <option value="">{state==="uploading"?t("candidates.photoUploading"):t("candidates.useAsPhoto")}</option>
+                          <option value="photo_url">{t("candidates.docPhoto")}</option>
+                          <option value="id_front_url">{t("candidates.docIdFront")}</option>
+                          <option value="id_back_url">{t("candidates.docIdBack")}</option>
+                          <option value="jlpt_cert_url">{t("candidates.docJlptCert")}</option>
+                          <option value="senmonkyu_url">{t("candidates.docSenmonkyu")}</option>
+                          <option value="other_cert_url">{t("candidates.docOther")}</option>
+                        </select>
+                        {state==="done"&&<div style={{fontSize:"10px",color:"#27500A",fontWeight:600}}>✓ {assignedLabel}</div>}
+                        {state==="error"&&<div style={{fontSize:"10px",color:"#A32D2D",fontWeight:600}}>✕ {t("candidates.fileUnavailable")}</div>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Extracted data preview */}
             {(()=>{
@@ -1450,9 +1574,15 @@ export default function CandidatesPage() {
               </button>
             </div>
 
-            <button onClick={saveCandidate} disabled={!editForm.name||saving} style={{width:"100%",padding:"13px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:editForm.name&&!saving?navy:"#B4B2A9",color:"#fff",border:"none",cursor:editForm.name?"pointer":"not-allowed",transition:"background 0.2s"}}>
-              {saving?t("candidates.savingDb"):t("candidates.saveToDbBtn")}
+            {/* Guards against saving mid-upload: clicking 保存 while an assigned image's S3
+                upload is still in flight would create the candidate with that photo/ID slot
+                silently empty, since saveCandidate only ever sees whatever is in editForm at
+                click time (verified — a fast click order really does drop the photo). */}
+            {(() => { const anyImageUploading = Object.values(imageUploadState).some(s=>s==="uploading"); return (
+            <button onClick={saveCandidate} disabled={!editForm.name||saving||anyImageUploading} style={{width:"100%",padding:"13px",borderRadius:"9px",fontSize:"14px",fontWeight:700,background:editForm.name&&!saving&&!anyImageUploading?navy:"#B4B2A9",color:"#fff",border:"none",cursor:editForm.name&&!anyImageUploading?"pointer":"not-allowed",transition:"background 0.2s"}}>
+              {anyImageUploading?t("candidates.photoUploading"):saving?t("candidates.savingDb"):t("candidates.saveToDbBtn")}
             </button>
+            ); })()}
           </div>
         </div>
       </div>
