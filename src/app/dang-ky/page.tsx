@@ -219,6 +219,17 @@ export default function DangKy() {
     const dob = form.dob_year && form.dob_month && form.dob_day ? `${form.dob_year}-${form.dob_month}-${form.dob_day}` : "";
     const visaExpiry = form.visa_exp_year && form.visa_exp_month && form.visa_exp_day ? `${form.visa_exp_year}-${form.visa_exp_month}-${form.visa_exp_day}` : "";
 
+    // JLPT_LEVELS shows the candidate a descriptive choice ("N3相当" / "JLPT N3") to match
+    // the reference form, but every consumer downstream — Admin's filter dropdown and
+    // colored badge (JC["N1".."N5"]), mypage's own job-recommendation ranking
+    // (jlptRank["N1".."N5"]), and CV-import's match scoring — does an exact match against
+    // the bare level only. Sending form.jlpt as-is silently fell through every one of those
+    // lookups (defaulting a real N1/N2 candidate to "lowest possible" in their own mypage
+    // recommendations), since "JLPT N3" and "N3相当" never equal "N3". `jlpt` now carries
+    // the canonical bare level every other part of the system keys off; the full label the
+    // candidate actually picked is preserved in `jlpt_actual` instead of being dropped.
+    const jlptBare = (form.jlpt.match(/N[1-5]/) || [])[0] || "";
+
     // Education/work_history reuse the exact {year,month,...,event} shape Admin already
     // renders — 入学/卒業 (enrolled/graduated) and 入社/退社 (joined/left) pairs — so
     // this data shows up correctly in Admin's 学歴・職歴 tab and feeds the same
@@ -244,7 +255,7 @@ export default function DangKy() {
           visa_type: form.visa_type, visa_expiry: visaExpiry,
           height_cm: form.height_cm, weight_kg: form.weight_kg, dependents: form.dependents,
           skill: form.skill,
-          jlpt: form.jlpt, jlpt_exam_year: form.jlpt_exam_year, jlpt_exam_month: form.jlpt_exam_month, jlpt_exam_status: form.jlpt_exam_status,
+          jlpt: jlptBare, jlpt_actual: form.jlpt, jlpt_exam_year: form.jlpt_exam_year, jlpt_exam_month: form.jlpt_exam_month, jlpt_exam_status: form.jlpt_exam_status,
           preferred_location: form.preferred_location,
           motivation: form.motivation, self_pr: form.self_pr,
           photo_url: form.photo_url, id_front_url: form.id_front_url, id_back_url: form.id_back_url,
