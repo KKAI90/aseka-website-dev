@@ -146,6 +146,13 @@ const DOC_FIELDS: {key:"photo_url"|"id_front_url"|"id_back_url"|"jlpt_cert_url"|
   { key:"senmonkyu_url",  labelKey:"candidates.docSenmonkyu" },
   { key:"other_cert_url", labelKey:"candidates.docOther" },
 ];
+// Same 6 slots as DOC_FIELDS plus the portrait photo — used by the Documents section in the
+// candidate detail panel, where (unlike the CV popup) an admin can also upload into an
+// empty slot, so 写真 belongs in this list too.
+const DOC_FIELDS_ALL: {key:"photo_url"|"id_front_url"|"id_back_url"|"jlpt_cert_url"|"senmonkyu_url"|"other_cert_url"; labelKey:string}[] = [
+  { key:"photo_url", labelKey:"candidates.docPhoto" },
+  ...DOC_FIELDS,
+];
 
 function CVModal({ candidate, fileUrls, loading, onClose, t }:
   { candidate:Candidate; fileUrls:Record<string,string|null>; loading:boolean; onClose:()=>void; t:(k:string,v?:Record<string,string|number>)=>string }) {
@@ -236,7 +243,10 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
               </tr>
               <tr>
                 <th style={th}>{t("candidates.currentAddress")}</th>
-                <td style={td} colSpan={4}>{candidate.address||"—"}（{candidate.nationality||"Vietnam"}）</td>
+                {/* Only append nationality as a fallback hint when there's no real address to
+                   show — appending it unconditionally made an actual Japan address read as
+                   "…（Vietnam）", which looks like a mistranslation, not a nationality note. */}
+                <td style={td} colSpan={4}>{candidate.address || `（${candidate.nationality||"Vietnam"}）`}</td>
               </tr>
               <tr>
                 <th style={th}>{t("candidates.mobile")}</th>
@@ -504,6 +514,35 @@ export default function CandidatesPage() {
       else alert(t("candidates.fileUnavailable"));
     } catch { alert(t("candidates.fileUnavailable")); }
     setOpeningFile(null);
+  };
+
+  // Lets admin attach a photo/ID/certificate file directly onto an EXISTING candidate —
+  // e.g. one imported via CV取込 before this upload option existed, or one whose original
+  // file the admin no longer has but now holds a scan/photo of separately. Same private-S3
+  // pipeline /dang-ky and CV取込's review screen already use, just wired to an update
+  // instead of a create.
+  const [uploadingDoc, setUploadingDoc] = useState<string|null>(null);
+  const uploadDocumentForCandidate = async (id: string, field: string, file: File) => {
+    setUploadingDoc(field);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("fieldKey", field);
+      const upRes = await fetch("/api/upload-candidate-file", { method:"POST", body: fd });
+      const upData = await upRes.json();
+      if (!upRes.ok) throw new Error(upData.error || "upload_failed");
+      const patchRes = await fetch("/api/admin/candidates", {
+        method: "PATCH", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ id, [field]: upData.key }),
+      });
+      if (!patchRes.ok) throw new Error("save_failed");
+      const merged = { ...(selected as Candidate), [field]: upData.key } as Candidate;
+      setSelected(merged);
+      setCands(p => p.map(c => c.id === id ? merged : c));
+    } catch {
+      alert(t("candidates.fileUnavailable"));
+    }
+    setUploadingDoc(null);
   };
 
   const [showCV, setShowCV] = useState(false);
@@ -1103,27 +1142,31 @@ export default function CandidatesPage() {
                       ))
                     )}
 
-                    {/* Documents — presigned URLs minted on click, never stored/shown as permanent links */}
+                    {/* Documents — presigned URLs minted on click, never stored/shown as permanent
+                        links. Empty slots get their own upload button too, so a candidate
+                        created without a photo/ID (e.g. via CV取込, or before this option
+                        existed) can still have one attached later. */}
                     {!editingBasic && (
                       <div style={{marginTop:"14px"}}>
                         <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"6px"}}>{t("candidates.documents")}</div>
                         <div style={{display:"flex",flexWrap:"wrap",gap:"6px"}}>
-                          {[
-                            {field:"photo_url",lk:"candidates.docPhoto",v:selected.photo_url},
-                            {field:"id_front_url",lk:"candidates.docIdFront",v:selected.id_front_url},
-                            {field:"id_back_url",lk:"candidates.docIdBack",v:selected.id_back_url},
-                            {field:"jlpt_cert_url",lk:"candidates.docJlptCert",v:selected.jlpt_cert_url},
-                            {field:"senmonkyu_url",lk:"candidates.docSenmonkyu",v:selected.senmonkyu_url},
-                            {field:"other_cert_url",lk:"candidates.docOther",v:selected.other_cert_url},
-                          ].filter(d=>d.v).map(d=>(
-                            <button key={d.field} onClick={()=>openCandidateFile(selected.id,d.field)} disabled={openingFile===d.field}
-                              style={{padding:"6px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:600,background:"#E6F1FB",color:"#0C447C",border:"0.5px solid #0C447C33",cursor:openingFile===d.field?"wait":"pointer",display:"flex",alignItems:"center",gap:"4px"}}>
-                              📎 {t(d.lk)} {openingFile===d.field?"...":"↗"}
-                            </button>
-                          ))}
-                          {![selected.photo_url,selected.id_front_url,selected.id_back_url,selected.jlpt_cert_url,selected.senmonkyu_url,selected.other_cert_url].some(Boolean) && (
-                            <span style={{fontSize:"11px",color:"#9BA0AC"}}>{t("candidates.noDocuments")}</span>
-                          )}
+                          {DOC_FIELDS_ALL.map(d=>{
+                            const v = selected[d.key];
+                            if (v) return (
+                              <button key={d.key} onClick={()=>openCandidateFile(selected.id,d.key)} disabled={openingFile===d.key}
+                                style={{padding:"6px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:600,background:"#E6F1FB",color:"#0C447C",border:"0.5px solid #0C447C33",cursor:openingFile===d.key?"wait":"pointer",display:"flex",alignItems:"center",gap:"4px"}}>
+                                📎 {t(d.labelKey)} {openingFile===d.key?"...":"↗"}
+                              </button>
+                            );
+                            return (
+                              <label key={d.key}
+                                style={{padding:"6px 10px",borderRadius:"6px",fontSize:"10px",fontWeight:600,background:"#F6F7F9",color:"#52525B",border:"0.5px dashed rgba(11,31,58,0.25)",cursor:uploadingDoc===d.key?"wait":"pointer",display:"flex",alignItems:"center",gap:"4px"}}>
+                                {uploadingDoc===d.key?`⏳ ${t("candidates.photoUploading")}`:`＋ ${t(d.labelKey)}`}
+                                <input type="file" accept="image/*,application/pdf" style={{display:"none"}} disabled={uploadingDoc===d.key}
+                                  onChange={e=>{ const f=e.target.files?.[0]; if (f) uploadDocumentForCandidate(selected.id, d.key, f); e.target.value=""; }}/>
+                              </label>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
