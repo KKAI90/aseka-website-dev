@@ -589,13 +589,31 @@ export default function CandidatesPage() {
         for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          const pageText = content.items
-            .map((item) => ("str" in item ? item.str : ""))
-            .join(" ");
-          pages.push(pageText);
+          // getTextContent() returns a flat stream of positioned text runs with no line
+          // breaks at all — joining them with plain spaces collapses an entire table-based
+          // 履歴書 page into one giant run-on blob (the same class of bug the .docx path
+          // had, but worse: no structure was ever attempted here). Each run carries its own
+          // baseline y-position in transform[5]; grouping runs whose y barely changes into
+          // one line, and starting a new line when it jumps, reconstructs the page's actual
+          // row layout well enough for the LLM to tell "住所" from its value again.
+          let curLine: string[] = [];
+          let lastY: number | null = null;
+          const pageLines: string[] = [];
+          for (const item of content.items) {
+            if (!("str" in item) || !("transform" in item)) continue;
+            const y = Math.round(item.transform[5]);
+            if (lastY !== null && Math.abs(y - lastY) > 3) {
+              if (curLine.length) pageLines.push(curLine.join(" ").trim());
+              curLine = [];
+            }
+            if (item.str.trim()) curLine.push(item.str);
+            lastY = y;
+          }
+          if (curLine.length) pageLines.push(curLine.join(" ").trim());
+          pages.push(pageLines.filter(Boolean).join("\n"));
         }
-        return pages.join("\n").replace(/\s+/g, " ").trim().slice(0, 5000);
-      } catch { return ""; }
+        return pages.join("\n").split("\n").map(l=>l.trim()).filter(Boolean).join("\n").slice(0, 5000);
+      } catch (e) { console.error("PDF extractText failed:", e); return ""; }
     }
     // Other fallback
     return "";
