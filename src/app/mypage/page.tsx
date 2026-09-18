@@ -214,8 +214,10 @@ export default function Mypage() {
           </div>
         </div>
 
-        {/* ── RED TAB BAR ── */}
-        <div style={{ background:red }}>
+        {/* ── TAB BAR — navy, matching Aseka's own brand usage (navy for large chrome
+             surfaces like this; the accent red stays reserved for small CTA highlights —
+             favorite hearts, NEW badges, 応募する — same pattern as /dang-ky and admin). ── */}
+        <div style={{ background:navy }}>
           <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 24px", display:"flex" }}>
             {[
               { key:"jobs",      label:"紹介求人",     count: allCount },
@@ -224,10 +226,10 @@ export default function Mypage() {
               { key:"profile",   label:"プロフィール", count: null },
             ].map(t => (
               <button key={t.key} onClick={() => setTab(t.key as typeof tab)}
-                style={{ padding:"12px 24px", fontSize:"13px", fontWeight: tab===t.key ? 700 : 400, color:"#fff", background: tab===t.key ? "rgba(255,255,255,0.18)" : "transparent", border:"none", cursor:"pointer", borderBottom: tab===t.key ? "3px solid #fff" : "3px solid transparent", display:"flex", alignItems:"center", gap:"6px" }}>
+                style={{ padding:"12px 24px", fontSize:"13px", fontWeight: tab===t.key ? 700 : 400, color:"#fff", background: tab===t.key ? "rgba(255,255,255,0.12)" : "transparent", border:"none", cursor:"pointer", borderBottom: tab===t.key ? `3px solid ${red}` : "3px solid transparent", display:"flex", alignItems:"center", gap:"6px" }}>
                 {t.label}
                 {t.count !== null && t.count > 0 && (
-                  <span style={{ background:"#fff", color:red, borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 7px" }}>{countLabel(t.count)}</span>
+                  <span style={{ background:red, color:"#fff", borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 7px" }}>{countLabel(t.count)}</span>
                 )}
               </button>
             ))}
