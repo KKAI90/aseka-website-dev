@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -8,6 +8,10 @@ const red   = "#C8002A";
 // Absolute — this page runs on the mypage.* subdomain, where middleware redirects any
 // path outside /mypage back to /mypage/login, so a relative href="/" would just bounce back.
 const MAIN_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dev.aseka.co.jp";
+// "未読" isn't tracked server-side (no per-candidate view-log table) — a job is marked read
+// client-side, scoped per candidate id, the moment its detail page is opened. Simple and
+// good enough for "have I looked at this yet", without a schema change for it.
+const READ_KEY_PREFIX = "aseka_mypage_read_jobs_";
 
 type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
@@ -16,7 +20,7 @@ type Candidate = {
   match_job_id:string|null; match_job_name:string; motivation:string; availability:string; created_at:string;
   hasPassword:boolean;
 };
-type Job = {
+export type Job = {
   id:string; company:string; position_ja:string; position_vn:string;
   industry:string; jlpt_min:string; salary:string; location:string;
   status:string; matchScore:number; isNew:boolean; isFavorite:boolean; isApplied:boolean; job_description:string;
@@ -28,31 +32,6 @@ type Job = {
   insurance:string|null; holidays:string|null; remarks:string|null; count:number|null;
 };
 
-/* Same field order/labels as the Admin job detail (求人概要 tab) —
-   candidates see the exact same info admin sees, minus internal-only fields. */
-const JOB_DETAIL_FIELDS: { key: keyof Job; label: string }[] = [
-  { key:"position_name",     label:"ポジション名" },
-  { key:"position_note",     label:"ポジション備考" },
-  { key:"job_description",   label:"職務内容" },
-  { key:"requirements",      label:"応募要件" },
-  { key:"qualifications",    label:"資格" },
-  { key:"language_skills",   label:"語学力" },
-  { key:"education_req",     label:"学歴" },
-  { key:"work_location",     label:"勤務地" },
-  { key:"selection_process", label:"選考内容" },
-  { key:"work_environment",  label:"就業環境備考" },
-  { key:"annual_income",     label:"年収" },
-  { key:"salary_type",       label:"給与形態" },
-  { key:"salary_note",       label:"賃金備考" },
-  { key:"employment_type",   label:"雇用形態" },
-  { key:"visa_type",         label:"在留資格" },
-  { key:"work_hours",        label:"勤務時間" },
-  { key:"trial_period",      label:"試用期間" },
-  { key:"insurance",         label:"各種保険" },
-  { key:"holidays",          label:"休日・休暇" },
-  { key:"remarks",           label:"備考" },
-];
-
 const STATUS_STEPS = [
   { key:"new",       ja:"書類審査中",  vn:"Đang xét hồ sơ",   color:"#378ADD" },
   { key:"interview", ja:"面接調整中",  vn:"Đang phỏng vấn",   color:"#EF9F27" },
@@ -60,17 +39,17 @@ const STATUS_STEPS = [
   { key:"working",   ja:"就業中",      vn:"Đang làm việc",    color:"#27500A" },
 ];
 
+const countLabel = (n:number) => n > 99 ? "99+" : String(n);
+
 export default function Mypage() {
   const router = useRouter();
   const [tab, setTab]         = useState<"jobs"|"favorites"|"status"|"profile">("jobs");
   const [cand, setCand]       = useState<Candidate|null>(null);
   const [jobs, setJobs]       = useState<Job[]>([]);
-  const [jobFilter, setJobFilter] = useState<"all"|"new">("all");
-  const [selectedJob, setSelectedJob] = useState<Job|null>(null);
+  const [jobFilter, setJobFilter] = useState<"all"|"unread"|"new">("all");
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [favBusy, setFavBusy] = useState<string|null>(null);
-  const [applyBusy, setApplyBusy] = useState<string|null>(null);
-  const [applyMsg, setApplyMsg] = useState<{ type:"ok"|"err"; text:string }|null>(null);
 
   // Password form (Profile tab)
   const [pwCurrent, setPwCurrent] = useState("");
@@ -86,6 +65,10 @@ export default function Mypage() {
       if (!me) { router.push("/mypage/login"); return; }
       setCand(me.data);
       setJobs(j?.jobs || []);
+      try {
+        const raw = localStorage.getItem(READ_KEY_PREFIX + me.data.id);
+        setReadIds(new Set<string>(raw ? JSON.parse(raw) : []));
+      } catch { /* localStorage unavailable — everything just reads as unread, harmless */ }
       setLoading(false);
     });
   }, [router]);
@@ -105,37 +88,13 @@ export default function Mypage() {
       const data = await res.json();
       if (res.ok) {
         setJobs(prev => prev.map(j => j.id === jobId ? { ...j, isFavorite: data.favorited } : j));
-        setSelectedJob(prev => prev && prev.id === jobId ? { ...prev, isFavorite: data.favorited } : prev);
       }
     } finally {
       setFavBusy(null);
     }
   };
 
-  const applyToJob = async (job: Job) => {
-    if (cand?.match_job_id && cand.match_job_id !== job.id) {
-      const ok = window.confirm(
-        `現在「${cand.match_job_name}」に応募中です。「${job.company}」に切り替えますか？\n` +
-        `Bạn đang ứng tuyển "${cand.match_job_name}". Chuyển sang "${job.company}"?`
-      );
-      if (!ok) return;
-    }
-    setApplyBusy(job.id); setApplyMsg(null);
-    try {
-      const res = await fetch("/api/mypage/apply", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId: job.id }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setApplyMsg({ type:"err", text: data.error || "エラーが発生しました" }); return; }
-      setJobs(prev => prev.map(j => ({ ...j, isApplied: j.id === job.id })));
-      setSelectedJob(prev => prev && prev.id === job.id ? { ...prev, isApplied: true } : prev);
-      setCand(prev => prev ? { ...prev, match_job_id: job.id, match_job_name: data.company } : prev);
-      setApplyMsg({ type:"ok", text:`「${data.company}」に応募しました / Đã ứng tuyển "${data.company}"` });
-    } finally {
-      setApplyBusy(null);
-    }
-  };
+  const openJob = (jobId: string) => router.push(`/mypage/jobs/${jobId}`);
 
   const changePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,52 +111,56 @@ export default function Mypage() {
     setCand(prev => prev ? { ...prev, hasPassword: true } : prev);
   };
 
-  const newCount  = jobs.filter(j => j.isNew).length;
-  const allCount  = jobs.length;
-  const favCount  = jobs.filter(j => j.isFavorite).length;
-  const displayed = jobFilter === "new" ? jobs.filter(j => j.isNew) : jobs;
-  const favorited = jobs.filter(j => j.isFavorite);
+  const allCount    = jobs.length;
+  const unreadCount = jobs.filter(j => !readIds.has(j.id)).length;
+  const newCount    = jobs.filter(j => j.isNew).length;
+  const favCount    = jobs.filter(j => j.isFavorite).length;
+  const displayed   = jobFilter==="unread" ? jobs.filter(j=>!readIds.has(j.id)) : jobFilter==="new" ? jobs.filter(j=>j.isNew) : jobs;
+  const favorited   = jobs.filter(j => j.isFavorite);
 
   const currentStep = STATUS_STEPS.findIndex(s => s.key === cand?.status);
 
-  /* Shared job table + accordion detail — used by both 紹介求人 and 検討中求人 tabs. */
+  /* Shared job table — used by both 紹介求人 and 検討中求人 tabs. Each row now navigates
+     to its own detail page (/mypage/jobs/[id]) instead of expanding inline, matching how
+     the reference design treats a job listing as a destination, not an accordion. */
   const renderJobTable = (list: Job[], emptyMsg: { ja:string; vn:string }) => (
     list.length === 0
-      ? <div style={{ padding:"40px", textAlign:"center", color:"#64748B", fontSize:"13px" }}>
+      ? <div style={{ padding:"48px", textAlign:"center", color:"#64748B", fontSize:"13px" }}>
           {emptyMsg.ja}<br/>{emptyMsg.vn}
         </div>
-      : <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"13px" }}>
+      : <div style={{ overflowX:"auto" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"13px", minWidth:"640px" }}>
           <thead>
             <tr style={{ background:"#F8F9FB" }}>
-              {["企業名","求人ポジション","給与・待遇","検討する"].map(h => (
-                <th key={h} style={{ padding:"10px 14px", textAlign:"left", fontSize:"11px", color:"#64748B", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
+              {["企業名","求人ポジション","年収","検討する"].map(h => (
+                <th key={h} style={{ padding:"10px 14px", textAlign: h==="検討する" ? "center":"left", fontSize:"11px", color:"#64748B", fontWeight:600, borderBottom:"1px solid #F0F1F4", whiteSpace:"nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {list.map(j => {
-              const isOpen = selectedJob?.id === j.id;
+              const unread = !readIds.has(j.id);
               return (
-              <Fragment key={j.id}>
-              <tr onClick={() => { setSelectedJob(isOpen ? null : j); setApplyMsg(null); }}
-                style={{ borderBottom: isOpen ? "none" : "1px solid #F8F9FB", cursor:"pointer", background: isOpen ? "#FFF8F8" : "transparent" }}>
+              <tr key={j.id} onClick={() => openJob(j.id)} className="mp-row"
+                style={{ borderBottom:"1px solid #F8F9FB", cursor:"pointer" }}>
                 <td style={{ padding:"13px 14px", fontWeight:600, color:navy }}>
                   <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
                     {j.isNew && <span style={{ background:red, color:"#fff", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>NEW</span>}
+                    {unread && !j.isNew && <span style={{ width:"7px", height:"7px", borderRadius:"50%", background:"#378ADD", flexShrink:0 }} title="未読"/>}
                     {j.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>⚡急募</span>}
                     {j.isApplied && <span style={{ background:"#27500A", color:"#fff", fontSize:"10px", fontWeight:700, padding:"1px 5px", borderRadius:"3px" }}>✓応募済み</span>}
                     {j.company}
                   </div>
                 </td>
                 <td style={{ padding:"13px 14px", color:navy }}>
-                  <div>{j.position_ja}</div>
+                  <div>{j.position_name || j.position_ja}</div>
                   {j.position_vn && <div style={{ fontSize:"11px", color:"#64748B", marginTop:"1px" }}>{j.position_vn}</div>}
                   <div style={{ display:"flex", gap:"4px", marginTop:"4px" }}>
                     <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{j.industry}</span>
                     <span style={{ fontSize:"10px", fontWeight:700, padding:"2px 6px", borderRadius:"4px", background:"#F6F7F9", color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{j.jlpt_min}以上</span>
                   </div>
                 </td>
-                <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.salary||"要相談"}</td>
+                <td style={{ padding:"13px 14px", color:"#444", fontSize:"12px" }}>{j.annual_income || j.salary || "要相談"}</td>
                 <td style={{ padding:"13px 14px", textAlign:"center" }}>
                   <button onClick={e => { e.stopPropagation(); toggleFavorite(j.id); }} disabled={favBusy===j.id}
                     title={j.isFavorite ? "お気に入り解除 / Bỏ yêu thích" : "お気に入りに追加 / Thêm vào yêu thích"}
@@ -206,80 +169,11 @@ export default function Mypage() {
                   </button>
                 </td>
               </tr>
-
-              {/* Job detail expand — right under the clicked row */}
-              {isOpen && (
-                <tr style={{ borderBottom:"1px solid #F8F9FB" }}>
-                  <td colSpan={4} style={{ padding:0 }}>
-                    <div style={{ borderTop:"2px solid #FFF0F0", padding:"20px", background:"#FFFAFA" }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"12px" }}>
-                        <div>
-                          <div style={{ fontSize:"15px", fontWeight:700, color:navy }}>{j.company}</div>
-                          <div style={{ fontSize:"13px", color:"#444", marginTop:"2px" }}>{j.position_ja}</div>
-                        </div>
-                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ background:"none", border:"none", fontSize:"18px", cursor:"pointer", color:"#64748B" }}>✕</button>
-                      </div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"12px" }}>
-                        {[
-                          { l:"勤務地", v: j.location||"要相談" },
-                          { l:"給与",   v: j.salary||"要相談" },
-                          { l:"業種",   v: j.industry },
-                          { l:"日本語", v: `${j.jlpt_min}以上` },
-                          ...(j.count ? [{ l:"募集人数", v: `${j.count}名` }] : []),
-                        ].map(d=>(
-                          <div key={d.l} style={{ background:"#fff", borderRadius:"7px", padding:"8px 12px", border:"1px solid #F0F1F4" }}>
-                            <div style={{ fontSize:"11px", color:"#64748B" }}>{d.l}</div>
-                            <div style={{ fontSize:"12px", fontWeight:600, color:navy, marginTop:"2px" }}>{d.v}</div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {j.osusume_point && (
-                        <div style={{ marginBottom:"12px", background:"#FFFBEB", borderRadius:"8px", padding:"10px 14px", fontSize:"12px", color:"#92400E", borderLeft:"3px solid #F59E0B", lineHeight:1.7 }}>
-                          <div style={{ fontWeight:700, marginBottom:"4px" }}>⭐ おすすめポイント</div>
-                          {j.osusume_point}
-                        </div>
-                      )}
-
-                      {/* Full job details — same fields as the admin's 求人概要 tab */}
-                      <div style={{ background:"#fff", borderRadius:"8px", border:"1px solid #F0F1F4", overflow:"hidden", maxHeight:"420px", overflowY:"auto" }}>
-                        {JOB_DETAIL_FIELDS.filter(f => j[f.key]).map((f, i) => (
-                          <div key={f.key} style={{ display:"grid", gridTemplateColumns:"110px 1fr", borderBottom:"1px solid #F0F1F4", background:i%2===0?"#fff":"#FAFBFC" }}>
-                            <div style={{ padding:"10px 12px", background:"#F8F9FB", fontSize:"11px", fontWeight:700, color:navy, borderRight:"1px solid #F0F1F4" }}>{f.label}</div>
-                            <div style={{ padding:"10px 12px", fontSize:"12px", color:"#444", lineHeight:1.7, whiteSpace:"pre-wrap" }}>{j[f.key] as string}</div>
-                          </div>
-                        ))}
-                        {!JOB_DETAIL_FIELDS.some(f => j[f.key]) && (
-                          <div style={{ padding:"20px", textAlign:"center", color:"#64748B", fontSize:"12px" }}>詳細情報は準備中です。</div>
-                        )}
-                      </div>
-                      {applyMsg && (
-                        <div style={{ marginTop:"12px", fontSize:"12px", padding:"9px 12px", borderRadius:"7px", background: applyMsg.type==="ok" ? "#EAF3DE" : "#FCEBEB", color: applyMsg.type==="ok" ? "#27500A" : "#C8002A" }}>
-                          {applyMsg.type==="ok" ? "✓ " : "⚠️ "}{applyMsg.text}
-                        </div>
-                      )}
-                      <div style={{ marginTop:"14px", display:"flex", gap:"8px" }}>
-                        <button onClick={() => applyToJob(j)} disabled={applyBusy===j.id || j.isApplied}
-                          style={{ padding:"9px 20px", borderRadius:"8px", background: j.isApplied ? "#EAF3DE" : red, color: j.isApplied ? "#27500A" : "#fff", border:"none", fontSize:"12px", fontWeight:700, cursor: (applyBusy===j.id || j.isApplied) ? "default" : "pointer", opacity: applyBusy===j.id ? 0.6 : 1 }}>
-                          {j.isApplied ? "✓ 応募済み" : applyBusy===j.id ? "送信中..." : "この求人に応募する"}
-                        </button>
-                        <button onClick={() => toggleFavorite(j.id)} disabled={favBusy===j.id}
-                          style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color: j.isFavorite ? red : "#52525B", border:`1px solid ${j.isFavorite ? red : "#E0E3E9"}`, fontSize:"12px", cursor: favBusy===j.id ? "not-allowed" : "pointer", display:"flex", alignItems:"center", gap:"5px" }}>
-                          {j.isFavorite ? "♥" : "♡"} {j.isFavorite ? "お気に入り済み" : "お気に入りに追加"}
-                        </button>
-                        <button onClick={() => { setSelectedJob(null); setApplyMsg(null); }} style={{ padding:"9px 16px", borderRadius:"8px", background:"#fff", color:"#52525B", border:"1px solid #E0E3E9", fontSize:"12px", cursor:"pointer" }}>
-                          閉じる
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-              </Fragment>
               );
             })}
           </tbody>
         </table>
+      </div>
   );
 
   if (loading) return (
@@ -293,6 +187,7 @@ export default function Mypage() {
 
   return (
     <div style={{ minHeight:"100vh", background:"#F4F5F7", fontFamily:"'Noto Sans JP','Yu Gothic UI',sans-serif" }}>
+      <style>{`.mp-row:hover{background:#FFF8F8 !important;} .mp-subtab:hover{opacity:0.75;}`}</style>
 
       {/* ── TOP NAVBAR ─────────────────────────────────────── */}
       <header style={{ background:"#fff", borderBottom:"1px solid #E8EAF0", position:"sticky", top:0, zIndex:100 }}>
@@ -332,7 +227,7 @@ export default function Mypage() {
                 style={{ padding:"12px 24px", fontSize:"13px", fontWeight: tab===t.key ? 700 : 400, color:"#fff", background: tab===t.key ? "rgba(255,255,255,0.18)" : "transparent", border:"none", cursor:"pointer", borderBottom: tab===t.key ? "3px solid #fff" : "3px solid transparent", display:"flex", alignItems:"center", gap:"6px" }}>
                 {t.label}
                 {t.count !== null && t.count > 0 && (
-                  <span style={{ background:"#fff", color:red, borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 7px" }}>{t.count}</span>
+                  <span style={{ background:"#fff", color:red, borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 7px" }}>{countLabel(t.count)}</span>
                 )}
               </button>
             ))}
@@ -346,7 +241,7 @@ export default function Mypage() {
         {/* LEFT MAIN */}
         <div>
 
-          {/* ── TAB: 紹介求人 ── */}
+          {/* ── TAB: 紹介求人 (ピックアップ求人) ── */}
           {tab === "jobs" && (
             <div style={{ background:"#fff", borderRadius:"10px", overflow:"hidden", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
@@ -357,23 +252,24 @@ export default function Mypage() {
                 </p>
               </div>
 
-              {/* Sub-tabs */}
+              {/* Sub-tabs: すべて / 未読 / 新着 */}
               <div style={{ borderBottom:"1px solid #F0F1F4", display:"flex", padding:"0 20px" }}>
                 {[
-                  { k:"all", l:"すべて", count: allCount },
-                  { k:"new", l:"新着",   count: newCount },
+                  { k:"all",    l:"すべて", count: allCount },
+                  { k:"unread", l:"未読",   count: unreadCount },
+                  { k:"new",    l:"新着",   count: newCount },
                 ].map(t => (
-                  <button key={t.k} onClick={() => setJobFilter(t.k as "all"|"new")}
-                    style={{ padding:"10px 0", marginRight:"24px", fontSize:"13px", fontWeight: jobFilter===t.k ? 700 : 400, color: jobFilter===t.k ? red : "#52525B", background:"none", border:"none", borderBottom: jobFilter===t.k ? `2px solid ${red}` : "2px solid transparent", cursor:"pointer", display:"flex", alignItems:"center", gap:"5px" }}>
+                  <button key={t.k} onClick={() => setJobFilter(t.k as "all"|"unread"|"new")} className="mp-subtab"
+                    style={{ padding:"10px 0", marginRight:"24px", fontSize:"13px", fontWeight: jobFilter===t.k ? 700 : 400, color: jobFilter===t.k ? red : "#52525B", background:"none", border:"none", borderBottom: jobFilter===t.k ? `2px solid ${red}` : "2px solid transparent", cursor:"pointer", display:"flex", alignItems:"center", gap:"5px", transition:"opacity 0.15s" }}>
                     {t.l}
-                    <span style={{ background: jobFilter===t.k ? red : "#E8EAF0", color: jobFilter===t.k ? "#fff" : "#52525B", borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 6px" }}>{t.count}</span>
+                    <span style={{ background: jobFilter===t.k ? red : "#E8EAF0", color: jobFilter===t.k ? "#fff" : "#52525B", borderRadius:"20px", fontSize:"11px", fontWeight:700, padding:"1px 6px" }}>{countLabel(t.count)}</span>
                   </button>
                 ))}
               </div>
 
               <div style={{ padding:"10px 20px 0", fontSize:"11px", color:"#64748B" }}>
                 検討する<span style={{ color:red }}>♡</span>をクリックすると、検討中求人に保存されます。
-                <span style={{ marginLeft:"4px" }}>Nhấn ♡ &quot;Cân nhắc&quot; để lưu vào mục Việc đang cân nhắc.</span>
+                <span style={{ marginLeft:"4px" }}>Nhấn ♡ &quot;Cân nhắc&quot; để lưu vào mục Việc đang cân nhắc. Nhấn vào một dòng để xem chi tiết.</span>
               </div>
               <div style={{ padding:"10px 0 0" }}>
                 {renderJobTable(displayed, { ja:"現在該当する求人はありません。", vn:"Hiện chưa có việc làm phù hợp." })}
@@ -537,7 +433,7 @@ export default function Mypage() {
 
           {/* Contact advisor */}
           <div style={{ background:"#fff", borderRadius:"10px", padding:"16px", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
-            <div style={{ fontSize:"12px", fontWeight:700, color:navy, marginBottom:"8px" }}>担当スタッフ / Nhân viên phụ trách</div>
+            <div style={{ fontSize:"12px", fontWeight:700, color:navy, marginBottom:"8px" }}>担当キャリアアドバイザー / Nhân viên phụ trách</div>
             <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"10px" }}>
               <div style={{ width:"36px", height:"36px", borderRadius:"50%", background:"#FAEEDA", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"16px" }}>👤</div>
               <div>
