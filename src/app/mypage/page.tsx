@@ -447,24 +447,6 @@ export default function Mypage() {
             </Link>
           </div>
 
-          {/* LINE banner */}
-          <div style={{ background:"linear-gradient(135deg,#06C755,#05A648)", borderRadius:"10px", padding:"16px", color:"#fff", boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
-            <div style={{ fontSize:"18px", marginBottom:"4px" }}>💬 LINE</div>
-            <div style={{ fontSize:"12px", fontWeight:700, marginBottom:"4px" }}>LINEで手軽に相談</div>
-            <div style={{ fontSize:"11px", opacity:0.85, marginBottom:"10px" }}>Nhắn tin qua LINE dễ dàng hơn</div>
-            <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:"7px", padding:"8px", textAlign:"center", fontSize:"11px", fontWeight:600 }}>
-              @ aseka_career
-            </div>
-          </div>
-
-          {/* Register new */}
-          <div style={{ background:"#fff", borderRadius:"10px", padding:"14px", boxShadow:"0 1px 6px rgba(0,0,0,0.06)", textAlign:"center" }}>
-            <div style={{ fontSize:"11px", color:"#64748B", marginBottom:"8px" }}>知人・友人の紹介 · Giới thiệu bạn bè</div>
-            <Link href={`${MAIN_SITE_URL}/dang-ky`}
-              style={{ display:"inline-block", padding:"8px 16px", borderRadius:"7px", background:"#FAEEDA", color:"#633806", textDecoration:"none", fontSize:"11px", fontWeight:700 }}>
-              🎁 新規登録はこちら
-            </Link>
-          </div>
         </div>
       </div>
     </div>
