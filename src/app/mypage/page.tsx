@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useMypageLang } from "@/lib/mypageI18n";
+import { useMypageLang, translateValue } from "@/lib/mypageI18n";
 import MypageLangSwitcher from "@/components/MypageLangSwitcher";
 
 const navy  = "#0B1F3A";
@@ -35,6 +35,7 @@ export type Job = {
   annual_income:string|null; salary_type:string|null; salary_note:string|null;
   employment_type:string|null; visa_type:string|null; work_hours:string|null; trial_period:string|null;
   insurance:string|null; holidays:string|null; remarks:string|null; count:number|null;
+  translations?: Partial<Record<"en"|"vi", Record<string,string>>> | null;
 };
 
 const STATUS_STEP_KEYS = ["new","interview","offered","working"] as const;
@@ -43,7 +44,7 @@ const countLabel = (n:number) => n > 99 ? "99+" : String(n);
 
 export default function Mypage() {
   const router = useRouter();
-  const { t } = useMypageLang();
+  const { t, lang } = useMypageLang();
   const [tab, setTab]         = useState<"jobs"|"favorites"|"status"|"profile">("jobs");
   const [cand, setCand]       = useState<Candidate|null>(null);
   const [jobs, setJobs]       = useState<Job[]>([]);
@@ -125,6 +126,15 @@ export default function Mypage() {
 
   /* Shared job table — used by both 紹介求人 and 検討中求人 tabs. Each row navigates
      to its own detail page (/mypage/jobs/[id]) instead of expanding inline. */
+  // Vietnamese prefers the human-curated position_vn (admin already writes a real
+  // Vietnamese title for most jobs) over a machine translation; English has no
+  // human-curated equivalent, so it always uses the cached MyMemory translation.
+  const positionTitle = (j: Job) => {
+    if (lang === "vi" && j.position_vn) return j.position_vn;
+    const cached = lang !== "ja" ? j.translations?.[lang]?.position_name : null;
+    return cached || j.position_name || j.position_ja;
+  };
+
   const renderJobTable = (list: Job[], emptyText: string) => (
     list.length === 0
       ? <div style={{ padding:"48px", textAlign:"center", color:"#64748B", fontSize:"13px" }}>
@@ -155,9 +165,9 @@ export default function Mypage() {
                   </div>
                 </td>
                 <td style={{ padding:"13px 14px", color:navy }}>
-                  <div>{j.position_name || j.position_ja}</div>
+                  <div>{positionTitle(j)}</div>
                   <div style={{ display:"flex", gap:"4px", marginTop:"4px" }}>
-                    <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{j.industry}</span>
+                    <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"10px", fontWeight:600, padding:"2px 6px", borderRadius:"4px" }}>{translateValue(j.industry, lang)}</span>
                     <span style={{ fontSize:"10px", fontWeight:700, padding:"2px 6px", borderRadius:"4px", background:"#F6F7F9", color: j.jlpt_min==="N1" ? "#A32D2D" : j.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{t("jobs.jlptOrMore",{lvl:j.jlpt_min})}</span>
                   </div>
                 </td>
@@ -252,7 +262,7 @@ export default function Mypage() {
               <div style={{ padding:"18px 20px", borderBottom:"1px solid #F0F1F4" }}>
                 <h2 style={{ margin:"0 0 4px", fontSize:"16px", fontWeight:700, color:navy }}>{t("jobs.pickupTitle")}</h2>
                 <p style={{ margin:0, fontSize:"11px", color:"#64748B" }}>
-                  {t("jobs.pickupDesc",{skill:cand?.skill||"—",jlpt:cand?.jlpt||"—"})}
+                  {t("jobs.pickupDesc",{skill:translateValue(cand?.skill,lang)||"—",jlpt:cand?.jlpt||"—"})}
                 </p>
               </div>
 
@@ -361,9 +371,9 @@ export default function Mypage() {
                   { l:t("profile.dob"),           v: cand.date_of_birth||t("unset") },
                   { l:t("profile.gender"),        v: cand.gender||t("unset") },
                   { l:t("profile.jlpt"),          v: cand.jlpt||t("unset") },
-                  { l:t("profile.skill"),         v: cand.skill||t("unset") },
+                  { l:t("profile.skill"),         v: cand.skill?translateValue(cand.skill,lang):t("unset") },
                   { l:t("profile.preferredJob"),  v: cand.preferred_job||t("unset") },
-                  { l:t("profile.visaType"),      v: cand.visa_type||t("unset") },
+                  { l:t("profile.visaType"),      v: cand.visa_type?translateValue(cand.visa_type,lang):t("unset") },
                   { l:t("profile.availability"),  v: cand.availability||t("unset") },
                 ].map(d => (
                   <div key={d.l} style={{ background:"#F8F9FB", borderRadius:"8px", padding:"10px 14px" }}>
@@ -424,7 +434,7 @@ export default function Mypage() {
               </div>
             </div>
             <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
-              {[cand?.skill, cand?.jlpt, cand?.visa_type].filter(Boolean).map(tg=>(
+              {[translateValue(cand?.skill,lang), cand?.jlpt, translateValue(cand?.visa_type,lang)].filter(Boolean).map(tg=>(
                 <span key={tg} style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"11px", fontWeight:600, padding:"3px 8px", borderRadius:"4px" }}>{tg}</span>
               ))}
             </div>

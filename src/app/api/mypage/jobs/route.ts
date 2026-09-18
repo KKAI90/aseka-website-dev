@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
         annual_income: true, salary_type: true, salary_note: true,
         employment_type: true, visa_type: true, work_hours: true, trial_period: true,
         insurance: true, holidays: true, remarks: true, count: true,
+        translations: true,
         created_at: true, updated_at: true,
       },
       orderBy: { created_at: "desc" },

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import type { Job } from "../../page";
-import { useMypageLang } from "@/lib/mypageI18n";
+import { useMypageLang, translateValue } from "@/lib/mypageI18n";
 import MypageLangSwitcher from "@/components/MypageLangSwitcher";
 
 const navy = "#0B1F3A";
@@ -60,7 +60,7 @@ export default function MypageJobDetail() {
   const router = useRouter();
   const params = useParams();
   const jobId = String(params?.id || "");
-  const { t } = useMypageLang();
+  const { t, lang } = useMypageLang();
 
   const [cand, setCand] = useState<Candidate|null>(null);
   const [job, setJob] = useState<Job|null>(null);
@@ -142,7 +142,18 @@ export default function MypageJobDetail() {
     </div>
   );
 
-  const v = (key: keyof Job, fallbackKey?: keyof Job) => (job[key] as string) || (fallbackKey ? (job[fallbackKey] as string) : "") || "";
+  // Prefers the cached MyMemory translation (job.translations[lang][key]) for the current
+  // language, falling back to the original Japanese field (and its fallbackKey) whenever a
+  // translation is missing — a job saved before this feature existed, or a field MyMemory
+  // failed to translate, still shows real content instead of a blank row.
+  const v = (key: keyof Job, fallbackKey?: keyof Job) => {
+    const cached = lang !== "ja" ? job.translations?.[lang]?.[key as string] : null;
+    return cached || (job[key] as string) || (fallbackKey ? (job[fallbackKey] as string) : "") || "";
+  };
+  const positionTitle = () => {
+    if (lang === "vi" && job.position_vn) return job.position_vn;
+    return v("position_name", "position_ja");
+  };
 
   return (
     <div style={{ minHeight:"100vh", background:"#F4F5F7", fontFamily:"'Noto Sans JP','Yu Gothic UI',sans-serif" }}>
@@ -175,11 +186,11 @@ export default function MypageJobDetail() {
           <div style={{ padding:"22px 24px 18px" }}>
             <div style={{ fontSize:"11px", color:"#64748B", marginBottom:"6px" }}>{t("detail.jobId")} {job.id.slice(0,8).toUpperCase()}</div>
             <div style={{ fontSize:"19px", fontWeight:700, color:navy, marginBottom:"4px" }}>{job.company}</div>
-            <div style={{ fontSize:"15px", color:"#333", marginBottom:"12px" }}>{job.position_name || job.position_ja}</div>
+            <div style={{ fontSize:"15px", color:"#333", marginBottom:"12px" }}>{positionTitle()}</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
-              <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"11px", fontWeight:600, padding:"3px 9px", borderRadius:"4px" }}>{job.industry}</span>
+              <span style={{ background:"#E6F1FB", color:"#185FA5", fontSize:"11px", fontWeight:600, padding:"3px 9px", borderRadius:"4px" }}>{translateValue(job.industry, lang)}</span>
               <span style={{ fontSize:"11px", fontWeight:700, padding:"3px 9px", borderRadius:"4px", background:"#F6F7F9", color: job.jlpt_min==="N1" ? "#A32D2D" : job.jlpt_min==="N2" ? "#633806" : "#27500A" }}>{t("jobs.jlptOrMore",{lvl:job.jlpt_min})}</span>
-              {job.employment_type && <span style={{ background:"#F1EFE8", color:"#444441", fontSize:"11px", fontWeight:600, padding:"3px 9px", borderRadius:"4px" }}>{job.employment_type}</span>}
+              {job.employment_type && <span style={{ background:"#F1EFE8", color:"#444441", fontSize:"11px", fontWeight:600, padding:"3px 9px", borderRadius:"4px" }}>{translateValue(job.employment_type, lang)}</span>}
               {job.count && <span style={{ background:"#F1EFE8", color:"#444441", fontSize:"11px", fontWeight:600, padding:"3px 9px", borderRadius:"4px" }}>{t("detail.hired",{n:job.count})}</span>}
               {job.status==="urgent" && <span style={{ background:"#FAEEDA", color:"#633806", fontSize:"11px", fontWeight:700, padding:"3px 9px", borderRadius:"4px" }}>{t("jobs.badgeUrgent")}</span>}
               {job.isNew && <span style={{ background:red, color:"#fff", fontSize:"11px", fontWeight:700, padding:"3px 9px", borderRadius:"4px" }}>{t("jobs.badgeNew")}</span>}
@@ -206,7 +217,7 @@ export default function MypageJobDetail() {
             {job.osusume_point && (
               <div style={{ marginBottom:"16px", background:"#FFFBEB", borderRadius:"10px", padding:"14px 18px", fontSize:"13px", color:"#92400E", borderLeft:"4px solid #F59E0B", lineHeight:1.8, boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
                 <div style={{ fontWeight:700, marginBottom:"4px" }}>{t("detail.osusume")}</div>
-                {job.osusume_point}
+                {v("osusume_point")}
               </div>
             )}
 
@@ -219,7 +230,7 @@ export default function MypageJobDetail() {
                   {rows.map((r, i) => (
                     <div key={r.key} style={{ display:"grid", gridTemplateColumns:"140px 1fr", borderBottom: i<rows.length-1 ? "1px solid #F0F1F4" : "none" }}>
                       <div style={{ padding:"12px 18px", background:"#F8F9FB", fontSize:"11px", fontWeight:700, color:navy, borderRight:"1px solid #F0F1F4" }}>{t(r.labelKey)}</div>
-                      <div style={{ padding:"12px 18px", fontSize:"13px", color:"#333", lineHeight:1.8, whiteSpace:"pre-wrap" }}>{v(r.key, r.fallbackKey)}</div>
+                      <div style={{ padding:"12px 18px", fontSize:"13px", color:"#333", lineHeight:1.8, whiteSpace:"pre-wrap" }}>{r.key==="employment_type" ? translateValue(job.employment_type, lang) : v(r.key, r.fallbackKey)}</div>
                     </div>
                   ))}
                 </div>
@@ -256,7 +267,7 @@ export default function MypageJobDetail() {
             <div style={{ background:navy, color:"#fff", fontSize:"12px", fontWeight:700, padding:"8px 18px" }}>{t("detail.tabCompany")}</div>
             {[
               { l:t("detail.row.companyName"), v: job.company },
-              { l:t("detail.row.industry"), v: job.industry },
+              { l:t("detail.row.industry"), v: translateValue(job.industry, lang) },
               { l:t("detail.row.location"), v: job.work_location || job.location || t("unset") },
             ].map((r,i,arr) => (
               <div key={r.l} style={{ display:"grid", gridTemplateColumns:"140px 1fr", borderBottom: i<arr.length-1 ? "1px solid #F0F1F4" : "none" }}>

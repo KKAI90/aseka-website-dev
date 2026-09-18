@@ -161,3 +161,59 @@ export function useMypageLang() {
   if (!ctx) throw new Error("useMypageLang must be used within MypageLangProvider");
   return ctx;
 }
+
+// ── Fixed-vocabulary job field translations ──────────────────────────────────
+// industry/employment_type/visa_type are each a small, closed list (the same options
+// admin's job form and /dang-ky's dropdowns use) reused across every job listing — worth
+// translating once here, for free and instantly, rather than spending a MyMemory call
+// re-translating "外食業" or "正社員" on every single job that happens to use it. Free-text
+// fields that vary per job (job_description, requirements, ...) still go through
+// src/lib/translate.ts and get cached per-job in job_listings.translations.
+const VALUE_DICT: Record<string, Record<MypageLang, string>> = {
+  // industry
+  "介護": { ja:"介護", en:"Nursing care", vi:"Chăm sóc điều dưỡng" },
+  "ビルクリーニング": { ja:"ビルクリーニング", en:"Building cleaning", vi:"Vệ sinh toà nhà" },
+  "工業製品製造業": { ja:"工業製品製造業", en:"Industrial manufacturing", vi:"Sản xuất công nghiệp" },
+  "建設": { ja:"建設", en:"Construction", vi:"Xây dựng" },
+  "造船・舶用工業": { ja:"造船・舶用工業", en:"Shipbuilding", vi:"Đóng tàu" },
+  "自動車整備": { ja:"自動車整備", en:"Automobile maintenance", vi:"Sửa chữa ô tô" },
+  "航空": { ja:"航空", en:"Aviation", vi:"Hàng không" },
+  "宿泊": { ja:"宿泊", en:"Accommodation", vi:"Lưu trú / Khách sạn" },
+  "農業": { ja:"農業", en:"Agriculture", vi:"Nông nghiệp" },
+  "漁業": { ja:"漁業", en:"Fishery", vi:"Ngư nghiệp" },
+  "飲食料品製造業": { ja:"飲食料品製造業", en:"Food & beverage manufacturing", vi:"Sản xuất thực phẩm" },
+  "外食業": { ja:"外食業", en:"Food service", vi:"Dịch vụ ăn uống" },
+  "繊維業": { ja:"繊維業", en:"Textile industry", vi:"Ngành dệt may" },
+  "印刷業": { ja:"印刷業", en:"Printing industry", vi:"Ngành in ấn" },
+  "鉄道": { ja:"鉄道", en:"Railway", vi:"Đường sắt" },
+  "林業": { ja:"林業", en:"Forestry", vi:"Lâm nghiệp" },
+  "IT": { ja:"IT", en:"IT", vi:"CNTT" },
+  "機械・電気電子": { ja:"機械・電気電子", en:"Machinery & electronics", vi:"Cơ khí điện tử" },
+  "国際業務": { ja:"国際業務", en:"International business", vi:"Nghiệp vụ quốc tế" },
+  "通訳・翻訳": { ja:"通訳・翻訳", en:"Interpretation / translation", vi:"Phiên dịch - Biên dịch" },
+  "経理・会計": { ja:"経理・会計", en:"Accounting", vi:"Kế toán" },
+  "その他": { ja:"その他", en:"Other", vi:"Khác" },
+  // employment_type
+  "正社員": { ja:"正社員", en:"Full-time employee", vi:"Nhân viên chính thức" },
+  "契約社員": { ja:"契約社員", en:"Contract employee", vi:"Nhân viên hợp đồng" },
+  "パート・アルバイト": { ja:"パート・アルバイト", en:"Part-time", vi:"Làm thêm / Bán thời gian" },
+  "派遣社員": { ja:"派遣社員", en:"Dispatched worker", vi:"Nhân viên phái cử" },
+  // visa_type
+  "特定技能1号": { ja:"特定技能1号", en:"Specified Skilled Worker (i)", vi:"Kỹ năng đặc định số 1" },
+  "特定技能2号": { ja:"特定技能2号", en:"Specified Skilled Worker (ii)", vi:"Kỹ năng đặc định số 2" },
+  "技術・人文知識・国際業務": { ja:"技術・人文知識・国際業務", en:"Engineer / Specialist in Humanities / International Services", vi:"Kỹ thuật - Tri thức nhân văn - Nghiệp vụ quốc tế" },
+  "技能実習": { ja:"技能実習", en:"Technical Intern Training", vi:"Thực tập kỹ năng" },
+  "特定活動": { ja:"特定活動", en:"Designated Activities", vi:"Hoạt động đặc định" },
+  "永住者": { ja:"永住者", en:"Permanent Resident", vi:"Vĩnh trú" },
+  "日本人配偶者等": { ja:"日本人配偶者等", en:"Spouse of Japanese National", vi:"Vợ/chồng người Nhật" },
+  "定住者": { ja:"定住者", en:"Long-term Resident", vi:"Định trú" },
+};
+
+/** Translates a fixed-vocabulary job value (industry, employment_type, visa_type). Returns
+ *  the original string unchanged if it's not one of the known values, or if lang is "ja" —
+ *  so an unrecognized/free-typed value never disappears, it just doesn't get translated. */
+export function translateValue(value: string | null | undefined, lang: MypageLang): string {
+  if (!value) return "";
+  if (lang === "ja") return value;
+  return VALUE_DICT[value]?.[lang] ?? value;
+}

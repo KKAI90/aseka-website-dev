@@ -101,6 +101,12 @@ model job_listings {
   holidays          String?
   remarks           String?
   reference_url     String?
+  // Cached machine translation of the free-text fields, keyed by target language:
+  // { en: { job_description: "...", requirements: "...", ... }, vi: { ... } }.
+  // Populated once when a job is created/updated (src/lib/translate.ts, MyMemory API — free,
+  // no per-request cost), not re-translated on every candidate view. null/missing keys just
+  // fall back to the original Japanese text on mypage.
+  translations      Json?
   created_at        DateTime @default(now())
   updated_at        DateTime @default(now()) @updatedAt
 }
