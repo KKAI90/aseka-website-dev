@@ -46,17 +46,42 @@ export async function GET(req: NextRequest) {
       return { ...v, val, pct: Math.round((val / maxPipeline) * 100) };
     });
 
+    // Covers the full 22-category vocabulary Jobs/dang-ky actually write to `industry`
+    // (see INDUSTRY_LIST in admin/jobs/page.tsx) — colors reused from that same file's IND
+    // dict for visual consistency. The old version only recognized 6 categories and matched
+    // by substring, so 18 of 22 real jobs (each with a perfectly valid specific industry —
+    // 介護, 建設, 宿泊, 航空...) silently fell into a meaningless "その他" catch-all,
+    // making this widget report "82% Other" regardless of the real distribution (caught via
+    // live DB audit against a real dashboard screenshot). Exact match now — a job's industry
+    // either is one of these 22 known values, or it genuinely renders under its own raw
+    // label rather than being swallowed into "その他".
     const industryMeta: Record<string, { vn: string; color: string }> = {
-      "飲食":   { vn: "Nhà hàng",    color: "#378ADD" },
-      "製造":   { vn: "Nhà máy",     color: "#5DCAA5" },
-      "農業":   { vn: "Nông nghiệp", color: "#EF9F27" },
-      "ホテル": { vn: "Khách sạn",   color: "#F09595" },
-      "IT":     { vn: "IT",          color: "#7C6FF7" },
-      "その他": { vn: "Khác",        color: "#B4B2A9" },
+      "介護":            { vn: "Chăm sóc điều dưỡng",     color: "#0F6E6E" },
+      "ビルクリーニング": { vn: "Vệ sinh toà nhà",          color: "#52525B" },
+      "工業製品製造業":   { vn: "Sản xuất công nghiệp",    color: "#27500A" },
+      "建設":            { vn: "Xây dựng",                color: "#8A6800" },
+      "造船・舶用工業":   { vn: "Đóng tàu",                color: "#0369A1" },
+      "自動車整備":       { vn: "Sửa chữa ô tô",           color: "#3730A3" },
+      "航空":            { vn: "Hàng không",              color: "#0C447C" },
+      "宿泊":            { vn: "Lưu trú / Khách sạn",     color: "#534AB7" },
+      "農業":            { vn: "Nông nghiệp",             color: "#633806" },
+      "漁業":            { vn: "Ngư nghiệp",              color: "#9F1239" },
+      "飲食料品製造業":   { vn: "Sản xuất thực phẩm",      color: "#4D6B0A" },
+      "外食業":          { vn: "Dịch vụ ăn uống",         color: "#0C447C" },
+      "繊維業":          { vn: "Ngành dệt may",           color: "#9D2467" },
+      "印刷業":          { vn: "Ngành in ấn",             color: "#52525B" },
+      "鉄道":            { vn: "Đường sắt",               color: "#0369A1" },
+      "林業":            { vn: "Lâm nghiệp",              color: "#27500A" },
+      "IT":              { vn: "CNTT",                    color: "#7C6FF7" },
+      "機械・電気電子":   { vn: "Cơ khí điện tử",          color: "#534AB7" },
+      "国際業務":         { vn: "Nghiệp vụ quốc tế",       color: "#0C447C" },
+      "通訳・翻訳":       { vn: "Phiên dịch - Biên dịch",  color: "#8A6800" },
+      "経理・会計":       { vn: "Kế toán",                 color: "#9F1239" },
+      "その他":          { vn: "Khác",                    color: "#B4B2A9" },
     };
     const indCount: Record<string, number> = {};
     jobList.filter(j => j.status !== "paused").forEach(j => {
-      const key = Object.keys(industryMeta).find(k => j.industry?.includes(k)) || "その他";
+      const key = j.industry && industryMeta[j.industry] ? j.industry : (j.industry || "その他");
       indCount[key] = (indCount[key] || 0) + 1;
     });
     const maxInd = Math.max(...Object.values(indCount), 1);

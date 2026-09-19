@@ -517,7 +517,12 @@ export default function Dashboard() {
                 <div style={{ fontSize:"12px",fontWeight:700,color:navy }}>{t(card.titleKey)}</div>
                 <Link href={card.href} className="dash-link" style={{ fontSize:"11px",color:"#185FA5",textDecoration:"none" }}>{t("dashboard.viewAll")}</Link>
               </div>
-              <div style={{ padding:"14px 16px" }}>
+              {/* jobsByIndustry can now list up to the full ~22-category vocabulary (see
+                  route.ts) instead of a 6-category summary, so this needs its own scroll —
+                  otherwise it would stretch far taller than the 5-row pipeline card next to
+                  it. maxHeight is generous enough that the pipeline card's 5 rows never
+                  trigger it. */}
+              <div className="dash-card-scroll" style={{ padding:"14px 16px", maxHeight:"320px", overflowY:"auto" }}>
                 {loading
                   ? Array(4).fill(0).map((_,i) => (
                       <div key={i} style={{ display:"flex",alignItems:"center",gap:"8px",marginBottom:"9px" }}>
@@ -636,6 +641,8 @@ export default function Dashboard() {
         .dash-activity-row { transition: background 0.15s ease; }
         .dash-activity-row:hover { background: #F9FAFB; }
         .dash-bar-col:hover .dash-bar { filter: brightness(1.08); transform: scaleY(1.01); }
+        .dash-card-scroll::-webkit-scrollbar { width: 4px; }
+        .dash-card-scroll::-webkit-scrollbar-thumb { background: rgba(11,31,58,0.15); border-radius: 4px; }
         .dash-live-dot { animation: dashPulseDot 2s infinite; }
         @media (prefers-reduced-motion: reduce) {
           .dash-fade-in { animation: none; }
