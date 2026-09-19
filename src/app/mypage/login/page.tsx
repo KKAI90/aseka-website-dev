@@ -25,7 +25,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 export default function MypageLogin() {
   const router = useRouter();
-  const [mode, setMode] = useState<"password" | "magic">("password");
+  const [mode, setMode] = useState<"password" | "forgot">("password");
 
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +33,7 @@ export default function MypageLogin() {
   const [remember, setRemember] = useState(true);
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
-  const [magicSent, setMagicSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,18 +47,18 @@ export default function MypageLogin() {
     router.push("/mypage");
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError(""); setMagicSent(false);
-    const res = await fetch("/api/mypage/magic-link/request", {
+    setLoading(true); setError(""); setResetSent(false);
+    const res = await fetch("/api/mypage/password-reset/request", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) { setError(data.error || "エラーが発生しました"); return; }
-    setMagicSent(true);
-    if (data._devLink) console.log("[dev] magic link:", data._devLink);
+    setResetSent(true);
+    if (data._devLink) console.log("[dev] password reset link:", data._devLink);
   };
 
   return (
@@ -87,6 +87,8 @@ export default function MypageLogin() {
         .login-text-link:hover { opacity:0.7; }
         .login-fade-in { animation: loginFadeIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
         @keyframes loginFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes loginResetPop { 0% { transform:scale(0.6); opacity:0; } 70% { transform:scale(1.08); } 100% { transform:scale(1); opacity:1; } }
+        .login-reset-check { animation: loginResetPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
         .float-card { position:absolute; border-radius:18px; overflow:hidden; box-shadow:0 24px 48px -12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.08); }
         .float-a { width:44%; aspect-ratio:3/4;  left:4%;  top:10%; animation:floatA 7s ease-in-out infinite; z-index:2; }
         .float-b { width:38%; aspect-ratio:4/5;  right:6%; top:4%;  animation:floatB 6s ease-in-out infinite -2s; z-index:3; }
@@ -95,7 +97,7 @@ export default function MypageLogin() {
         @keyframes floatB { 0%,100% { transform:translateY(0) rotate(3deg); }  50% { transform:translateY(-12px) rotate(3deg); } }
         @keyframes floatC { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-20px) rotate(-2deg); } }
         @media (prefers-reduced-motion: reduce) {
-          .float-a, .float-b, .float-c, .login-fade-in { animation:none; }
+          .float-a, .float-b, .float-c, .login-fade-in, .login-reset-check { animation:none; }
         }
         @media (max-width: 900px) {
           .login-right { display:none !important; }
@@ -122,12 +124,13 @@ export default function MypageLogin() {
 
           {/* Mode switch */}
           <div style={{ display:"flex", gap:"3px", background:"#F1EEEE", borderRadius:"9px", padding:"3px", marginBottom:"22px" }}>
-            {[{ k:"password" as const, l:"パスワードでログイン" }, { k:"magic" as const, l:"マジックリンク" }].map(m => (
-              <button key={m.k} type="button" className="login-mode-tab" onClick={() => { setMode(m.k); setError(""); setMagicSent(false); }}
+            {[{ k:"password" as const, l:"パスワードでログイン", icon:"🔐" }, { k:"forgot" as const, l:"パスワードを忘れた", icon:"🔑" }].map(m => (
+              <button key={m.k} type="button" className="login-mode-tab" onClick={() => { setMode(m.k); setError(""); setResetSent(false); }}
                 style={{ flex:1, padding:"9px 4px", borderRadius:"7px", fontSize:"13px", fontWeight:700, border:"none", cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
                   background: mode===m.k ? "#fff" : "transparent", color: mode===m.k ? navy : "#64748B",
                   boxShadow: mode===m.k ? "0 2px 6px rgba(11,31,58,0.1)" : "none" }}>
-                {m.l}
+                <span style={{ fontSize:"12px" }}>{m.icon}</span>{m.l}
               </button>
             ))}
           </div>
@@ -187,18 +190,36 @@ export default function MypageLogin() {
               </button>
 
               <div style={{ marginTop:"16px" }}>
-                <button type="button" className="login-text-link" onClick={() => { setMode("magic"); setError(""); }}
+                <button type="button" className="login-text-link" onClick={() => { setMode("forgot"); setError(""); }}
                   style={{ background:"none", border:"none", color:navy, fontSize:"14px", fontWeight:600, cursor:"pointer", padding:0 }}>
                   パスワードをお忘れの方は<span style={{ textDecoration:"underline" }}>こちら</span>
                 </button>
               </div>
             </form>
-          ) : (
-            <form onSubmit={handleMagicLink}>
-              <p style={{ fontSize:"13px", color:"#3F4552", marginBottom:"16px", lineHeight:1.7 }}>
-                登録済みのメールアドレスにログイン用リンクを送ります。<br/>
-                <span style={{ fontSize:"12px", color:"#64748B" }}>Gửi link đăng nhập tới email đã đăng ký (không cần mật khẩu).</span>
+          ) : resetSent ? (
+            <div style={{ textAlign:"center", padding:"8px 0 4px" }}>
+              <div className="login-reset-check" style={{ width:"56px", height:"56px", borderRadius:"50%", background:"#EAF3DE", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"26px", margin:"0 auto 16px" }}>✉️</div>
+              <div style={{ fontSize:"15px", fontWeight:800, color:navy, marginBottom:"6px" }}>メールを送信しました</div>
+              <p style={{ fontSize:"13px", color:"#3F4552", lineHeight:1.7, margin:"0 0 4px" }}>
+                受信箱をご確認のうえ、メール内のリンクから<br/>新しいパスワードを設定してください（有効期限30分）。
               </p>
+              <p style={{ fontSize:"12px", color:"#64748B", margin:"0 0 22px" }}>
+                Vui lòng kiểm tra hộp thư và nhấn vào link trong email để đặt mật khẩu mới (có hiệu lực trong 30 phút).
+              </p>
+              <button type="button" className="login-text-link" onClick={() => { setMode("password"); setResetSent(false); setError(""); }}
+                style={{ background:"none", border:`1.5px solid ${navy}`, borderRadius:"9px", color:navy, fontSize:"13px", fontWeight:700, cursor:"pointer", padding:"10px 20px" }}>
+                ← ログインページへ戻る
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleForgotPassword}>
+              <div style={{ background:"#F7F8FA", border:"1px solid #EDE7E7", borderRadius:"10px", padding:"12px 14px", marginBottom:"18px", display:"flex", gap:"10px", alignItems:"flex-start" }}>
+                <span style={{ fontSize:"16px", flexShrink:0 }}>🔑</span>
+                <p style={{ fontSize:"12.5px", color:"#3F4552", margin:0, lineHeight:1.7 }}>
+                  登録済みのメールアドレスに、パスワード再設定用のリンクを送ります。<br/>
+                  <span style={{ fontSize:"11.5px", color:"#64748B" }}>Nhập email đã đăng ký để nhận link đặt lại mật khẩu mới.</span>
+                </p>
+              </div>
               <div style={{ marginBottom:"16px" }}>
                 <FieldLabel>メールアドレス</FieldLabel>
                 <input
@@ -217,17 +238,18 @@ export default function MypageLogin() {
                   ⚠️ {error}
                 </div>
               )}
-              {magicSent && (
-                <div style={{ background:"#EAF3DE", border:"1px solid #27500A22", borderRadius:"8px", padding:"11px 13px", fontSize:"13px", color:"#1E4009", marginBottom:"14px", fontWeight:600 }}>
-                  ✓ メールを送信しました。受信箱をご確認ください（登録済みの場合）。<br/>
-                  <span style={{ fontSize:"12px", fontWeight:400 }}>Đã gửi email — vui lòng kiểm tra hộp thư (nếu đã đăng ký).</span>
-                </div>
-              )}
 
               <button type="submit" disabled={loading} className="login-submit-btn"
-                style={{ width:"100%", padding:"15px", borderRadius:"9px", background: loading ? "#64748B" : navy, color:"#fff", fontSize:"15px", fontWeight:700, border:"none", cursor: loading ? "not-allowed" : "pointer", letterSpacing:"0.06em" }}>
-                {loading ? "送信中..." : "ログインリンクを送信"}
+                style={{ width:"100%", padding:"15px", borderRadius:"9px", background: loading ? "#64748B" : red, color:"#fff", fontSize:"15px", fontWeight:700, border:"none", cursor: loading ? "not-allowed" : "pointer", letterSpacing:"0.06em" }}>
+                {loading ? "送信中..." : "再設定用リンクを送信"}
               </button>
+
+              <div style={{ marginTop:"16px" }}>
+                <button type="button" className="login-text-link" onClick={() => { setMode("password"); setError(""); }}
+                  style={{ background:"none", border:"none", color:"#64748B", fontSize:"13px", fontWeight:600, cursor:"pointer", padding:0 }}>
+                  ← パスワードでログインする
+                </button>
+              </div>
             </form>
           )}
 

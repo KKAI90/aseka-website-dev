@@ -73,7 +73,7 @@ const DICT: Record<string, Record<MypageLang, string>> = {
   "profile.pwChangeTitle": { en: "Change password", vi: "Đổi mật khẩu", ja: "パスワード変更" },
   "profile.pwSetTitle": { en: "Set a password", vi: "Đặt mật khẩu", ja: "パスワードを設定する" },
   "profile.pwChangeDesc": { en: "Log in with your password from now on.", vi: "Đổi mật khẩu đăng nhập.", ja: "次回からパスワードでログインできます。" },
-  "profile.pwSetDesc": { en: "Setting one skips the magic-link step next time.", vi: "Đặt mật khẩu để lần sau đăng nhập nhanh hơn.", ja: "設定すると次回からマジックリンク不要でログインできます。" },
+  "profile.pwSetDesc": { en: "Set one so you can log in with a password from now on.", vi: "Đặt mật khẩu để lần sau đăng nhập bằng mật khẩu.", ja: "設定すると次回からパスワードでログインできます。" },
   "profile.pwCurrentPlaceholder": { en: "Current password", vi: "Mật khẩu hiện tại", ja: "現在のパスワード" },
   "profile.pwNewPlaceholder": { en: "New password (6+ characters)", vi: "Mật khẩu mới (từ 6 ký tự)", ja: "新しいパスワード（6文字以上）" },
   "profile.pwSave": { en: "Saving...", vi: "Đang lưu...", ja: "保存中..." },
