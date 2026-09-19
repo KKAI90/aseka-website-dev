@@ -89,7 +89,7 @@ const FIELDS = [
 ];
 
 const EMPTY_JOB = {
-  company:"",location:"",position_ja:"",position_vn:"",industry:"その他",
+  id:"",company:"",location:"",position_ja:"",position_vn:"",industry:"その他",
   count:"1",salary:"",jlpt_min:"N4",status:"open",
   osusume_point:"",position_name:"",position_note:"",job_description:"",
   requirements:"",qualifications:"",language_skills:"",education_req:"",
