@@ -132,7 +132,7 @@ export default function JobsPage() {
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/jobs");
-    if (res.status===401){router.push("/admin/login");return;}
+    if (res.status===401){router.replace("/admin/login");return;}
     const d = await res.json();
     setJobs(d.data||[]);
     setLoading(false);

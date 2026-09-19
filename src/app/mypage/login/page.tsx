@@ -44,7 +44,14 @@ export default function MypageLogin() {
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error); setLoading(false); return; }
-    router.push("/mypage");
+    // replace, not push — push adds /mypage on TOP of this login page in browser history,
+    // so pressing Back after a successful login restores this exact page from Next's
+    // client-side router cache: the same React component instance, with whatever the
+    // previous candidate had typed still sitting in the email/password fields (verified:
+    // reported live — logging in, then pressing Back, showed the just-used email still
+    // filled in). replace swaps this history entry instead of stacking on it, so Back skips
+    // over the login page entirely rather than resurrecting its stale state.
+    router.replace("/mypage");
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {

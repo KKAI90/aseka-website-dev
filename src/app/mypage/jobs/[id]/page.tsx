@@ -78,7 +78,7 @@ export default function MypageJobDetail() {
       fetch("/api/mypage/me").then(r => r.ok ? r.json() : null),
       fetch("/api/mypage/jobs").then(r => r.ok ? r.json() : null),
     ]).then(([me, j]) => {
-      if (!me) { router.push("/mypage/login"); return; }
+      if (!me) { router.replace("/mypage/login"); return; }
       setCand(me.data);
       const found = (j?.jobs || []).find((x: Job) => x.id === jobId) || null;
       if (!found) { setNotFound(true); setLoading(false); return; }

@@ -43,7 +43,10 @@ function ResetPasswordInner() {
       const data = await res.json();
       if (!res.ok) { setError(data.error || "エラーが発生しました"); setLoading(false); return; }
       setDone(true);
-      setTimeout(() => router.push("/mypage"), 1500);
+      // replace, not push — see the matching comment in mypage/login/page.tsx. Also stops
+      // the reset-password form (with the token already spent) from being resurrected by
+      // Back with its now-stale state.
+      setTimeout(() => router.replace("/mypage"), 1500);
     } catch {
       setError("通信エラーが発生しました / Lỗi kết nối");
       setLoading(false);

@@ -92,7 +92,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
-    router.push("/admin/login");
+    // replace, not push — push adds /admin/login on TOP of this page in browser history,
+    // so pressing Back after logout can restore this exact admin page from Next's client
+    // router cache (a previously-rendered authenticated view, still holding this admin's
+    // data) even though the session cookie is already cleared. replace swaps the history
+    // entry instead of stacking on it, so Back skips past it. Same fix applied to the
+    // matching mypage flow after this exact bug was reported live there.
+    router.replace("/admin/login");
   };
 
   const visibleNav = ALL_NAV

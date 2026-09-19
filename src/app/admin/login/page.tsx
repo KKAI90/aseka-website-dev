@@ -28,7 +28,11 @@ export default function AdminLogin() {
       setLoading(false);
       return;
     }
-    router.push("/admin/dashboard");
+    // replace, not push — see the matching comment on admin/layout.tsx's handleLogout.
+    // Prevents Back after a successful login from restoring this exact login page (with
+    // whatever the previous admin had typed still sitting in its fields) from Next's
+    // client router cache.
+    router.replace("/admin/dashboard");
   };
 
   return (

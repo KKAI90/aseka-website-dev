@@ -64,7 +64,7 @@ export default function Mypage() {
       fetch("/api/mypage/me").then(r => r.ok ? r.json() : null),
       fetch("/api/mypage/jobs").then(r => r.ok ? r.json() : null),
     ]).then(([me, j]) => {
-      if (!me) { router.push("/mypage/login"); return; }
+      if (!me) { router.replace("/mypage/login"); return; }
       setCand(me.data);
       setJobs(j?.jobs || []);
       try {
@@ -77,7 +77,12 @@ export default function Mypage() {
 
   const logout = async () => {
     await fetch("/api/mypage/logout", { method:"POST" });
-    router.push("/mypage/login");
+    // replace, not push — see the matching comment in mypage/login/page.tsx. Same reasoning
+    // here in the more serious direction: without this, pressing Back after logout can
+    // restore this exact dashboard from Next's client router cache — a previously-rendered
+    // authenticated page with the candidate's own data still in it — even though the
+    // session cookie is already gone.
+    router.replace("/mypage/login");
   };
 
   const toggleFavorite = async (jobId: string) => {

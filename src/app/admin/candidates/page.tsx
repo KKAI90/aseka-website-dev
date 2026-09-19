@@ -354,7 +354,7 @@ export default function CandidatesPage() {
     if (jlptFilter!=="all") p.set("jlpt",jlptFilter);
     if (search) p.set("search",search);
     const res = await fetch(`/api/admin/candidates?${p}`);
-    if (res.status===401){router.push("/admin/login");return;}
+    if (res.status===401){router.replace("/admin/login");return;}
     const d = await res.json();
     setCands(d.data||[]);
     setLoading(false);

@@ -83,7 +83,7 @@ export default function MessagesPage() {
   const load = useCallback(async (spin = false) => {
     if (spin) setRefreshing(true);
     const res = await fetch("/api/admin/messages");
-    if (res.status === 401) { router.push("/admin/login"); return; }
+    if (res.status === 401) { router.replace("/admin/login"); return; }
     const d = await res.json();
     setMsgs(d.data || []);
     setLoading(false);
