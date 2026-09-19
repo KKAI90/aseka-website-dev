@@ -21,8 +21,8 @@ const READ_KEY_PREFIX = "aseka_mypage_read_jobs_";
 type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
   date_of_birth:string; gender:string; skill:string; jlpt:string;
-  preferred_job:string; visa_type:string; status:string;
-  match_job_id:string|null; match_job_name:string; motivation:string; availability:string; created_at:string;
+  preferred_job:string; visa_type:string; visa_expiry:string; address:string; status:string;
+  match_job_id:string|null; match_job_name:string; availability:string;
   hasPassword:boolean;
 };
 export type Job = {
@@ -336,11 +336,15 @@ export default function Mypage() {
                   })}
                 </div>
 
-                {/* Current status card */}
-                <div style={{ background: currentStep >= 0 ? "#F8FFF8" : "#F8F9FB", border:`1px solid ${currentStep>=0?"#27500A22":"#E8EAF0"}`, borderRadius:"10px", padding:"16px 20px" }}>
+                {/* Current status card. "quit" (退職) is a real, admin-settable status that
+                   doesn't fit the linear 4-step pipeline above (it's a terminal state after
+                   working, not a step within onboarding) — falling through to the currentStep
+                   === -1 branch would have wrongly shown "Registered" for someone who has
+                   actually left. Shown as its own explicit case instead. */}
+                <div style={{ background: cand?.status==="quit" ? "#F6F7F9" : currentStep >= 0 ? "#F8FFF8" : "#F8F9FB", border:`1px solid ${cand?.status==="quit"?"#44444122":currentStep>=0?"#27500A22":"#E8EAF0"}`, borderRadius:"10px", padding:"16px 20px" }}>
                   <div style={{ fontSize:"12px", fontWeight:700, color:navy, marginBottom:"4px" }}>
-                    {t("status.current")} <span style={{ color: currentStep>=0 ? stepColor(STATUS_STEP_KEYS[currentStep]) : "#64748B" }}>
-                      {currentStep>=0 ? t(`status.step.${STATUS_STEP_KEYS[currentStep]}`) : t("status.registered")}
+                    {t("status.current")} <span style={{ color: cand?.status==="quit" ? "#444441" : currentStep>=0 ? stepColor(STATUS_STEP_KEYS[currentStep]) : "#64748B" }}>
+                      {cand?.status==="quit" ? t("status.step.quit") : currentStep>=0 ? t(`status.step.${STATUS_STEP_KEYS[currentStep]}`) : t("status.registered")}
                     </span>
                   </div>
                   {cand?.match_job_name && (
@@ -374,6 +378,8 @@ export default function Mypage() {
                   { l:t("profile.skill"),         v: cand.skill?translateValue(cand.skill,lang):t("unset") },
                   { l:t("profile.preferredJob"),  v: cand.preferred_job||t("unset") },
                   { l:t("profile.visaType"),      v: cand.visa_type?translateValue(cand.visa_type,lang):t("unset") },
+                  { l:t("profile.visaExpiry"),    v: cand.visa_expiry||t("unset") },
+                  { l:t("profile.address"),       v: cand.address||t("unset") },
                   { l:t("profile.availability"),  v: cand.availability||t("unset") },
                 ].map(d => (
                   <div key={d.l} style={{ background:"#F8F9FB", borderRadius:"8px", padding:"10px 14px" }}>

@@ -65,8 +65,12 @@ export async function GET(req: NextRequest) {
   // The job an admin has explicitly assigned (match_job_id) must always be visible here —
   // otherwise a manually-pushed job could silently never appear if it didn't also score
   // well enough to land in a plain top-10-by-score slice. Pin it first, then fill the rest.
+  // "full" (充足 — headcount already filled) is excluded from the general recommendation
+  // pool — a candidate shouldn't be offered a position that has no openings left — but NOT
+  // from the pinned slot: if a job fills up after a candidate is already matched/applied to
+  // it, they still need to see their own application on their own dashboard.
   const appliedJob = cand.match_job_id ? scored.find(j => j.id === cand.match_job_id) : undefined;
-  const rest = scored.filter(j => j.id !== cand.match_job_id);
+  const rest = scored.filter(j => j.id !== cand.match_job_id && j.status !== "full");
   const top10 = appliedJob ? [appliedJob, ...rest.slice(0, 9)] : rest.slice(0, 10);
 
   return NextResponse.json({ jobs: top10 });

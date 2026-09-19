@@ -25,6 +25,7 @@ const SECTIONS: { titleKey:string; rows: { labelKey:string; key:keyof Job; fallb
   ]},
   { titleKey:"detail.section.jobDesc", rows:[
     { labelKey:"detail.row.jobDesc", key:"job_description" },
+    { labelKey:"detail.row.positionNote", key:"position_note" },
   ]},
   { titleKey:"detail.section.location", rows:[
     { labelKey:"detail.row.location", key:"work_location", fallbackKey:"location" },
@@ -33,6 +34,7 @@ const SECTIONS: { titleKey:string; rows: { labelKey:string; key:keyof Job; fallb
   { titleKey:"detail.section.requirements", rows:[
     { labelKey:"detail.row.requirements", key:"requirements" },
     { labelKey:"detail.row.qualifications", key:"qualifications" },
+    { labelKey:"detail.row.visaType", key:"visa_type" },
   ]},
   { titleKey:"detail.section.language", rows:[
     { labelKey:"detail.row.language", key:"language_skills" },
@@ -230,7 +232,11 @@ export default function MypageJobDetail() {
                   {rows.map((r, i) => (
                     <div key={r.key} style={{ display:"grid", gridTemplateColumns:"140px 1fr", borderBottom: i<rows.length-1 ? "1px solid #F0F1F4" : "none" }}>
                       <div style={{ padding:"12px 18px", background:"#F8F9FB", fontSize:"11px", fontWeight:700, color:navy, borderRight:"1px solid #F0F1F4" }}>{t(r.labelKey)}</div>
-                      <div style={{ padding:"12px 18px", fontSize:"13px", color:"#333", lineHeight:1.8, whiteSpace:"pre-wrap" }}>{r.key==="employment_type" ? translateValue(job.employment_type, lang) : v(r.key, r.fallbackKey)}</div>
+                      <div style={{ padding:"12px 18px", fontSize:"13px", color:"#333", lineHeight:1.8, whiteSpace:"pre-wrap" }}>
+                        {r.key==="employment_type" ? translateValue(job.employment_type, lang)
+                          : r.key==="visa_type" ? translateValue(job.visa_type, lang)
+                          : v(r.key, r.fallbackKey)}
+                      </div>
                     </div>
                   ))}
                 </div>
