@@ -33,7 +33,13 @@ export default function AdminLogin() {
 
   return (
     <>
-      <style>{`
+      {/* dangerouslySetInnerHTML, not a literal JSX text child — the quote characters in
+          content:"" and font-family:"Segoe UI" get HTML-entity-escaped ("&quot;") by
+          React's normal SSR text serialization, but browsers treat <style> as a raw-text
+          element and never decode entities back, so the SSR'd markup and the client's
+          re-render disagreed and forced a full client-side re-render on every page load
+          (same bug class fixed earlier in admin/layout.tsx). */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .login-root { min-height:100vh; display:flex; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
         /* Left panel */
@@ -66,7 +72,7 @@ export default function AdminLogin() {
           .login-card { box-shadow:none; padding:32px 24px; }
           .login-lang-mobile { display:flex !important; }
         }
-      `}</style>
+      ` }} />
 
       <div className="login-root">
         {/* ── Left branding panel ── */}

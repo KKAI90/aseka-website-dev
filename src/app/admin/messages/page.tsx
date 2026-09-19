@@ -157,7 +157,13 @@ export default function MessagesPage() {
 
   return (
     <>
-      <style>{`
+      {/* dangerouslySetInnerHTML, not a literal JSX text child — the quote characters in
+          content:"" and font-family:"Segoe UI" get HTML-entity-escaped ("&quot;") by
+          React's normal SSR text serialization, but browsers treat <style> as a raw-text
+          element and never decode entities back, so the SSR'd markup and the client's
+          re-render disagreed and forced a full client-side re-render on every page load
+          (same bug class fixed earlier in admin/layout.tsx). */}
+      <style dangerouslySetInnerHTML={{ __html: `
         * { box-sizing:border-box; }
         @keyframes spin      { to { transform:rotate(360deg); } }
         @keyframes fadeUp    { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -325,7 +331,7 @@ export default function MessagesPage() {
           .refresh-btn span:last-child { display:none; }
           .toast { bottom:16px; right:16px; left:16px; }
         }
-      `}</style>
+      ` }} />
 
       <div className="page-bg">
 

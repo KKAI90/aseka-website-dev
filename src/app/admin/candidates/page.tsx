@@ -105,9 +105,15 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
   // sidebar still visible, instead of covering the whole screen).
   return createPortal(
     <div className="rirekisho-overlay" style={{position:"fixed",inset:0,background:"rgba(11,31,58,0.55)",zIndex:200,display:"flex",alignItems:"flex-start",justifyContent:"center",overflowY:"auto",padding:"28px 16px"}} onClick={onClose}>
-      <style>{`
+      {/* dangerouslySetInnerHTML, not a literal JSX text child — the ">" combinator in
+          "body > *:not(...)" and the quote marks in this block's own comment get
+          HTML-entity-escaped by React's normal SSR text serialization, but browsers treat
+          <style> as a raw-text element and never decode entities back, so the SSR'd markup
+          and the client's re-render disagreed and forced a full client-side re-render on
+          every render of this modal (same bug class fixed earlier in admin/layout.tsx). */}
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          /* visibility:hidden (the usual "print only this element" trick) keeps every
+          /* visibility:hidden (the usual print-only-this-element trick) keeps every
              hidden element's layout box in the flow — it only stops painting. Since this
              modal is portalled to document.body, the whole rest of the admin app (sidebar,
              candidate list, detail panel) is a sibling that still occupies its full height
@@ -124,7 +130,7 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
           .rirekisho-print { position: static !important; overflow: visible !important; width: 100% !important; max-width: 100% !important; box-shadow: none !important; border-radius: 0 !important; }
           .rirekisho-noprint { display: none !important; }
         }
-      `}</style>
+      ` }} />
       <div className="rirekisho-print" onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:"10px",maxWidth:"860px",width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.3)",overflow:"hidden"}}>
         <div className="rirekisho-noprint" style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 18px",borderBottom:"0.5px solid rgba(11,31,58,0.1)",position:"sticky",top:0,background:"#fff",zIndex:2}}>
           <div style={{fontSize:"14px",fontWeight:700,color:navy}}>📋 {t("candidates.rirekishoTitle")} — {candidate.name}</div>

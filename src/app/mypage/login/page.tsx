@@ -63,7 +63,13 @@ export default function MypageLogin() {
 
   return (
     <div className="login-split" style={{ minHeight:"100vh", display:"flex", fontFamily:"'Noto Sans JP','Yu Gothic UI',sans-serif" }}>
-      <style>{`
+      {/* dangerouslySetInnerHTML, not a literal JSX text child — the quote characters in
+          content:"" (::before/::after) get HTML-entity-escaped ("&quot;") by React's
+          normal SSR text serialization, but browsers treat <style> as a raw-text element
+          and never decode entities back, so the SSR'd markup and the client's re-render
+          disagreed and forced a full client-side re-render on every page load (same bug
+          class fixed earlier in admin/layout.tsx, found here via a fresh console check). */}
+      <style dangerouslySetInnerHTML={{ __html: `
         .login-split { background:#fff; }
         .login-left { position:relative; background:linear-gradient(160deg, #FFFFFF 0%, #FDF8F8 55%, #FCF4F4 100%); }
         .login-left::before {
@@ -79,7 +85,6 @@ export default function MypageLogin() {
         .login-input:focus { border-color:${navy} !important; box-shadow:0 0 0 3px rgba(11,31,58,0.1); background:#fff !important; }
         .login-eye-btn { transition: color 0.15s ease, transform 0.15s ease; }
         .login-eye-btn:hover { color:${navy} !important; transform:translateY(-50%) scale(1.1); }
-        .login-mode-tab { transition: color 0.15s ease, background 0.15s ease; }
         .login-submit-btn { transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease; box-shadow:0 4px 14px rgba(11,31,58,0.18); }
         .login-submit-btn:hover:not(:disabled) { opacity:0.92; transform:translateY(-1px); box-shadow:0 6px 18px rgba(11,31,58,0.24); }
         .login-submit-btn:active:not(:disabled) { transform:translateY(0); }
@@ -103,7 +108,7 @@ export default function MypageLogin() {
           .login-right { display:none !important; }
           .login-left { width:100% !important; max-width:100% !important; }
         }
-      `}</style>
+      ` }} />
 
       {/* ── Left: form ── */}
       <div className="login-left" style={{ width:"460px", maxWidth:"100%", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", padding:"48px 32px", overflow:"hidden" }}>
@@ -117,22 +122,27 @@ export default function MypageLogin() {
             </div>
             <span style={{ fontSize:"23px", fontWeight:800, color:navy, letterSpacing:"0.08em" }}>ASEKA</span>
           </div>
-          <p style={{ fontSize:"14px", color:"#3F4552", marginBottom:"26px", lineHeight:1.6 }}>
+          <p style={{ fontSize:"14px", color:"#3F4552", marginBottom:"8px", lineHeight:1.6 }}>
             求人紹介サービス「Asekaキャリア」<br/>
             <span style={{ fontSize:"12px", color:"#64748B" }}>Dịch vụ giới thiệu việc làm tại Nhật Bản</span>
           </p>
 
-          {/* Mode switch */}
-          <div style={{ display:"flex", gap:"3px", background:"#F1EEEE", borderRadius:"9px", padding:"3px", marginBottom:"22px" }}>
-            {[{ k:"password" as const, l:"パスワードでログイン", icon:"🔐" }, { k:"forgot" as const, l:"パスワードを忘れた", icon:"🔑" }].map(m => (
-              <button key={m.k} type="button" className="login-mode-tab" onClick={() => { setMode(m.k); setError(""); setResetSent(false); }}
-                style={{ flex:1, padding:"9px 4px", borderRadius:"7px", fontSize:"13px", fontWeight:700, border:"none", cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:"5px",
-                  background: mode===m.k ? "#fff" : "transparent", color: mode===m.k ? navy : "#64748B",
-                  boxShadow: mode===m.k ? "0 2px 6px rgba(11,31,58,0.1)" : "none" }}>
-                <span style={{ fontSize:"12px" }}>{m.icon}</span>{m.l}
-              </button>
-            ))}
+          {/* Heading — changes with mode instead of a tab bar, so "forgot password" reads
+              as a small recovery step tucked under normal login, not an equally-weighted
+              alternative way to sign in. */}
+          <div key={mode} className="login-fade-in" style={{ marginBottom:"22px", paddingTop:"14px", borderTop:"1px solid #EDE7E7" }}>
+            {mode === "password" ? (
+              <div style={{ fontSize:"15px", fontWeight:800, color:navy }}>ログイン / Đăng nhập</div>
+            ) : (
+              <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                <button type="button" onClick={() => { setMode("password"); setError(""); }}
+                  style={{ background:"#F1EEEE", border:"none", borderRadius:"8px", width:"30px", height:"30px", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:navy, flexShrink:0 }}
+                  aria-label="ログインに戻る">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                <div style={{ fontSize:"15px", fontWeight:800, color:navy }}>パスワードを再設定 / Đặt lại mật khẩu</div>
+              </div>
+            )}
           </div>
 
           {mode === "password" ? (
@@ -189,10 +199,10 @@ export default function MypageLogin() {
                 {loading ? "ログイン中..." : "ログインする"}
               </button>
 
-              <div style={{ marginTop:"16px" }}>
+              <div style={{ marginTop:"16px", textAlign:"center" }}>
                 <button type="button" className="login-text-link" onClick={() => { setMode("forgot"); setError(""); }}
-                  style={{ background:"none", border:"none", color:navy, fontSize:"14px", fontWeight:600, cursor:"pointer", padding:0 }}>
-                  パスワードをお忘れの方は<span style={{ textDecoration:"underline" }}>こちら</span>
+                  style={{ background:"none", border:"none", color:"#64748B", fontSize:"13px", fontWeight:600, cursor:"pointer", padding:0, textDecoration:"underline", textUnderlineOffset:"3px" }}>
+                  パスワードをお忘れですか？ / Quên mật khẩu?
                 </button>
               </div>
             </form>
@@ -243,13 +253,6 @@ export default function MypageLogin() {
                 style={{ width:"100%", padding:"15px", borderRadius:"9px", background: loading ? "#64748B" : red, color:"#fff", fontSize:"15px", fontWeight:700, border:"none", cursor: loading ? "not-allowed" : "pointer", letterSpacing:"0.06em" }}>
                 {loading ? "送信中..." : "再設定用リンクを送信"}
               </button>
-
-              <div style={{ marginTop:"16px" }}>
-                <button type="button" className="login-text-link" onClick={() => { setMode("password"); setError(""); }}
-                  style={{ background:"none", border:"none", color:"#64748B", fontSize:"13px", fontWeight:600, cursor:"pointer", padding:0 }}>
-                  ← パスワードでログインする
-                </button>
-              </div>
             </form>
           )}
 
