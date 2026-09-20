@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, verifyPassword } from "@/lib/mypageAuth";
+import { hashPassword, verifyPassword, getMypageCandidateId } from "@/lib/mypageAuth";
 
 export async function POST(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {

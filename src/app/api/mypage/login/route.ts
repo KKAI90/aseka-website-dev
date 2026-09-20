@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, dobToDefaultPassword, normalizeDigits } from "@/lib/mypageAuth";
+import { verifyPassword, dobToDefaultPassword, normalizeDigits, signMypageSessionToken } from "@/lib/mypageAuth";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Shared for both "no such email" and "wrong password" — those used to return distinct
 // messages ("アカウントが見つかりません" vs "パスワードが正しくありません"), which let
@@ -16,6 +17,13 @@ const BAD_CREDENTIALS = "メールアドレスまたはパスワードが正し�
 const DUMMY_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8dqLzKvUKEZ.KzP4S6QzzZC5.pPkP2";
 
 export async function POST(req: NextRequest) {
+  // 10 attempts / 15 min per IP. Matters more here than on the admin side — a first-login
+  // candidate's default password is their own date of birth (DDMMYYYY), a much smaller
+  // search space than a real password, so unlimited attempts would make that default
+  // meaningfully brute-forceable.
+  const limited = rateLimit(req, "mypage-login", { max: 10, windowMs: 15 * 60_000 });
+  if (limited) return limited;
+
   try {
     const { email, password, remember } = await req.json();
     if (!email || !password) {
@@ -51,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const res = NextResponse.json({ success: true, name: cand.name });
-    res.cookies.set("mypage-id", cand.id, {
+    res.cookies.set("mypage-id", signMypageSessionToken(cand.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

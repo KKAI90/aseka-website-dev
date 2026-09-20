@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getMypageCandidateId } from "@/lib/mypageAuth";
 
 const jlptRank: Record<string, number> = { N1: 1, N2: 2, N3: 3, N4: 4, N5: 5 };
 
 export async function GET(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const cand = await prisma.candidates.findUnique({

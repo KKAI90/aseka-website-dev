@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getMypageCandidateId } from "@/lib/mypageAuth";
 
 // candidates.status is stored inconsistently (Japanese labels like "新規"
 // for most rows, English keys like "new" for a few) — normalize to the
@@ -15,7 +16,7 @@ const STATUS_NORM: Record<string, string> = {
 const normStatus = (s: string | null | undefined): string => s ? (STATUS_NORM[s] ?? s) : "new";
 
 export async function GET(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const data = await prisma.candidates.findUnique({

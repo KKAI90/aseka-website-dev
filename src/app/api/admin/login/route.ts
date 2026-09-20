@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Same cost factor bcryptjs uses for real password hashes — compared against on every
 // "account not found" path below so that path takes about as long as a real bcrypt.compare,
@@ -11,6 +12,11 @@ import { signToken } from "@/lib/auth";
 const DUMMY_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8dqLzKvUKEZ.KzP4S6QzzZC5.pPkP2";
 
 export async function POST(req: NextRequest) {
+  // 10 attempts / 15 min per IP — generous for a real admin fumbling their password a few
+  // times, but closes unlimited brute-force against a small, high-value admin account pool.
+  const limited = rateLimit(req, "admin-login", { max: 10, windowMs: 15 * 60_000 });
+  if (limited) return limited;
+
   try {
     const { email, password } = await req.json();
 

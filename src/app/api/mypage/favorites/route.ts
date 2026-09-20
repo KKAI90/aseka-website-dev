@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getMypageCandidateId } from "@/lib/mypageAuth";
 
 export async function GET(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const favs = await prisma.mypage_favorites.findMany({
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
 
 // Toggle a job's favorite state for the logged-in candidate.
 export async function POST(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {

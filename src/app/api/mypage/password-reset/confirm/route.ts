@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, verifyPasswordResetToken } from "@/lib/mypageAuth";
+import { hashPassword, verifyPasswordResetToken, signMypageSessionToken } from "@/lib/mypageAuth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     // Log the candidate straight in — they just proved email ownership and set a fresh
     // password in the same action, no reason to make them type it again immediately after.
     const res = NextResponse.json({ success: true, name: cand.name });
-    res.cookies.set("mypage-id", cand.id, {
+    res.cookies.set("mypage-id", signMypageSessionToken(cand.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

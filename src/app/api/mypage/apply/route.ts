@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { transporter, mailerConfigured } from "@/lib/mailer";
+import { getMypageCandidateId } from "@/lib/mypageAuth";
 
 // Candidate applies to a job from mypage. Writes to the same
 // match_job_id / match_job_name fields the admin Candidates page reads
@@ -8,7 +9,7 @@ import { transporter, mailerConfigured } from "@/lib/mailer";
 // this is the single active "pipeline" job for the candidate, matching
 // the existing one-track-at-a-time recruiting model.
 export async function POST(req: NextRequest) {
-  const id = req.cookies.get("mypage-id")?.value;
+  const id = getMypageCandidateId(req);
   if (!id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {

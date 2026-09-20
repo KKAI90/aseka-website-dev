@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signPasswordResetToken } from "@/lib/mypageAuth";
 import { transporter, mailerConfigured } from "@/lib/mailer";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Always returns a generic success message regardless of whether the email
 // exists — avoids leaking which addresses are registered.
 const GENERIC_OK = { success: true, message: "パスワード再設定用リンクを送信しました（登録済みの場合）/ Đã gửi link đặt lại mật khẩu (nếu email đã đăng ký)" };
 
 export async function POST(req: NextRequest) {
+  // 5 / hour per IP — this endpoint sends a real email per call, so without a limit it's a
+  // ready-made way to spam-email any candidate (or flood Gmail's sending quota) by just
+  // repeatedly submitting their address.
+  const limited = rateLimit(req, "password-reset-request", { max: 5, windowMs: 60 * 60_000 });
+  if (limited) return limited;
+
   try {
     const { email } = await req.json();
     if (!email) return NextResponse.json({ error: "メールアドレスを入力してください / Nhập email" }, { status: 400 });

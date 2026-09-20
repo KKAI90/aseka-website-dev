@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, apiError } from "@/lib/adminAuth";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
   const auth = await requireAdmin(req);
@@ -67,6 +68,13 @@ export async function POST(req: NextRequest) {
   if (!isPublic) {
     const auth = await requireAdmin(req);
     if (auth instanceof NextResponse) return auth;
+  } else {
+    // Only the public dang-ky submission path needs this — an authenticated admin creating
+    // candidates through the admin UI isn't a spam/abuse vector the same way an anonymous
+    // public form is. 5 / hour per IP still comfortably covers one real person filling the
+    // form (including a retry after a mistake) while shutting down automated flooding.
+    const limited = rateLimit(req, "public-candidate-signup", { max: 5, windowMs: 60 * 60_000 });
+    if (limited) return limited;
   }
 
   try {
