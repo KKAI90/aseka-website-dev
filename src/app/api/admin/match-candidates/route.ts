@@ -142,6 +142,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ matches: [] });
   } catch (err) {
     console.error("match error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }

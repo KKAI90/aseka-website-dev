@@ -32,6 +32,6 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     console.error("password-reset confirm error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }

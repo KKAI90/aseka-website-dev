@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, company: job.company });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    console.error("mypage apply error:", err);
+    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }
 

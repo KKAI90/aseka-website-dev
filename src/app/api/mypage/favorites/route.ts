@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ favorited: true });
     }
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    console.error("mypage favorites error:", err);
+    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }

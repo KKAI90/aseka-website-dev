@@ -22,7 +22,6 @@ export async function GET(req: NextRequest) {
     };
     const norm = (s: string | null | undefined): string => s ? (STATUS_NORM[s] ?? s) : "new";
 
-    const rawStatuses = Array.from(new Set(candidates.map(c => c.status)));
     const cands = candidates.map(c => ({ ...c, status: norm(c.status), created_at: c.created_at.toISOString(), updated_at: c.updated_at.toISOString() }));
     const jobList = jobs.map(j => ({ ...j, created_at: j.created_at.toISOString(), updated_at: j.updated_at.toISOString() }));
     const msgs = messages.map(m => ({ ...m, created_at: m.created_at.toISOString() }));
@@ -147,10 +146,9 @@ export async function GET(req: NextRequest) {
       monthly: { cv: cvThisMonth, jobs: jobsThisMonth, offers: offersThisMonth },
       monthlyTrend, trendDeltas,
       generatedAt: now.toISOString(),
-      _debug: { rawStatuses },
     });
   } catch (err) {
     console.error("dashboard error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return NextResponse.json({ error: "サーバーエラーが発生しました" }, { status: 500 });
   }
 }

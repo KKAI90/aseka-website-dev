@@ -200,14 +200,29 @@ export default function DangKy() {
     if (step === 1 && (!form.photo_url || !form.id_front_url || !form.id_back_url)) {
       setError("Vui lòng tải lên đủ 3 ảnh bắt buộc (chân dung, mặt trước/sau giấy tờ)"); return;
     }
-    if (step === 2 && (!form.name.trim() || !form.name_kana.trim() || !form.email.trim() || !form.gender || !form.dob_year || !form.address.trim())) {
+    if (step === 2 && (!form.name.trim() || !form.name_kana.trim() || !form.email.trim() || !form.gender
+        // dob_year alone used to pass this gate while month/day stayed empty — submit()
+        // only builds `dob` when all three are present, so the candidate saw the "required"
+        // check pass yet date_of_birth reached the server blank (found via live audit).
+        || !form.dob_year || !form.dob_month || !form.dob_day || !form.address.trim())) {
       setError("Vui lòng điền đầy đủ các trường bắt buộc (*)"); return;
     }
     if (step === 3 && (!form.visa_type || !form.height_cm || !form.weight_kg || !form.skill)) {
       setError("Vui lòng điền đầy đủ các trường bắt buộc (*)"); return;
     }
     if (step === 4 && !form.jlpt) { setError("Vui lòng chọn trình độ tiếng Nhật"); return; }
-    if (step === 5 && !form.hs_name.trim()) { setError("Vui lòng nhập tên trường cấp 3"); return; }
+    if (step === 5 && (!form.hs_name.trim()
+        // 入学年月/卒業年月 both show a required (*) marker on their labels but were never
+        // actually enforced here — bring the gate in line with what the UI already promises.
+        || !form.hs_enroll_year || !form.hs_enroll_month || !form.hs_grad_year || !form.hs_grad_month)) {
+      setError("Vui lòng điền đầy đủ thông tin trường cấp 3 (tên trường, ngày nhập học, ngày tốt nghiệp)"); return;
+    }
+    if (step === 6 && (!workEntries[0]?.company.trim() || !workEntries[0]?.content.trim())) {
+      // Entry #1's company + content fields both show a required (*) marker but step 6
+      // previously had no gate at all — a candidate could skip the whole step and submit
+      // with zero work history.
+      setError("Vui lòng nhập ít nhất 1 kinh nghiệm làm việc (tên công ty, nội dung công việc)"); return;
+    }
     setError(""); setStep(s => s + 1);
   };
   const back = () => { setError(""); setStep(s => s - 1); };
