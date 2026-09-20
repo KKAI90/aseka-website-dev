@@ -113,6 +113,18 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
           every render of this modal (same bug class fixed earlier in admin/layout.tsx). */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
+          /* Browsers skip background colors/images when printing by default (saves ink) —
+             every navy sectionBar title strip (学歴, 職歴, 志望動機, 自己PR...) printed as
+             plain text with no bar at all. Most rows didn't visibly suffer since their own
+             table cells carry real borders, but 志望動機/自己PR's content box deliberately
+             omits borderTop and relies on the sectionBar's bottom edge sitting flush above
+             it — with the bar invisible, that box lost its entire top edge in the printed
+             output (reported live against a real exported PDF). Forcing exact color
+             printing here fixes it at the source, matching the on-screen preview exactly
+             instead of only patching around the one box that happened to expose it.
+             (border:none belt-and-suspenders fix below in case some print engine still
+             doesn't honor this.) */
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           /* visibility:hidden (the usual print-only-this-element trick) keeps every
              hidden element's layout box in the flow — it only stops painting. Since this
              modal is portalled to document.body, the whole rest of the admin app (sidebar,
@@ -257,13 +269,19 @@ function CVModal({ candidate, fileUrls, loading, onClose, t }:
           </table>
 
           <div style={sectionBar}>{t("candidates.motivationTitle")}</div>
-          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.motivation||t("candidates.noEntry")}</div>
+          {/* border (not borderTop:"none") — this box used to rely on the navy sectionBar
+              above it for its own top edge, which disappeared when printed (browsers skip
+              background colors by default) and left the box looking cut open at the top in
+              exported PDFs. A self-contained border doesn't depend on that. */}
+          <div style={{border:"1px solid #C9C6BB",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.motivation||t("candidates.noEntry")}</div>
 
           <div style={sectionBar}>{t("candidates.selfPrTitle")}</div>
-          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.self_pr||t("candidates.noEntry")}</div>
+          <div style={{border:"1px solid #C9C6BB",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"48px",marginBottom:"14px",whiteSpace:"pre-wrap"}}>{candidate.self_pr||t("candidates.noEntry")}</div>
 
           <div style={sectionBar}>{t("candidates.requestField")}</div>
-          <div style={{border:"1px solid #C9C6BB",borderTop:"none",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"36px",marginBottom:"4px"}}>{candidate.preferred_location||t("candidates.noEntry")}</div>
+          {/* Same fix as motivation/self_pr above — self-contained border instead of
+              relying on the sectionBar's (print-invisible) bottom edge. */}
+          <div style={{border:"1px solid #C9C6BB",padding:"10px",fontSize:"12px",lineHeight:1.8,minHeight:"36px",marginBottom:"4px"}}>{candidate.preferred_location||t("candidates.noEntry")}</div>
         </div>
 
         {/* ─ Page 2: attached ID / certificate images ─ */}
