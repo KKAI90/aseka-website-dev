@@ -140,7 +140,17 @@ function FileUpload({ ja, vn, required, fieldKey, value, onUploaded }: {
       const d = await res.json();
       if (!res.ok) {
         setStatus("error");
-        setErrMsg(d.error === "upload_not_configured" ? "Tính năng tải file đang được thiết lập, vui lòng thử lại sau." : "Tải file thất bại, thử lại.");
+        // The server converts iPhone/iPad HEIC photos to JPEG automatically — this only
+        // fires if that conversion itself failed (a genuinely corrupt/unusual file), not
+        // for HEIC as such, so the message points at a concrete next step rather than
+        // just "try again" for what's likely a one-off bad file.
+        setErrMsg(
+          d.error === "upload_not_configured" ? "Tính năng tải file đang được thiết lập, vui lòng thử lại sau."
+          : d.error === "heic_conversion_failed" ? "Không đọc được file ảnh này. Vui lòng chụp ảnh mới hoặc chọn ảnh khác."
+          : d.error === "Unsupported file type" ? "Định dạng file không được hỗ trợ. Vui lòng chọn ảnh JPG/PNG hoặc PDF."
+          : (typeof d.error === "string" && d.error.includes("File too large")) ? "File quá lớn (tối đa 15MB). Vui lòng chọn ảnh có dung lượng nhỏ hơn."
+          : "Tải file thất bại, thử lại."
+        );
         return;
       }
       onUploaded(d.key);
@@ -158,11 +168,14 @@ function FileUpload({ ja, vn, required, fieldKey, value, onUploaded }: {
         border:`1.5px dashed ${status==="error"?"#C8002A":status==="done"?"#27500A":"rgba(11,31,58,0.25)"}`,
         background: status==="done" ? "#EAF3DE" : "#F9FAFB", cursor:"pointer",
       }}>
-        <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" style={{ display:"none" }}
+        {/* image/heic + image/heif included so iOS's own file/photo picker doesn't filter
+            out a candidate's existing camera-roll photos — iPhone/iPad save those in HEIC
+            by default, and the server converts them to JPEG automatically (see s3.ts). */}
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" style={{ display:"none" }}
           onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         <span style={{ fontSize:"16px" }}>{status==="uploading" ? "⏳" : status==="done" ? "✅" : status==="error" ? "⚠️" : "📤"}</span>
         <span style={{ fontSize:"12px", color: status==="done" ? "#27500A" : navy, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-          {status==="uploading" ? "Đang tải lên..." : status==="done" ? fileName || "Đã tải lên" : status==="error" ? errMsg : "Bấm để chọn file (JPG/PNG/PDF, tối đa 15MB)"}
+          {status==="uploading" ? "Đang tải lên..." : status==="done" ? fileName || "Đã tải lên" : status==="error" ? errMsg : "Bấm để chọn ảnh hoặc chụp ảnh mới (tối đa 15MB)"}
         </span>
       </label>
     </div>
