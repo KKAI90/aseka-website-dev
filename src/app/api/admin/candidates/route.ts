@@ -4,7 +4,7 @@ import { requireAdmin, apiError } from "@/lib/adminAuth";
 import { rateLimit } from "@/lib/rateLimit";
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(req.url);
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const isPublic = searchParams.get("public") === "1";
   if (!isPublic) {
-    const auth = await requireAdmin(req);
+    const auth = await requireAdmin(req, ["superadmin"]);
     if (auth instanceof NextResponse) return auth;
   } else {
     // Only the public dang-ky submission path needs this — an authenticated admin creating
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   try {
@@ -160,7 +160,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const id = new URL(req.url).searchParams.get("id");

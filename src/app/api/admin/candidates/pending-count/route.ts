@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 // Lightweight count for the sidebar badge — how many candidates self-applied
 // via mypage and haven't been marked reviewed by staff yet.
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const count = await prisma.candidates.count({

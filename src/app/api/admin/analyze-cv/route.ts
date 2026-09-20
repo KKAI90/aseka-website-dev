@@ -116,7 +116,7 @@ async function matchJobs(candidate: Record<string, unknown>) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   try {

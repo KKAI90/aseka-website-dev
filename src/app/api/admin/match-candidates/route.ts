@@ -80,7 +80,7 @@ const PRIORITY_INSTRUCTION =
   "つまり日本語レベルの適合を最も重視し、次に実務経験、その次に業種一致、内容(職務内容/希望との一致)は最後の判断材料としてください。";
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   try {

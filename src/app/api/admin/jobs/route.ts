@@ -37,7 +37,7 @@ function translateInBackground(jobId: string, data: Record<string, unknown>) {
 }
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(req.url);
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   try {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   try {
@@ -97,7 +97,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const id = new URL(req.url).searchParams.get("id");

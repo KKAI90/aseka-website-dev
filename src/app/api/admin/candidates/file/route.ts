@@ -12,7 +12,7 @@ const ALLOWED_FIELDS = new Set([
 // key/URL directly, since these are ID scans and portraits. Looks the key up from the DB
 // by candidate id rather than trusting a raw key from the client.
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin(req);
+  const auth = await requireAdmin(req, ["superadmin"]);
   if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(req.url);
