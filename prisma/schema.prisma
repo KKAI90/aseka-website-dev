@@ -68,6 +68,24 @@ model mypage_favorites {
   @@unique([candidate_id, job_id])
 }
 
+// Admin override on the auto-computed mypage job recommendation list for one candidate.
+// "include" forces a job into that candidate's list regardless of match score; "exclude"
+// hides it regardless of score — e.g. staff judges a job unsuitable for reasons the scoring
+// formula (JLPT/industry/preferred-position text match) can't see. One row per
+// (candidate, job) pair — a job can't be both included and excluded at once, so setting a
+// new type on an existing pair just overwrites it rather than needing two tables.
+model mypage_job_overrides {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  candidate_id String   @db.Uuid
+  job_id       String   @db.Uuid
+  type         String   // "include" | "exclude"
+  note         String?
+  created_by   String?
+  created_at   DateTime @default(now())
+
+  @@unique([candidate_id, job_id])
+}
+
 model job_listings {
   id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   company           String?

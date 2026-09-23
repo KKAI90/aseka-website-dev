@@ -13,6 +13,22 @@ type Work = { year:string; month:string; company:string; position:string; event:
 type Cert = { year:string; month:string; name:string; result:string };
 type MatchBreakdown = { criterion:string; score:number; noteVn:string };
 type Job  = { id:string; company:string; position_ja:string; position_vn:string; industry:string; jlpt_min:string; salary:string; location:string; status:string; score:number; matchPct:number; reasons:string[]; breakdown?:MatchBreakdown[] };
+// Shape returned by /api/admin/mypage-preview — mirrors computeMypageJobList() in
+// src/lib/mypageJobMatching.ts exactly, since that's the real algorithm actually driving
+// what a candidate sees on their own mypage (not the separate Groq-judged `Job`/matchPct
+// type above, which is a different tool entirely).
+type MypageScoredJob = {
+  id:string; company:string; position_ja:string; position_vn:string; industry:string;
+  jlpt_min:string; status:string; location:string; salary:string; annual_income:string;
+  matchScore:number;
+  scoreBreakdown:{ jlpt:number; industry:number; preferredPosition:number; urgent:number };
+  isNew:boolean; isFavorite:boolean; isApplied:boolean;
+  overrideType:"include"|"exclude"|null;
+};
+type MypagePreview = {
+  shownJobs:MypageScoredJob[]; notShownJobs:MypageScoredJob[];
+  candidateSummary:{ skill:string|null; jlpt:string|null; preferred_job:string|null };
+};
 
 type Candidate = {
   id:string; name:string; name_kana:string; email:string; phone:string;
@@ -330,7 +346,7 @@ export default function CandidatesPage() {
   const [cands, setCands] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Candidate|null>(null);
-  const [detailTab, setDetailTab] = useState<"basic"|"history"|"pr"|"match">("basic");
+  const [detailTab, setDetailTab] = useState<"basic"|"history"|"pr"|"match"|"mypage">("basic");
   const [filter, setFilter] = useState("all");
   const [pendingAppliesOnly, setPendingAppliesOnly] = useState(false);
   const [search, setSearch] = useState("");
@@ -359,6 +375,10 @@ export default function CandidatesPage() {
   const [matchResults, setMatchResults] = useState<Job[]>([]);
   const [matching, setMatching] = useState(false);
   const [matchError, setMatchError] = useState<string|null>(null);
+  const [mypagePreview, setMypagePreview] = useState<MypagePreview|null>(null);
+  const [mypagePreviewLoading, setMypagePreviewLoading] = useState(false);
+  const [mypageAddSearch, setMypageAddSearch] = useState("");
+  const [mypageOverrideBusyId, setMypageOverrideBusyId] = useState<string|null>(null);
   const [retryCountdown, setRetryCountdown] = useState(0);
   const [showFormPopup, setShowFormPopup] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -547,6 +567,33 @@ export default function CandidatesPage() {
       setMatchError(d.error||null);
     } catch { setMatchResults([]); setMatchError("failed"); }
     setMatching(false);
+  };
+
+  const loadMypagePreview = async (candidateId: string) => {
+    setMypagePreviewLoading(true);
+    try {
+      const res = await fetch(`/api/admin/mypage-preview?candidateId=${candidateId}`);
+      const d = await res.json();
+      setMypagePreview(res.ok ? (d as MypagePreview) : null);
+    } catch { setMypagePreview(null); }
+    setMypagePreviewLoading(false);
+  };
+
+  const setMypageJobOverride = async (candidateId: string, jobId: string, type: "include"|"exclude") => {
+    setMypageOverrideBusyId(jobId);
+    await fetch("/api/admin/mypage-job-override", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ candidateId, jobId, type }),
+    });
+    await loadMypagePreview(candidateId);
+    setMypageOverrideBusyId(null);
+  };
+
+  const clearMypageJobOverride = async (candidateId: string, jobId: string) => {
+    setMypageOverrideBusyId(jobId);
+    await fetch(`/api/admin/mypage-job-override?candidateId=${candidateId}&jobId=${jobId}`, { method: "DELETE" });
+    await loadMypagePreview(candidateId);
+    setMypageOverrideBusyId(null);
   };
 
   const applyJobToCandidate = async (cand: Candidate, job: Job) => {
@@ -1046,8 +1093,8 @@ export default function CandidatesPage() {
 
               {/* Tabs */}
               <div style={{display:"flex",borderBottom:"0.5px solid rgba(11,31,58,0.08)"}}>
-                {[{k:"basic",lk:"candidates.tabBasic"},{k:"history",lk:"candidates.tabHistory"},{k:"pr",lk:"candidates.tabPr"},{k:"match",lk:"candidates.tabMatch"}].map(tb=>(
-                  <button key={tb.k} onClick={()=>setDetailTab(tb.k as "basic"|"history"|"pr"|"match")} style={{flex:1,padding:"8px 4px",fontSize:"11px",fontWeight:detailTab===tb.k?700:400,color:detailTab===tb.k?navy:"#52525B",border:"none",background:detailTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
+                {[{k:"basic",lk:"candidates.tabBasic"},{k:"history",lk:"candidates.tabHistory"},{k:"pr",lk:"candidates.tabPr"},{k:"match",lk:"candidates.tabMatch"},{k:"mypage",lk:"candidates.tabMypage"}].map(tb=>(
+                  <button key={tb.k} onClick={()=>{ const k=tb.k as "basic"|"history"|"pr"|"match"|"mypage"; setDetailTab(k); if (k==="mypage") loadMypagePreview(selected.id); }} style={{flex:1,padding:"8px 4px",fontSize:"11px",fontWeight:detailTab===tb.k?700:400,color:detailTab===tb.k?navy:"#52525B",border:"none",background:detailTab===tb.k?"#fff":"#F6F7F9",borderBottom:`2px solid ${detailTab===tb.k?navy:"transparent"}`,cursor:"pointer"}}>
                     {t(tb.lk)}
                   </button>
                 ))}
@@ -1300,6 +1347,100 @@ export default function CandidatesPage() {
                       </div>
                       );
                     })}
+                  </div>
+                )}
+
+                {/* Mypage preview tab — shows the exact list this candidate currently sees
+                   on their own mypage (computeMypageJobList(), same function the real
+                   /api/mypage/jobs route calls), not a separate AI-guessed approximation. */}
+                {detailTab==="mypage"&&(
+                  <div>
+                    {mypagePreviewLoading && <div style={{textAlign:"center",padding:"20px",color:"#52525B",fontSize:"12px"}}>{t("common.loading")}</div>}
+                    {!mypagePreviewLoading && !mypagePreview && (
+                      <div style={{textAlign:"center",padding:"20px",color:"#52525B",fontSize:"12px"}}>{t("jobs.matchFailed")}</div>
+                    )}
+                    {!mypagePreviewLoading && mypagePreview && (
+                      <>
+                        <div style={{fontSize:"10px",color:"#52525B",marginBottom:"10px",lineHeight:1.6}}>{t("candidates.mypageShownDesc")}</div>
+
+                        {mypagePreview.shownJobs.map(job => {
+                          const busy = mypageOverrideBusyId === job.id;
+                          return (
+                            <div key={job.id} className="match-card" style={{...B,borderRadius:"9px",padding:"10px",marginBottom:"8px",background: job.overrideType==="include" ? "#EAF3DE" : job.isApplied ? "#F0F7FF" : "#fff"}}>
+                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"6px"}}>
+                                <div onClick={()=>router.push(`/admin/jobs?id=${job.id}`)} style={{cursor:"pointer"}} title={t("jobs.viewJobDetail")}>
+                                  <div className="match-name-link" style={{fontSize:"12px",fontWeight:700,color:navy,textDecoration:"underline",textDecorationColor:"transparent",transition:"text-decoration-color 0.15s"}}>{job.company} →</div>
+                                  <div style={{fontSize:"11px",color:"#52525B"}}>{job.position_vn||job.position_ja} · {job.location}</div>
+                                </div>
+                                <div style={{textAlign:"right",flexShrink:0}}>
+                                  <div style={{fontSize:"16px",fontWeight:700,color:navy}}>{job.matchScore}{t("candidates.pts")}</div>
+                                  {job.isApplied && <div style={{fontSize:"9px",fontWeight:700,color:"#0C447C"}}>{t("candidates.appliedTo")}</div>}
+                                  {job.overrideType==="include" && <div style={{fontSize:"9px",fontWeight:700,color:"#27500A"}}>{t("candidates.manuallyAdded")}</div>}
+                                </div>
+                              </div>
+
+                              <div style={{display:"flex",flexDirection:"column",gap:"4px",marginBottom:"8px",background:"#FAFBFC",borderRadius:"7px",padding:"7px 9px",border:"0.5px solid rgba(11,31,58,0.06)"}}>
+                                {[
+                                  {lk:"candidates.scoreJlpt", v:job.scoreBreakdown.jlpt, max:40},
+                                  {lk:"candidates.scoreIndustry", v:job.scoreBreakdown.industry, max:40},
+                                  {lk:"candidates.scorePosition", v:job.scoreBreakdown.preferredPosition, max:20},
+                                  {lk:"candidates.scoreUrgent", v:job.scoreBreakdown.urgent, max:5},
+                                ].map(row=>(
+                                  <div key={row.lk} style={{display:"flex",alignItems:"center",gap:"6px"}}>
+                                    <span style={{fontSize:"10px",fontWeight:600,color:navy,width:"46px",flexShrink:0}}>{t(row.lk)}</span>
+                                    <div style={{flex:1,background:"#EEF0F3",borderRadius:"3px",height:"4px",overflow:"hidden"}}>
+                                      <div style={{height:"100%",width:`${row.max?(row.v/row.max)*100:0}%`,background:row.v>0?"#27500A":"#D1D5DB",borderRadius:"3px"}}/>
+                                    </div>
+                                    <span style={{fontSize:"10px",fontWeight:700,color:navy,width:"24px",textAlign:"right",flexShrink:0}}>+{row.v}</span>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div style={{display:"flex",gap:"6px"}}>
+                                {!job.isApplied && (
+                                  <button onClick={()=>setMypageJobOverride(selected.id, job.id, "exclude")} disabled={busy}
+                                    style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,cursor:busy?"wait":"pointer",background:"#FCEBEB",color:"#A32D2D",border:"0.5px solid #F09595"}}>
+                                    {busy ? "..." : `✕ ${t("candidates.hideFromMypage")}`}
+                                  </button>
+                                )}
+                                {job.overrideType && (
+                                  <button onClick={()=>clearMypageJobOverride(selected.id, job.id)} disabled={busy}
+                                    style={{flex:1,padding:"6px",borderRadius:"6px",fontSize:"11px",fontWeight:600,cursor:busy?"wait":"pointer",background:"#fff",color:navy,border:"1px solid rgba(11,31,58,0.2)"}}>
+                                    {busy ? "..." : t("candidates.clearOverride")}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        <div style={{marginTop:"14px",paddingTop:"12px",borderTop:"0.5px solid rgba(11,31,58,0.08)"}}>
+                          <div style={{fontSize:"11px",fontWeight:700,color:navy,marginBottom:"8px"}}>{t("candidates.addJobToMypage")}</div>
+                          <input value={mypageAddSearch} onChange={e=>setMypageAddSearch(e.target.value)} placeholder={t("candidates.searchJobPlaceholder")}
+                            style={{width:"100%",padding:"7px 10px",borderRadius:"7px",border:"0.5px solid rgba(11,31,58,0.2)",fontSize:"12px",outline:"none",marginBottom:"8px",boxSizing:"border-box"}}/>
+                          {(() => {
+                            const q = mypageAddSearch.trim().toLowerCase();
+                            const filtered = mypagePreview.notShownJobs.filter(j => !q || `${j.company} ${j.position_ja} ${j.position_vn}`.toLowerCase().includes(q)).slice(0, 20);
+                            if (filtered.length === 0) return <div style={{fontSize:"11px",color:"#52525B",textAlign:"center",padding:"10px"}}>{t("candidates.noOtherJobs")}</div>;
+                            return filtered.map(job => {
+                              const busy = mypageOverrideBusyId === job.id;
+                              return (
+                                <div key={job.id} style={{display:"flex",alignItems:"center",gap:"8px",padding:"6px 0",borderBottom:"0.5px solid rgba(11,31,58,0.05)"}}>
+                                  <div style={{flex:1,minWidth:0}}>
+                                    <div style={{fontSize:"11px",fontWeight:600,color:navy,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{job.company}</div>
+                                    <div style={{fontSize:"10px",color:"#52525B"}}>{job.position_ja} · {job.matchScore}{t("candidates.pts")}</div>
+                                  </div>
+                                  <button onClick={()=>setMypageJobOverride(selected.id, job.id, "include")} disabled={busy}
+                                    style={{padding:"5px 10px",borderRadius:"6px",fontSize:"11px",fontWeight:700,cursor:busy?"wait":"pointer",background:navy,color:"#fff",border:"none",whiteSpace:"nowrap",flexShrink:0}}>
+                                    {busy ? "..." : `+ ${t("candidates.addBtn")}`}
+                                  </button>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
